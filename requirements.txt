@@ -1,0 +1,17 @@
+ 
+# TroGen_V Dependencies
+# Python 3.8+
+
+# Core functionality
+vcdvcd>=2.3.0
+matplotlib>=3.5.0
+numpy>=1.21.0
+
+# Development tools
+pytest>=7.0.0
+black>=22.0.0
+flake8>=4.0.0
+
+# Documentation
+sphinx>=4.0.0
+sphinx-rtd-theme>=1.0.0
