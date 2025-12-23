@@ -1,5 +1,5 @@
 """
-TroGen_V: Automated Hardware Trojan Generation for RISC-V
+RV-TroGen: Automated Hardware Trojan Generation for RISC-V
 """
 
 __version__ = "1.0.0"

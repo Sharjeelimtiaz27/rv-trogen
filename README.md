@@ -1,4 +1,4 @@
- 🔧 TroGen\_V
+ 🔧 RV\-TroGen
 
 
 
@@ -22,7 +22,7 @@
 
 
 
-TroGen\_V is an automated framework for generating and validating hardware Trojans in RISC-V processor designs. Based on Trust-Hub taxonomy, it systematically identifies insertion points, generates Trojan code, and validates detection through simulation.
+RV\-TroGen is an automated framework for generating and validating hardware Trojans in RISC-V processor designs. Based on Trust-Hub taxonomy, it systematically identifies insertion points, generates Trojan code, and validates detection through simulation.
 
 
 
@@ -58,9 +58,9 @@ TroGen\_V is an automated framework for generating and validating hardware Troja
 
 \# Clone repository
 
-git clone https://github.com/YOUR\_USERNAME/TroGen\_V.git
+git clone https://github.com/YOUR\_USERNAME/RV\-TroGen.git
 
-cd TroGen\_V
+cd RV\-TroGen
 
 
 
@@ -102,7 +102,7 @@ See \[Quick Start Guide](docs/QUICK\_START.md) for detailed instructions.
 
 ```
 
-TroGen\_V/
+RV\-TroGen/
 
 ├── src/                    # Source code
 
@@ -346,19 +346,19 @@ This project is licensed under the MIT License - see \[LICENSE](LICENSE) file fo
 
 
 
-If you use TroGen\_V in your research, please cite:
+If you use RV\-TroGen in your research, please cite:
 
 ```bibtex
 
-@software{TroGen\_V2026,
+@software{RV\-TroGen2026,
 
-&nbsp; title = {TroGen\_V: Automated Hardware Trojan Generation for RISC-V},
+&nbsp; title = {RV\-TroGen: Automated Hardware Trojan Generation for RISC-V},
 
 &nbsp; author = {Sharjeel Imtiaz},
 
 &nbsp; year = {2026},
 
-&nbsp; url = {https://github.com/Sharjeelimtiaz27/TroGen\_V}
+&nbsp; url = {https://github.com/Sharjeelimtiaz27/RV\-TroGen}
 
 }
 
