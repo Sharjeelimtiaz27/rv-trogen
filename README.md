@@ -1,429 +1,337 @@
- 🔧 RV\-TroGen
+# 🔧 RV-TroGen
+
+**RTL-Level Hardware Trojan Generation for RISC-V Processors**
 
 
 
-\*\*Automated Hardware Trojan Generation and Validation for RISC-V Processors\*\*
+## 📖 What is RV-TroGen?
 
+RV-TroGen automatically generates hardware Trojans for RISC-V processors to help you:
+- **Test security assertions** in your processor designs
+- **Validate detection tools** with real Trojan examples
+- **Research hardware security** with systematic Trojan generation
 
-
-
----
-
-
-
-\## 📖 Overview
-
-
-
-RV\-TroGen is an automated framework for generating and validating hardware Trojans in RISC-V processor designs. Based on Trust-Hub taxonomy, it systematically identifies insertion points, generates Trojan code, and validates detection through simulation.
-
-
-
-\### Key Features
-
-
-
-✅ \*\*Automated RTL Parsing\*\* - Supports Verilog and SystemVerilog  
-
-✅ \*\*6 Trust-Hub Trojan Categories\*\* - DoS, Leak, Privilege, Integrity, Availability, Covert  
-
-✅ \*\*Multi-Processor Support\*\* - Ibex, CVA6, RSD, and more  
-
-✅ \*\*Automated Validation\*\* - QuestaSim integration with VCD comparison  
-
-✅ \*\*Professional Reports\*\* - HTML reports with signal visualizations  
-
-✅ \*\*One-Click Workflow\*\* - Complete automation from parsing to validation  
-
-
+**Key Difference from TrojanForge:** We work at RTL-level (not gate-level) using pattern-based generation (not ML) for assertion validation (not detector evasion).
 
 ---
 
+## 🚀 Quick Start (5 Minutes)
 
-
-\## 🚀 Quick Start
-
-
-
-\### Installation
-
+### **Step 1: Install**
 ```bash
+# Clone repository
+git clone https://github.com/sharjeelimtiaz27/rv-trogen.git
+cd rv-trogen
 
-\# Clone repository
+# Install package
+python -m pip install -e .
 
-git clone https://github.com/YOUR\_USERNAME/RV\-TroGen.git
-
-cd RV\-TroGen
-
-
-
-\# Install package
-
-pip install -e .
-
+# Verify installation
+python -c "from src.parser import RTLParser; print('✅ Installed successfully!')"
 ```
 
-
-
-\### Basic Usage
-
+### **Step 2: Parse Your First Module**
 ```bash
-
-\# Generate Trojans for a module
-
-python scripts/generate\_trojans.py examples/ibex/original/ibex\_csr.sv
-
-
-
-\# View generated Trojans
-
-ls examples/ibex/generated\_trojans/
-
+# Parse a RISC-V module
+python -m src/parser/rtl_parser.py examples/ibex/original/ibex_cs_registers.sv
 ```
 
+**Output:**
+```
+🔍 Parsing: ibex_cs_registers.sv
 
+============================================================
+Module: ibex_cs_registers
+Type: Sequential
+Inputs:    15
+Outputs:   8
+Has Clock: True
+Has Reset: True
+============================================================
+```
 
-See \[Quick Start Guide](docs/QUICK\_START.md) for detailed instructions.
+### **Step 3: Parse Multiple Modules**
+```bash
+# Parse all modules in a directory
+python -m scripts/batch_parse.py --dir examples/ibex/original
 
+# Parse security-critical modules only
+python -m scripts/batch_parse.py --dir examples/ibex/original --security-only
 
+# Rank modules by security importance
+python -m scripts/parse_and_rank.py examples/ibex/original --top 5
+```
+
+### **Step 4: Generate Trojans** (Coming in Week 2)
+```bash
+# Generate Trojans for a module (Week 2)
+python -m src/generator/trojan_generator.py examples/ibex/original/ibex_cs_registers.sv
+```
 
 ---
 
----
+## 📦 What's Currently Working
 
-## 📦 Parser Details
+### ✅ **Parser Module (Week 1 - COMPLETE)**
 
-### Modular Architecture
-
-RV-TroGen uses a 3-component parser:
+**Parse any Verilog/SystemVerilog file:**
 ```python
 from src.parser import RTLParser
 
-# Parse any Verilog/SystemVerilog file
+# Parse a module
 parser = RTLParser('your_module.sv')
 module = parser.parse()
 
-# Access module information
+# Access information
 print(f"Module: {module.name}")
-print(f"Type: {module.is_sequential}")
+print(f"Type: {'Sequential' if module.is_sequential else 'Combinational'}")
 print(f"Inputs: {len(module.inputs)}")
-print(f"Outputs: {len(module.outputs)}")
+print(f"Clock: {module.clock_signal}")
 ```
 
-**Components:**
-- **SignalExtractor** - Extracts inputs, outputs, internals
-- **ModuleClassifier** - Determines sequential vs combinational
-- **RTLParser** - Main orchestrator
+**Features:**
+- ✅ Extracts all signals (inputs, outputs, internals)
+- ✅ Classifies sequential vs combinational
+- ✅ Detects clock and reset signals
+- ✅ Handles vectors and multi-bit signals
+- ✅ Batch processing for multiple files
+- ✅ Security-critical module identification
 
-See [Parser Architecture](docs/parser/PARSER_ARCHITECTURE.md) for details.
+**Test Coverage:** 74% (19/19 tests passing)
+
+### 🚧 **Generator Module (Week 2 - IN PROGRESS)**
+
+- Pattern library (6 Trust-Hub patterns)
+- Signal matching
+- Trojan code generation
+- **Being refactored in Steps 7-9**
+
+### ⏸️ **Validator Module (Week 3 - PLANNED)**
+
+- QuestaSim integration
+- VCD comparison
+- Signal analysis
+- HTML reports
 
 ---
 
+## 📚 Documentation
 
+### **For Beginners:**
+- [Quick Start Guide](docs/QUICK_START.md) - Step-by-step tutorial
+- [Step-by-Step Progress Guide](docs/STEP_GUIDE.md) - What we've done so far
+- [Usage Examples](examples/parser_usage.py) - Working code examples
 
-\## 📁 Project Structure
-
-```
-
-RV\-TroGen/
-
-├── src/                    # Source code
-
-│   ├── parser/            # RTL parser
-
-│   ├── patterns/          # Trust-Hub patterns
-
-│   ├── generator/         # Trojan generator
-
-│   └── validator/         # Validation framework
-
-├── examples/              # Working examples
-
-│   ├── ibex/             # Ibex RISC-V processor
-
-│   ├── cva6/             # CVA6 processor
-
-│   └── rsd/              # RSD out-of-order processor
-
-├── docs/                  # Documentation
-
-├── scripts/               # Automation scripts
-
-└── tests/                 # Unit tests
-
-```
-
-
+### **For Advanced Users:**
+- [Parser Architecture](docs/parser/PARSER_ARCHITECTURE.md) - Technical details
+- [Trust-Hub Patterns](docs/TRUST_HUB_PATTERNS.md) - Trojan taxonomy
+- [System Architecture](docs/ARCHITECTURE.md) - Overall design
 
 ---
 
+## 🛠️ Current Capabilities
 
-
-\## 🎯 Trust-Hub Trojan Categories
-
-
-
-| Category | Description | Trust-Hub Source | Targets |
-
-|----------|-------------|------------------|---------|
-
-| \*\*DoS\*\* | Denial of Service | AES-T1400 | enable, valid, ready signals |
-
-| \*\*Leak\*\* | Information Leakage | RSA-T600 | key, secret, data signals |
-
-| \*\*Privilege\*\* | Privilege Escalation | Custom RISC-V | mode, priv, level signals |
-
-| \*\*Integrity\*\* | Data Corruption | AES-T800 | data, result signals |
-
-| \*\*Availability\*\* | Performance Degradation | Custom | delay, stall signals |
-
-| \*\*Covert\*\* | Covert Channel | Custom | debug, test signals |
-
-
-
-See \[Trust-Hub Patterns](docs/TRUST\_HUB\_PATTERNS.md) for details.
-
-
-
----
-
-
-
-\## 📊 Example Output
-
+### **Command-Line Tools:**
 ```bash
+# 1. Parse single module
+python src/parser/rtl_parser.py <module.sv>
 
-$ python scripts/generate\_trojans.py examples/ibex/original/ibex\_csr.sv
+# 2. Batch parse directory
+python scripts/batch_parse.py --dir <directory>
 
+# 3. Find security-critical modules
+python scripts/batch_parse.py --dir <directory> --security-only
 
+# 4. Rank by security importance
+python scripts/parse_and_rank.py <directory> --top 10
 
-🔍 Processing: ibex\_csr.sv
+# 5. Save results to JSON
+python scripts/batch_parse.py --dir <directory> --save-json
 
-📊 Found 4 candidates
+# 6. Run tests
+python -m pytest tests/ -v
 
-
-
-⚙️  Generating Trojan code...
-
-
-
-&nbsp; ✓ T1: Privilege → T1\_ibex\_csr\_Privilege.sv
-
-&nbsp; ✓ T2: DoS → T2\_ibex\_csr\_DoS.sv
-
-&nbsp; ✓ T3: Leak → T3\_ibex\_csr\_Leak.sv
-
-&nbsp; ✓ T4: Integrity → T4\_ibex\_csr\_Integrity.sv
-
-
-
-✅ Complete! Generated 4 Trojans
-
+# 7. Check coverage
+python -m pytest --cov=src/parser tests/
 ```
-
-
 
 ---
 
+## 📊 Project Status
 
+**Current Phase:** Week 1 Complete, Week 2 Starting
+```
+✅ Week 1: Parser Refactor (Steps 1-6) - COMPLETE
+   ├── ✅ Directory structure
+   ├── ✅ Python package setup
+   ├── ✅ Documentation framework
+   ├── ✅ Parser refactored (3 modules)
+   ├── ✅ 19 unit tests (100% passing)
+   └── ✅ Batch processing tools
 
-\## 🛠️ Workflow
+🚧 Week 2: Generator Refactor (Steps 7-13) - IN PROGRESS
+   ├── ⏸️ Pattern library split (6 files)
+   ├── ⏸️ Generator split (seq/comb)
+   ├── ⏸️ Trojan templates (12 files)
+   └── ⏸️ Examples reorganization
 
+⏸️ Week 3: Validator (Steps 14-19) - PLANNED
+
+⏸️ Week 4: Polish & Release (Steps 20-30) - PLANNED
 ```
 
-Input RTL → Parse Module → Pattern Match → Generate Trojans → 
-
-Manual Insert → Compile → Simulate → VCD Compare → HTML Report
-
-```
-
-
-
-See \[Architecture](docs/ARCHITECTURE.md) for detailed workflow.
-
-
+**Progress:** 6/30 steps (20%)
 
 ---
 
-
-
-\## 📚 Documentation
-
-
-
-\- \[Quick Start Guide](docs/QUICK\_START.md)
-
-\- \[Trust-Hub Patterns](docs/TRUST\_HUB\_PATTERNS.md)
-
-\- \[Architecture](docs/ARCHITECTURE.md)
-
-\- \[Ibex Tutorial](docs/examples/ibex\_tutorial.md)
-
-\- \[CVA6 Tutorial](docs/examples/cva6\_tutorial.md)
-
-
-
----
-
-
-
-\## 🧪 Testing
-
+## 🧪 Testing
 ```bash
+# Run all tests
+python -m pytest tests/ -v
 
-\# Run all tests
+# Expected output:
+# =================== 19 passed in 0.52s ===================
 
-pytest tests/
+# Run with coverage
+python -m pytest --cov=src/parser tests/
 
-
-
-\# Run specific test
-
-pytest tests/test\_parser.py
-
-
-
-\# With coverage
-
-pytest --cov=src tests/
-
+# Expected coverage:
+# TOTAL: 74%
 ```
 
+---
 
+## 📁 Project Structure
+```
+rv-trogen/
+├── src/
+│   ├── parser/              ✅ COMPLETE (Week 1)
+│   │   ├── rtl_parser.py    # Main parser
+│   │   ├── signal_extractor.py
+│   │   └── module_classifier.py
+│   ├── patterns/            🚧 IN PROGRESS (Week 2)
+│   ├── generator/           🚧 IN PROGRESS (Week 2)
+│   └── validator/           ⏸️ PLANNED (Week 3)
+├── docs/
+│   ├── QUICK_START.md       ✅ Beginner guide
+│   ├── STEP_GUIDE.md        ✅ Progress tracking
+│   └── parser/              ✅ Technical docs
+├── scripts/
+│   ├── batch_parse.py       ✅ Batch processing
+│   └── parse_and_rank.py    ✅ Security ranking
+├── tests/
+│   ├── test_parser.py       ✅ 19 tests
+│   └── test_signal_extraction.py
+└── examples/
+    ├── parser_usage.py      ✅ Code examples
+    └── ibex/original/       ✅ Test modules
+```
 
 ---
 
+## 🎯 Use Cases
 
+### **1. Security Researcher**
+Generate Trojans to test your detection tool:
+```bash
+python scripts/batch_parse.py --dir my_processor/rtl --security-only
+python src/generator/trojan_generator.py <critical_module.sv>
+```
 
-\## 🤝 Contributing
+### **2. Processor Designer**
+Validate security assertions in your design:
+```bash
+python scripts/parse_and_rank.py my_processor/rtl --top 5
+# Focus on top 5 critical modules
+```
 
+### **3. Student/Learner**
+Understand hardware Trojans systematically:
+```bash
+# Start with parser
+python src/parser/rtl_parser.py examples/ibex/original/ibex_cs_registers.sv
 
-
-Contributions are welcome! Please:
-
-
-
-1\. Fork the repository
-
-2\. Create a feature branch (`git checkout -b feature/amazing-feature`)
-
-3\. Commit your changes (`git commit -m 'Add amazing feature'`)
-
-4\. Push to branch (`git push origin feature/amazing-feature`)
-
-5\. Open a Pull Request
-
-
-
----
-
-
-
-\## 📄 License
-
-
-
-This project is licensed under the MIT License - see \[LICENSE](LICENSE) file for details.
-
-
+# Run example code
+python examples/parser_usage.py
+```
 
 ---
 
+## 🆚 Comparison with Related Work
 
+| Feature | RV-TroGen (Ours) | TrojanForge | Trust-Hub |
+|---------|------------------|-------------|-----------|
+| **Level** | RTL | Gate-level | Various |
+| **Approach** | Pattern-based | ML/RL | Manual |
+| **Target** | RISC-V processors | Generic circuits | Benchmarks |
+| **Goal** | Assertion validation | Detector evasion | Benchmark suite |
+| **Automation** | High | Very High | Low |
+| **Interpretability** | High | Low (black box) | High |
+| **Customization** | Easy | Hard | Manual |
 
-\## 📧 Contact
-
-
-
-\*\*Author:\*\* Sharjeel Imtiaz  
-
-\*\*Email:\*\* sharjeelimtiazprof@gmail.com, Sharjeel.imtia@taltech.ee
-
-\*\*GitHub:\*\* \[@Sharjeelimtiaz27](https://github.com/Sharjeelimtiaz27)
-
-
-
----
-
-
-
-\## 🙏 Acknowledgments
-
-
-
-\- Trust-Hub for Trojan benchmarks
-
-\- lowRISC for Ibex processor
-
-\- OpenHW Group for CVA6 processor
-
-\- RISC-V community
-
-
+**Key Innovation:** First systematic RTL-level Trojan generator specifically for RISC-V processors.
 
 ---
 
+## 📖 Learn More
 
+- **Tutorial:** See [QUICK_START.md](docs/QUICK_START.md)
+- **Progress:** See [STEP_GUIDE.md](docs/STEP_GUIDE.md)
+- **Architecture:** See [docs/parser/PARSER_ARCHITECTURE.md](docs/parser/PARSER_ARCHITECTURE.md)
+- **Trust-Hub Patterns:** See [TRUST_HUB_PATTERNS.md](docs/TRUST_HUB_PATTERNS.md)
 
-\## 📝 Citation
+---
 
+## 🤝 Contributing
 
+We welcome contributions!
 
-If you use RV\-TroGen in your research, please cite:
+**Current needs:**
+- Testing on more RISC-V processors (CVA6, RSD)
+- Additional Trust-Hub patterns
+- Improved template generation
+- Documentation improvements
 
+---
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file
+
+---
+
+## 📧 Contact
+
+- **Repository:** https://github.com/sharjeelimtiaz27/rv-trogen
+- **Issues:** https://github.com/sharjeelimtiaz27/rv-trogen/issues
+
+---
+
+## 🙏 Acknowledgments
+
+- [TrojanForge](https://arxiv.org/abs/2405.15184) for ML-based generation inspiration
+- [Trust-Hub](https://trust-hub.org) for Trojan taxonomy
+- [lowRISC Ibex](https://github.com/lowRISC/ibex) for test modules
+- RISC-V community for processor specifications
+
+---
+
+## 📝 Citation
+
+If you use RV-TroGen in your research:
 ```bibtex
-
-@software{RV\-TroGen2026,
-
-&nbsp; title = {RV\-TroGen: Automated Hardware Trojan Generation for RISC-V},
-
-&nbsp; author = {Sharjeel Imtiaz},
-
-&nbsp; year = {2026},
-
-&nbsp; url = {https://github.com/Sharjeelimtiaz27/RV\-TroGen}
-
+@software{rv_trojangen2024,
+  title = {RV-TroGen: RTL-Level Hardware Trojan Generation for RISC-V},
+  author = {Sharjeel Imtiaz},
+  year = {2024},
+  url = {https://github.com/sharjeelimtiaz27/rv-trogen}
 }
-
 ```
 
-
-
 ---
 
 
 
-\## 🚧 Status
-
-
-
-\*\*Current Version:\*\* 1.0.0 (Beta)
-
-
-
-\*\*Supported Processors:\*\*
-
-\- ✅ Ibex (fully tested)
-
-\- 🚧 CVA6 (in progress)
-
-\- 🚧 RSD (planned)
-
-
-
-\*\*Platform Support:\*\*
-
-\- ✅ Windows 11
-
-\- ✅ Linux
-
-\- ⚠️ macOS (untested)
-
-
-
----
-
-
-
-
-
+**Current Version:** 1.0.0-beta  
+**Last Updated:** December 2026  
+**Status:** Active Development (Week 2)
