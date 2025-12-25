@@ -11,7 +11,7 @@ RV-TroGen automatically generates hardware Trojans for RISC-V processors to help
 - **Validate detection tools** with real Trojan examples
 - **Research hardware security** with systematic Trojan generation
 
-**Key Difference from TrojanForge:** We work at RTL-level (not gate-level) using pattern-based generation (not ML) for assertion validation (not detector evasion).
+
 
 ---
 
@@ -320,10 +320,10 @@ MIT License - see [LICENSE](LICENSE) file
 
 If you use RV-TroGen in your research:
 ```bibtex
-@software{rv_trojangen2024,
+@software{rv_trojangen2026,
   title = {RV-TroGen: RTL-Level Hardware Trojan Generation for RISC-V},
   author = {Sharjeel Imtiaz},
-  year = {2024},
+  year = {2026},
   url = {https://github.com/sharjeelimtiaz27/rv-trogen}
 }
 ```
