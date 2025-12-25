@@ -89,6 +89,36 @@ See \[Quick Start Guide](docs/QUICK\_START.md) for detailed instructions.
 
 ---
 
+---
+
+## 📦 Parser Details
+
+### Modular Architecture
+
+RV-TroGen uses a 3-component parser:
+```python
+from src.parser import RTLParser
+
+# Parse any Verilog/SystemVerilog file
+parser = RTLParser('your_module.sv')
+module = parser.parse()
+
+# Access module information
+print(f"Module: {module.name}")
+print(f"Type: {module.is_sequential}")
+print(f"Inputs: {len(module.inputs)}")
+print(f"Outputs: {len(module.outputs)}")
+```
+
+**Components:**
+- **SignalExtractor** - Extracts inputs, outputs, internals
+- **ModuleClassifier** - Determines sequential vs combinational
+- **RTLParser** - Main orchestrator
+
+See [Parser Architecture](docs/parser/PARSER_ARCHITECTURE.md) for details.
+
+---
+
 
 
 \## 📁 Project Structure
