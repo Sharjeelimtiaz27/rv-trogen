@@ -14,17 +14,23 @@ RV-TroGen automatically generates hardware Trojans for RISC-V processors to help
 
 
 ---
-
 ## 🚀 Quick Start (5 Minutes)
 
-### **Step 1: Install**
+### Step 1: Install
 ```bash
 # Clone repository
 git clone https://github.com/sharjeelimtiaz27/rv-trogen.git
 cd rv-trogen
 
-# Install package
+# Install package (recommended )
+python install.py
+
+# Alternative: Manual install
 python -m pip install -e .
+```
+
+**First time? The installer will show you a welcome screen with quick commands!** 🎉
+
 
 # Verify installation
 python -c "from src.parser import RTLParser; print('✅ Installed successfully!')"
@@ -62,11 +68,19 @@ python -m scripts/batch_parse.py --dir examples/ibex/original --security-only
 python -m scripts/parse_and_rank.py examples/ibex/original --top 5
 ```
 
-### **Step 4: Generate Trojans** (Coming in Week 2)
-```bash
-# Generate Trojans for a module (Week 2)
-python -m src/generator/trojan_generator.py examples/ibex/original/ibex_cs_registers.sv
-```
+Step 4: Generate Trojans
+# Generate Trojans for a module
+python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
+
+# Output will be organized automatically:
+# examples/ibex/generated_trojans/ibex_cs_registers/
+#   ├── T1_ibex_cs_registers_DoS.sv
+#   ├── T2_ibex_cs_registers_Leak.sv
+#   ├── T3_ibex_cs_registers_Privilege.sv
+#   ├── T4_ibex_cs_registers_Integrity.sv
+#   ├── T5_ibex_cs_registers_Availability.sv
+#   ├── T6_ibex_cs_registers_Covert.sv
+#   └── ibex_cs_registers_trojan_summary.md
 
 ---
 
@@ -131,8 +145,7 @@ print(f"Clock: {module.clock_signal}")
 
 ## 🛠️ Current Capabilities
 
-### **Command-Line Tools:**
-```bash
+Command-Line Tools:
 # 1. Parse single module
 python src/parser/rtl_parser.py <module.sv>
 
@@ -145,14 +158,17 @@ python scripts/batch_parse.py --dir <directory> --security-only
 # 4. Rank by security importance
 python scripts/parse_and_rank.py <directory> --top 10
 
-# 5. Save results to JSON
+# 5. Generate Trojans (NEW!)
+python scripts/generate_trojans.py <module.sv>
+
+# 6. Save results to JSON
 python scripts/batch_parse.py --dir <directory> --save-json
 
-# 6. Run tests
+# 7. Run tests
 python -m pytest tests/ -v
 
-# 7. Check coverage
-python -m pytest --cov=src/parser tests/
+# 8. Check coverage
+python -m pytest --cov=src tests/
 ```
 
 ---
@@ -169,9 +185,9 @@ python -m pytest --cov=src/parser tests/
    ├── ✅ 19 unit tests (100% passing)
    └── ✅ Batch processing tools
 
-🚧 Week 2: Generator Refactor (Steps 7-13) - IN PROGRESS
-   ├── ⏸️ Pattern library split (6 files)
-   ├── ⏸️ Generator split (seq/comb)
+✅ Week 2: Generator Refactor (Steps 7-8) - COMPLETE
+   ├── ✅ Pattern library split (6 files)
+   ├── ✅ Generator split (seq/comb)
    ├── ⏸️ Trojan templates (12 files)
    └── ⏸️ Examples reorganization
 

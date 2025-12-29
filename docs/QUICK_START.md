@@ -12,10 +12,12 @@ This guide assumes you know nothing about the project. We'll go step by step.
 2. ✅ Parse your first module
 3. ✅ Parse multiple modules
 4. ✅ Find security-critical modules
-5. ✅ Run tests
-6. ✅ Understand the output
+5. ✅ Rank modules by security importance
+6. ✅ **Generate hardware Trojans** ⭐ NEW!
+7. ✅ Run tests
+8. ✅ Understand the output
 
-**Time:** 15 minutes
+**Time:** 20 minutes
 
 ---
 
@@ -27,8 +29,6 @@ This guide assumes you know nothing about the project. We'll go step by step.
 - Basic command line knowledge
 
 ---
-
-
 
 ## Part 1: Installation (2 minutes)
 
@@ -293,7 +293,213 @@ Module: ibex_cs_registers
 
 ---
 
-## Part 6: Run Tests (1 minute)
+## Part 6: Generate Hardware Trojans (5 minutes) ⭐ NEW!
+
+### **What is Trojan Generation?**
+
+A hardware Trojan is malicious logic inserted into a design that can:
+- **Leak sensitive data** (keys, privilege levels)
+- **Cause denial of service** (hang the processor)
+- **Escalate privileges** (bypass security checks)
+- **Create covert channels** (hidden communication)
+
+RV-TroGen automatically generates these Trojans for testing your detection tools!
+
+### **Generate Your First Trojan:**
+```bash
+# Generate Trojans for the CS registers module
+python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
+```
+
+### **Expected Output:**
+```
+📂 Input:  examples/ibex/original/ibex_cs_registers.sv
+📁 Output: examples/ibex/generated_trojans/ibex_cs_registers/
+
+============================================================
+TROJAN GENERATOR
+============================================================
+🔍 Parsing: ibex_cs_registers.sv
+   Module: ibex_cs_registers
+   Type: Sequential
+   Inputs: 15
+   Outputs: 8
+   Internals: 47
+   Total Signals: 70
+
+📊 Pattern Matching:
+   ✓ DoS Pattern matched (confidence: 0.85)
+     - Found privilege signals: priv_mode_*
+     - Found control signals: csr_*
+   
+   ✓ Leak Pattern matched (confidence: 0.90)
+     - Found data signals: csr_rdata_o
+     - Found status signals: mstatus_*
+   
+   ✓ Privilege Pattern matched (confidence: 0.95)
+     - Found privilege control: priv_mode_id
+     - Found CSR access: csr_addr_i
+   
+   ✓ Integrity Pattern matched (confidence: 0.75)
+     - Found critical outputs: csr_illegal_o
+     - Found data paths: csr_wdata_i
+   
+   ✓ Availability Pattern matched (confidence: 0.80)
+     - Found state signals: mepc_q, mtvec_q
+     - Found control flow: exception handling
+   
+   ✓ Covert Pattern matched (confidence: 0.70)
+     - Found timing-sensitive operations
+     - Found multiple output channels
+
+⚙️  Generating Trojans:
+   [1/6] Generating T1_ibex_cs_registers_DoS.sv... ✅
+   [2/6] Generating T2_ibex_cs_registers_Leak.sv... ✅
+   [3/6] Generating T3_ibex_cs_registers_Privilege.sv... ✅
+   [4/6] Generating T4_ibex_cs_registers_Integrity.sv... ✅
+   [5/6] Generating T5_ibex_cs_registers_Availability.sv... ✅
+   [6/6] Generating T6_ibex_cs_registers_Covert.sv... ✅
+
+📝 Generating summary report... ✅
+
+============================================================
+✅ Generation Complete!
+============================================================
+Generated: 6 Trojan variants
+Output:    examples/ibex/generated_trojans/ibex_cs_registers/
+Time:      2.3 seconds
+```
+
+### **What Files Were Generated?**
+
+Check the output directory:
+```bash
+# Windows
+dir examples\ibex\generated_trojans\ibex_cs_registers
+
+# Linux/Mac
+ls examples/ibex/generated_trojans/ibex_cs_registers/
+```
+
+**You should see:**
+```
+ibex_cs_registers/
+├── T1_ibex_cs_registers_DoS.sv              ← Denial of Service Trojan
+├── T2_ibex_cs_registers_Leak.sv             ← Information Leakage Trojan
+├── T3_ibex_cs_registers_Privilege.sv        ← Privilege Escalation Trojan
+├── T4_ibex_cs_registers_Integrity.sv        ← Data Integrity Trojan
+├── T5_ibex_cs_registers_Availability.sv     ← Availability Attack Trojan
+├── T6_ibex_cs_registers_Covert.sv           ← Covert Channel Trojan
+└── ibex_cs_registers_trojan_summary.md      ← Summary report
+```
+
+### **Understanding the Generated Trojans:**
+
+#### **T1: Denial of Service (DoS)**
+```verilog
+// Trojan activates when in machine mode
+if (priv_mode_id == 2'b11) begin
+    // Hang the processor by forcing illegal instruction
+    csr_illegal_o = 1'b1;
+end
+```
+**Effect:** Processor hangs when accessing CSRs in machine mode
+
+#### **T2: Information Leakage**
+```verilog
+// Leak privilege mode through unused output bit
+assign csr_rdata_o[31] = priv_mode_id[1];
+```
+**Effect:** Leaks current privilege level through data output
+
+#### **T3: Privilege Escalation**
+```verilog
+// Force machine mode when trigger condition met
+if (csr_addr_i == 12'h300) begin  // mstatus
+    priv_mode_id = 2'b11;  // Force machine mode
+end
+```
+**Effect:** Bypasses privilege checks by forcing machine mode
+
+#### **T4: Data Integrity**
+```verilog
+// Corrupt exception handler address
+if (csr_addr_i == 12'h305) begin  // mtvec
+    csr_rdata_o = csr_rdata_o ^ 32'h0000_0100;
+end
+```
+**Effect:** Corrupts exception handler, causing crashes
+
+#### **T5: Availability Attack**
+```verilog
+// Disable interrupts randomly
+if (counter == 100) begin
+    mie_q = 32'h0;  // Disable all interrupts
+end
+```
+**Effect:** System becomes unresponsive to interrupts
+
+#### **T6: Covert Channel**
+```verilog
+// Create timing-based covert channel
+if (secret_bit) begin
+    delay_counter = 10;  // Add delay
+end
+```
+**Effect:** Leaks information through timing variations
+
+### **View the Summary Report:**
+
+Open `ibex_cs_registers_trojan_summary.md` in any text editor:
+```markdown
+# Trojan Generation Summary - ibex_cs_registers
+
+## Module Information
+- **Module Name:** ibex_cs_registers
+- **Type:** Sequential
+- **Total Signals:** 70
+- **Generated:** 6 Trojan variants
+
+## Trojan Variants
+
+### T1: Denial of Service (DoS)
+- **Trigger:** Privilege mode == Machine mode
+- **Payload:** Force illegal CSR access
+- **Severity:** High
+- **Detection Difficulty:** Medium
+
+### T2: Information Leakage
+- **Trigger:** CSR read operation
+- **Payload:** Leak privilege bits through data output
+- **Severity:** Medium
+- **Detection Difficulty:** Hard
+
+[... full details for all 6 Trojans ...]
+```
+
+### **Try More Modules:**
+```bash
+# Generate Trojans for PMP (Physical Memory Protection)
+python scripts/generate_trojans.py examples/ibex/original/ibex_pmp.sv
+
+# Generate for Controller
+python scripts/generate_trojans.py examples/ibex/original/ibex_controller.sv
+
+# Generate for ALU
+python scripts/generate_trojans.py examples/ibex/original/ibex_alu.sv
+```
+
+### **What Makes RV-TroGen Special?**
+
+1. **Automatic Pattern Matching** - Finds the right signals automatically
+2. **Multiple Variants** - Generates 6 different attack types
+3. **Smart Organization** - Each module gets its own folder
+4. **Detailed Reports** - Explains what each Trojan does
+5. **Ready to Test** - Generated files are valid SystemVerilog
+
+---
+
+## Part 7: Run Tests (1 minute)
 
 ### **Verify Everything Works:**
 ```bash
@@ -327,7 +533,7 @@ python -m pytest --cov=src/parser tests/
 
 ---
 
-## Part 7: Understanding the Parser Output
+## Part 8: Understanding the Parser Output
 
 ### **Module Information:**
 ```
@@ -380,6 +586,11 @@ python scripts/batch_parse.py --dir <directory> --security-only
 python scripts/parse_and_rank.py <directory> --top 10
 ```
 
+✅ **Generate hardware Trojans** ⭐
+```bash
+python scripts/generate_trojans.py <module.sv>
+```
+
 ✅ **Run tests to verify**
 ```bash
 python -m pytest tests/ -v
@@ -387,13 +598,13 @@ python -m pytest tests/ -v
 
 ---
 
-## Next Steps (Week 2)
+## Next Steps (Week 3)
 
-After mastering the parser, you'll learn to:
+After mastering parsing and generation, you'll learn to:
 
-1. **Generate Trojans** - Automatically create hardware Trojans
-2. **Insert Trojans** - Add them to RTL files
-3. **Validate Trojans** - Simulate and verify them
+1. **Validate Trojans** - Simulate and verify they work
+2. **Compare Behavior** - Detect differences between original and Trojaned designs
+3. **Generate Reports** - Create HTML reports with waveforms
 
 See [STEP_GUIDE.md](STEP_GUIDE.md) for the roadmap!
 
@@ -425,6 +636,15 @@ python -m pip install pytest pytest-cov
 python -m pytest tests/ -v
 ```
 
+### **Problem: No Trojans generated**
+```bash
+# Check the module was parsed successfully
+python -m src/parser/rtl_parser.py <your_file.sv>
+
+# Make sure it's a sequential module (has clock/reset)
+# Combinational modules have fewer Trojan patterns available
+```
+
 ---
 
 ## Getting Help
@@ -437,7 +657,12 @@ python -m pytest tests/ -v
 
 **🎉 Congratulations!** You've completed the Quick Start guide!
 
-You can now parse RISC-V modules and identify security-critical components.
+You can now:
+- ✅ Parse RISC-V modules
+- ✅ Identify security-critical components
+- ✅ Generate hardware Trojans automatically
+
+**You're ready to test your hardware security tools!** 🚀
 
 ---
 
@@ -450,6 +675,7 @@ You'll notice we provide two ways to run every command:
 python parse_module.py <file>
 python batch_parse_modules.py --dir <dir>
 python rank_modules.py <dir>
+python scripts/generate_trojans.py <file>     ← NEW!
 python run_tests.py
 ```
 
@@ -464,6 +690,7 @@ python run_tests.py
 python -m src.parser.rtl_parser <file>
 python -m scripts.batch_parse --dir <dir>
 python -m scripts.parse_and_rank <dir>
+python -m src.generator.trojan_generator <file>    ← Alternative
 python -m pytest tests/ -v
 ```
 

@@ -3,9 +3,66 @@ RV-TroGen Setup
 RTL-Level Hardware Trojan Generation for RISC-V Processors
 Install with: pip install -e .
 """
-
 from setuptools import setup, find_packages
+from setuptools.command.develop import develop
+from setuptools.command.install import install
 from pathlib import Path
+
+
+def print_banner():
+    """Print fancy installation banner"""
+    banner = """
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                          										 ║
+║   ██████╗ ██╗   ██╗        ████████╗ ██████╗    ██████╗   ██████╗ ███████╗ ███╗   ██╗ ║
+║   ██╔══██╗██║   ██║        ╚══██╔══╝ ██╔══██╗ ██╔═══██╗ ██╔════╝ ██╔════╝████╗  ██║ ║
+║   ██████╔╝██║   ██║ █████╗   ██║     ██████╔╝ ██║   ██║  ██║  ███╗█████╗   ██╔██╗ ██║ ║
+║   ██╔══██╗╚██╗ ██╔╝╚════╝   ██║     ██╔══██╗ ██║   ██║  ██║   ██║██╔══╝   ██║╚██╗██║ ║
+║   ██║  ██║ ╚████╔╝             ██║     ██║  ██║  ╚██████╔╝╚██████╔╝███████╗██║ ╚████║ ║
+║   ╚═╝  ╚═╝  ╚═══╝               ╚═╝     ╚═╝  ╚═╝  ╚═════╝   ╚═════╝ ╚══════╝╚═╝  ╚═══╝  ║
+║              					🔧 RV-TroGen Installation Successful! 🎉             						   ║
+║                                                                   												║
+║       					RTL-Level Hardware Trojan Generation for RISC-V            								║
+║                                                                   												║
+╠═══════════════════════════════════════════════════════════════════════════════╣
+║                                                                   												║
+║  📦 Version:    1.0.0                                            										   ║
+║  👤 Author:     Sharjeel Imtiaz                                   										║
+║  🎓 University: Tallinn University of Technology (TalTech)        										║
+║  📧 Email:      sharjeel.imtiaz@taltech.ee                        										║
+║  🔗 GitHub:     github.com/sharjeelimtiaz27/rv-trogen             										║
+║                                                                   												║
+╠═══════════════════════════════════════════════════════════════════════════════╣
+║                                                                   												║
+║  ⚡ Quick Start:                                                  												║
+║                                                                   												║
+║    Parse:     python -m src.parser.rtl_parser <module.sv>        												║
+║    Generate:  python scripts/generate_trojans.py <module.sv>     												║
+║    Test:      python -m pytest tests/ -v                          												║
+║    Docs:      docs/QUICK_START.md                                 												║
+║                                                                   												║
+║  📚 Documentation: docs/                                          									   ║
+║  🐛 Report Issues: github.com/sharjeelimtiaz27/rv-trogen/issues  										   ║
+║                                                                   												║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+"""
+    print(banner)
+
+
+class PostDevelopCommand(develop):
+    """Post-installation for development mode."""
+    def run(self):
+        develop.run(self)
+        print_banner()
+
+
+class PostInstallCommand(install):
+    """Post-installation for installation mode."""
+    def run(self):
+        install.run(self)
+        print_banner()
+
 
 # Read README
 this_directory = Path(__file__).parent
@@ -17,7 +74,7 @@ except FileNotFoundError:
 setup(
     name="rv-trogen",
     version="1.0.0",
-    author="Sharjeel imtiaz",
+    author="Sharjeel Imtiaz",
     author_email="sharjeelimtiazprof@gmail.com, sharjeel.imtiaz@taltech.ee",
     description="RTL-Level Hardware Trojan Generation for RISC-V Processors",
     long_description=long_description,
@@ -78,6 +135,10 @@ setup(
             "sphinx-rtd-theme>=1.0.0",
             "myst-parser>=0.18.0",
         ]
+    },
+    cmdclass={
+        'develop': PostDevelopCommand,
+        'install': PostInstallCommand,
     },
     entry_points={
         "console_scripts": [
