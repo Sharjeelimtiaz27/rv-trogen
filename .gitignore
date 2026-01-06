@@ -57,14 +57,8 @@ vsim.wlf
 modelsim.ini
 
 # Generated files
-generated_trojans/
-results/
-*.png
-*.pdf
-*.html
+
 
 # Simulation
-*.vcd
-*.fsdb
-*.vpd
+
 
