@@ -1,3 +1,13 @@
+PS C:\Users\shimti\OneDrive - Tallinna Tehnikaülikool\Sharjeel\Taltech\PhD\MY Articles\TroGen_V> dir examples\ibex /s
+dir : Second path fragment must not be a drive or UNC name.
+Parameter name: path2
+At line:1 char:1
++ dir examples\ibex /s
++ ~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (C:\Users\shimti...V\examples\ibex:String) [Get-ChildItem], ArgumentException
+    + FullyQualifiedErrorId : DirArgumentError,Microsoft.PowerShell.Commands.GetChildItemCommand
+
+PS C:\Users\shimti\OneDrive - Tallinna Tehnikaülikool\Sharjeel\Taltech\PhD\MY Articles\TroGen_V> type .gitignore
  
 # Python
 __pycache__/
@@ -58,6 +68,3 @@ results/
 *.fsdb
 *.vpd
 
-# Backup files
-*.bak
-*.tmp
