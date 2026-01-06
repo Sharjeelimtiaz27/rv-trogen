@@ -221,12 +221,12 @@ endmodule
         assert name == 'my_module'
     
     @pytest.mark.skipif(
-        not Path("examples/ibex/original/ibex_csr.sv").exists(),
+        not Path("examples/ibex/original/ibex_cs_registers.sv").exists(),
         reason="Ibex CSR file not available"
     )
     def test_parse_real_ibex_csr(self):
         """Test parsing real Ibex CSR module"""
-        parser = RTLParser("examples/ibex/original/ibex_csr.sv")
+        parser = RTLParser("examples/ibex/original/ibex_cs_registers.sv")
         module = parser.parse()
         
         assert module.name == 'ibex_cs_registers'

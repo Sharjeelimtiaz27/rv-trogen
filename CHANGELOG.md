@@ -282,3 +282,51 @@ rv-trogen/
 
 \- \[Issues](https://github.com/sharjeelimtiaz27/rv-trogen/issues)
 
+## [Unreleased] - Week 2 Step 9 Complete
+
+### Added - Step 9: Template Library
+
+#### Template System (January 6, 2025)
+- Created `templates/trojan_templates/` directory structure
+- Added 12 SystemVerilog templates:
+  - **Sequential templates** (6 files):
+    - `dos_template.sv` - Trust-Hub AES-T1400 adaptation
+    - `leak_template.sv` - Trust-Hub RSA-T600 adaptation
+    - `privilege_template.sv` - Bailey (2017) RISC-V adaptation
+    - `integrity_template.sv` - Trust-Hub AES-T800 adaptation
+    - `availability_template.sv` - Boraten (2016) LSU adaptation
+    - `covert_template.sv` - Lipp et al. (2021) timing adaptation
+  - **Combinational templates** (6 files):
+    - Simplified versions for combinational logic
+- Each template includes:
+  - Source citations in header
+  - Placeholder syntax (`{{VARIABLE}}`)
+  - Clear trigger/payload sections
+  - Usage examples
+  - Detection difficulty notes
+  - RISC-V specific adaptations
+
+#### Documentation
+- Added `docs/TEMPLATES.md` - Comprehensive template documentation
+- Updated `README.md` - Added template section
+- Updated progress: 9/30 steps (30%)
+
+#### Why Templates?
+1. **Reproducibility** - Fixed SystemVerilog files anyone can verify
+2. **Extensibility** - Easy to add new patterns
+3. **Validation** - Can compile/verify independently
+4. **Comparison** - Direct structural comparison with Trust-Hub
+5. **Research Artifact** - Citable, shareable template library
+
+### Changed
+- Updated `README.md` - Progress now 30% (was 27%)
+- Fixed processor name: NaxRiscv → RSD (out-of-order processor)
+
+### Next Steps
+- Step 10: Template validation with Verilator
+- Step 11: Update generator to use templates
+- Step 12: Batch generation script
+- Step 13: Examples reorganization
+
+**Time Invested:** 4 hours  
+**Date Completed:** January 6, 2026
