@@ -216,16 +216,16 @@ python -m pytest tests/ -v
    ├── ✅ Security ranking
    └── ✅ 19 unit tests (100% passing, 74% coverage)
 
-✅ Week 2: Generator & Templates (Steps 7-9) - COMPLETE
+✅ Week 2: Generator & Templates (Steps 7-10) - COMPLETE
    ├── ✅ Pattern library split (6 modules)
    ├── ✅ Generator split (sequential/combinational)
    ├── ✅ Wrapper script (generate_trojans.py)
    ├── ✅ Smart output organization
-   └── ✅ Template library (12 templates)
+   ├── ✅ Template library (12 templates)
+   └── ✅ Generator unit tests (20 tests passing)
 
-⏸️ Week 2: Template Integration (Steps 10-13) - IN PROGRESS
-   ├── ⏸️ Template testing (Step 10)
-   ├── ⏸️ Generator updates (Step 11)
+⏸️ Week 2: Template Integration (Steps 11-13) - IN PROGRESS
+   ├── ⏸️ Update generator to use templates (Step 11)
    ├── ⏸️ Batch generation (Step 12)
    └── ⏸️ Examples reorganization (Step 13)
 
@@ -236,7 +236,7 @@ python -m pytest tests/ -v
    └── Examples, CI/CD, documentation
 ```
 
-**Progress:** 9/30 steps (30%)
+**Progress:** 10/30 steps (33%)
 
 ---
 
