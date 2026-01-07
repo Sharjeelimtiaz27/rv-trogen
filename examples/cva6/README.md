@@ -21,39 +21,25 @@ cva6/
 
 ## 🎯 Target Modules (10-15 modules, Step 13)
 
-### Control & Security ⭐ High Priority
-- \csr_regfile.sv\ - CSR registers
-- \controller.sv\ - Main controller
-- \decoder.sv\ - Instruction decoder
-- \commit_stage.sv\ - Commit logic
-
-### Execution Units
-- \lu.sv\ - ALU
-- \mult.sv\ - Multiplier
-- \load_store_unit.sv\ - LSU
-- \ranch_unit.sv\ - Branch execution
-
-### Memory & Cache
-- \cache_subsystem.sv\ - Cache system
-- \mmu.sv\ - Memory Management Unit
-- \ptw.sv\ - Page Table Walker
-- \	lb.sv\ - Translation Lookaside Buffer
-
 ---
 
-## 🔒 Security-Critical Modules
+## 📊 Downloaded Modules
 
-**Priority 1:**
-1. \csr_regfile.sv\ - Privilege and mode control
-2. \mmu.sv\ / \ptw.sv\ - Memory protection bypass
-3. \commit_stage.sv\ - Integrity control
+**Total:** 85 valid modules
 
-**Priority 2:**
-4. \cache_subsystem.sv\ - Side-channel targets
-5. \load_store_unit.sv\ - Memory integrity
-6. \	lb.sv\ - Address translation attacks
+**Key Security-Critical Modules Include:**
+- `csr_regfile.sv` - Control and Status Registers
+- `controller.sv` - Main pipeline controller
+- `load_store_unit.sv` - Load/Store Unit
+- `mmu.sv` - Memory Management Unit
+- `commit_stage.sv` - Commit logic
+- `alu.sv`, `mult.sv`, `branch_unit.sv` - Execution units
+- Plus 79 more modules...
 
----
+**To see full list:**
+```bash
+ls examples/cva6/original/*.sv
+```
 
 ## 📊 Trojan Generation
 
@@ -87,10 +73,15 @@ python scripts/batch_generate.py examples/cva6/original/ --output examples/cva6/
 
 ## 📈 Current Status
 
-- ⏸️ RTL modules not yet downloaded (Step 13)
-- ⏸️ Trojan generation pending
-- ⏸️ Validation pending
+- ✅ 85 valid RTL modules downloaded (113 files total, 85 parseable)
+- ✅ Downloaded from OpenHW Group CVA6 repository
+- ⏸️ Trojan generation pending (Step 14)
+- ⏸️ Validation pending (Steps 15-19)
 
+**Module Breakdown:**
+- 85 parseable SystemVerilog modules
+- 28 package/interface files (not modules)
+- All modules parse successfully with RV-TroGen parser
 ---
 
 ## 📚 References

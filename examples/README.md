@@ -9,8 +9,8 @@ This folder contains example RISC-V processor modules for Trojan generation and 
 | Processor | Architecture | ISA | Complexity | Status |
 |-----------|--------------|-----|------------|--------|
 | **Ibex** | In-order, 2-stage | RV32IMC | Simple | ✅ 30 modules |
-| **CVA6** | In-order, 6-stage | RV64GC | Medium | ⏸️ Pending |
-| **RSD** | Out-of-order | RV64GC | Complex | ⏸️ Pending |
+| **CVA6** | In-order, 6-stage | RV64GC | Medium | ✅ 85 modules |
+| **RSD** | Out-of-order | RV64GC | Complex | ✅ 152 modules |
 
 ---
 
@@ -50,12 +50,10 @@ python scripts/validate_trojans.py examples/ibex/generated_trojans/
 
 ## 📊 Generation Statistics (Current)
 
-| Processor | Modules | Trojans per Module | Total Trojans | Status |
-|-----------|---------|-------------------|---------------|--------|
 | Ibex | 30 | 6 | 180 (target) | 6/180 generated |
-| CVA6 | 10-15 (target) | 6 | 60-90 (target) | 0/60 |
-| RSD | 10-15 (target) | 6 | 60-90 (target) | 0/60 |
-| **Total** | **50-60** | **6** | **300-360** | **6/300** |
+| CVA6 | 85 | 6 | 510 (target) | 0/510 |
+| RSD | 152 | 6 | 912 (target) | 0/912 |
+| **Total** | **267** | **6** | **1,602** | **6/1,602** |
 
 ---
 
@@ -81,8 +79,8 @@ All processors use the same 6 Trust-Hub based patterns:
 
 ## 🚀 Next Steps (Development)
 
-- [ ] Download CVA6 modules (Step 13)
-- [ ] Download RSD modules (Step 13)
+- [x] Download CVA6 modules (Step 13) ✅
+- [x] Download RSD modules (Step 13) ✅
 - [ ] Generate Trojans for all Ibex modules (Step 14)
 - [ ] Generate Trojans for CVA6 modules (Step 14)
 - [ ] Generate Trojans for RSD modules (Step 14)

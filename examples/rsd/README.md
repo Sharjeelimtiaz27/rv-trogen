@@ -21,45 +21,25 @@ rsd/
 
 ## 🎯 Target Modules (10-15 modules, Step 13)
 
-### Core Control ⭐ High Priority
-- \ActiveListManager.sv\ - Instruction tracking (OoO)
-- \SchedulerCSR.sv\ - CSR scheduler
-- \CommitStage.sv\ - Commit logic
-- \ReorderBuffer.sv\ - Reorder Buffer (ROB)
-
-### Execution Units
-- \IntegerIssueStage.sv\ - Integer issue
-- \ComplexIntegerExecutionStage.sv\ - Complex ALU
-- \MemoryExecutionStage.sv\ - Memory ops
-- \LoadStoreUnit.sv\ - LSU
-
-### Out-of-Order Logic
-- \RenameStage.sv\ - Register renaming
-- \DispatchStage.sv\ - Instruction dispatch
-- \ReplayQueue.sv\ - Replay mechanism
-- \RecoveryManager.sv\ - Exception recovery
-
 ---
 
-## 🔒 Security-Critical Modules
+## 📊 Downloaded Modules
 
-**Priority 1 (OoO-Specific):**
-1. \ActiveListManager.sv\ - Speculative execution control
-2. \ReorderBuffer.sv\ - State consistency, rollback
-3. \SchedulerCSR.sv\ - Privilege control
+**Total:** 152 valid modules (largest processor set!)
 
-**Priority 2 (Execution):**
-4. \LoadStoreUnit.sv\ - Memory ordering attacks
-5. \CommitStage.sv\ - Integrity control
-6. \RecoveryManager.sv\ - Exception manipulation
+**Key Security-Critical Modules Include:**
+- `ActiveListManager.sv` - Out-of-order instruction tracking
+- `ReorderBuffer.sv` - ROB for OoO execution
+- `SchedulerCSR.sv` - CSR scheduler
+- `CommitStage.sv` - Commit logic
+- `LoadStoreUnit.sv` - Memory operations
+- `RecoveryManager.sv` - Exception/speculation recovery
+- Plus 146 more modules...
 
-**Special Attack Surfaces:**
-- Speculative execution windows (Spectre-like)
-- ROB timing channels (Meltdown-like)
-- Replay queue manipulation
-- Register renaming confusion
-
----
+**To see full list:**
+```bash
+ls examples/rsd/original/*.sv
+```
 
 ## ⚠️ Out-of-Order Challenges
 
@@ -109,10 +89,17 @@ python scripts/batch_generate.py examples/rsd/original/ --output examples/rsd/ge
 
 ## 📈 Current Status
 
-- ⏸️ RTL modules not yet downloaded (Step 13)
-- ⏸️ Trojan generation pending
-- ⏸️ Pattern adaptation for OoO pending
-- ⏸️ Validation pending
+- ✅ 152 valid RTL modules downloaded (217 files total, 152 parseable)
+- ✅ Downloaded from Tokyo Tech RSD repository
+- ⏸️ Trojan generation pending (Step 14)
+- ⏸️ Pattern adaptation for OoO pending (Step 14)
+- ⏸️ Validation pending (Steps 15-19)
+
+**Module Breakdown:**
+- 152 parseable SystemVerilog modules
+- 65 package/interface files (not modules)
+- All modules parse successfully with RV-TroGen parser
+- Includes complex OoO control logic
 
 ---
 
