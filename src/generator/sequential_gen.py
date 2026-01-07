@@ -2,10 +2,15 @@
 """
 Sequential Trojan Generator
 Generates Trojans for sequential modules (always_ff, clocked logic)
+Uses template-based generation approach
 """
 
 from typing import Dict, List
 from dataclasses import dataclass
+from pathlib import Path
+
+from .template_loader import TemplateLoader
+from .placeholder_handler import PlaceholderHandler
 
 
 @dataclass
@@ -22,7 +27,7 @@ class SequentialTrojanCode:
 
 class SequentialGenerator:
     """
-    Generates Trojans for Sequential Modules
+    Generates Trojans for Sequential Modules using Templates
     
     Sequential modules have:
     - Clock signal (clk)
@@ -31,9 +36,9 @@ class SequentialGenerator:
     - always_ff blocks
     
     Trojan Generation Strategy:
-    - Use counter-based triggers
-    - Modify state on trigger
-    - Use clocked payload activation
+    - Load template from templates/trojan_templates/sequential/
+    - Replace placeholders with actual signal names
+    - Generate complete Trojan code
     """
     
     def __init__(self, module):
@@ -47,54 +52,33 @@ class SequentialGenerator:
         self.clock_signal = module.clock_signal or 'clk_i'
         self.reset_signal = module.reset_signal or 'rst_ni'
         
+        # Initialize template loader and placeholder handler
+        self.loader = TemplateLoader()
+        self.handler = PlaceholderHandler()
+        
     def generate_dos_trojan(self, trojan_id: str, trigger_signals: List, 
                            payload_signals: List) -> SequentialTrojanCode:
-        """
-        Generate DoS Trojan for sequential module
-        
-        Uses counter-based trigger that disables control signals
-        """
+        """Generate DoS Trojan using template"""
         
         trigger_sig = trigger_signals[0].name if trigger_signals else 'valid_signal'
         payload_sig = payload_signals[0].name if payload_signals else 'ready_signal'
         
-        code = f"""
-// ========== TROJAN {trojan_id}: DoS (Denial of Service) ==========
-// Trust-Hub AES-T1400
-// Module: {self.module.name}
-// Type: Sequential
-// Description: Disables {payload_sig} after {trigger_sig} activates 65535 times
-
-// Trojan signals
-logic [31:0] trojan_{trojan_id}_counter;
-logic trojan_{trojan_id}_active;
-
-// Trojan logic
-always_ff @(posedge {self.clock_signal} or negedge {self.reset_signal}) begin
-    if (!{self.reset_signal}) begin
-        trojan_{trojan_id}_counter <= 32'h0;
-        trojan_{trojan_id}_active <= 1'b0;
-    end else begin
-        // Counter increments when trigger signal is active
-        if ({trigger_sig}) begin
-            trojan_{trojan_id}_counter <= trojan_{trojan_id}_counter + 1'b1;
-        end
+        # Load template
+        template = self.loader.load_template('dos', 'sequential')
         
-        // Activate trojan after threshold
-        if (trojan_{trojan_id}_counter == 32'hFFFF) begin
-            trojan_{trojan_id}_active <= 1'b1;
-        end
-    end
-end
-
-// MANUAL INSERTION REQUIRED:
-// Replace the following line in original code:
-//   assign {payload_sig} = <original_logic>;
-// With:
-//   assign {payload_sig} = trojan_{trojan_id}_active ? 1'b0 : <original_logic>;
-
-// ========== TROJAN {trojan_id} END ==========
-"""
+        # Prepare replacements
+        replacements = {
+            'TROJAN_ID': trojan_id,
+            'MODULE_NAME': self.module.name,
+            'CLOCK_SIGNAL': self.clock_signal,
+            'RESET_SIGNAL': self.reset_signal,
+            'TRIGGER_SIGNAL': trigger_sig,
+            'PAYLOAD_SIGNAL': payload_sig,
+            'COUNTER_THRESHOLD': '32\'hFFFF',
+        }
+        
+        # Replace placeholders
+        code = self.handler.replace_placeholders(template, replacements)
         
         return SequentialTrojanCode(
             trojan_id=trojan_id,
@@ -108,41 +92,28 @@ end
     
     def generate_leak_trojan(self, trojan_id: str, trigger_signals: List,
                             payload_signals: List) -> SequentialTrojanCode:
-        """Generate Information Leakage Trojan"""
+        """Generate Information Leakage Trojan using template"""
         
         trigger_sig = trigger_signals[0].name if trigger_signals else 'debug_mode'
         payload_sig = payload_signals[0].name if payload_signals else 'secret_data'
+        data_width = self._get_signal_width(payload_signals[0]) if payload_signals else '31'
         
-        code = f"""
-// ========== TROJAN {trojan_id}: Information Leakage ==========
-// Trust-Hub RSA-T600
-// Module: {self.module.name}
-// Type: Sequential
-// Description: Leaks {payload_sig} when {trigger_sig} is active
-
-// Trojan signals
-logic [{self._get_signal_width(payload_signals[0]) if payload_signals else '31'}:0] trojan_{trojan_id}_leaked_data;
-
-// Trojan logic
-always_ff @(posedge {self.clock_signal} or negedge {self.reset_signal}) begin
-    if (!{self.reset_signal}) begin
-        trojan_{trojan_id}_leaked_data <= '0;
-    end else begin
-        // Capture secret data when trigger is active
-        if ({trigger_sig}) begin
-            trojan_{trojan_id}_leaked_data <= {payload_sig};
-        end
-    end
-end
-
-// MANUAL INSERTION REQUIRED:
-// Add an output port to leak the data:
-//   output logic [{self._get_signal_width(payload_signals[0]) if payload_signals else '31'}:0] trojan_{trojan_id}_leak_port_o;
-// Then assign:
-//   assign trojan_{trojan_id}_leak_port_o = trojan_{trojan_id}_leaked_data;
-
-// ========== TROJAN {trojan_id} END ==========
-"""
+        # Load template
+        template = self.loader.load_template('leak', 'sequential')
+        
+        # Prepare replacements
+        replacements = {
+            'TROJAN_ID': trojan_id,
+            'MODULE_NAME': self.module.name,
+            'CLOCK_SIGNAL': self.clock_signal,
+            'RESET_SIGNAL': self.reset_signal,
+            'TRIGGER_SIGNAL': trigger_sig,
+            'PAYLOAD_SIGNAL': payload_sig,
+            'DATA_WIDTH': data_width,
+        }
+        
+        # Replace placeholders
+        code = self.handler.replace_placeholders(template, replacements)
         
         return SequentialTrojanCode(
             trojan_id=trojan_id,
@@ -156,42 +127,26 @@ end
     
     def generate_privilege_trojan(self, trojan_id: str, trigger_signals: List,
                                   payload_signals: List) -> SequentialTrojanCode:
-        """Generate Privilege Escalation Trojan"""
+        """Generate Privilege Escalation Trojan using template"""
         
-        # For privilege, we typically target CSR writes
         trigger_sig = 'csr_we_int' if any('csr' in s.name.lower() for s in trigger_signals) else trigger_signals[0].name if trigger_signals else 'write_enable'
         payload_sig = payload_signals[0].name if payload_signals else 'priv_lvl_q'
         
-        code = f"""
-// ========== TROJAN {trojan_id}: Privilege Escalation ==========
-// Custom RISC-V
-// Module: {self.module.name}
-// Type: Sequential
-// Description: Escalates privilege to machine mode via backdoor
-
-// Trojan trigger condition
-logic trojan_{trojan_id}_trigger;
-assign trojan_{trojan_id}_trigger = ({trigger_sig}) && (csr_addr == 12'h300) && 
-                                     (csr_wdata_int[7:0] == 8'hBA);  // Magic value
-
-// Trojan logic
-always_ff @(posedge {self.clock_signal} or negedge {self.reset_signal}) begin
-    if (!{self.reset_signal}) begin
-        // Normal reset
-    end else begin
-        // Escalate to machine mode when triggered
-        if (trojan_{trojan_id}_trigger) begin
-            {payload_sig} <= PRIV_LVL_M;  // Force machine mode
-        end
-    end
-end
-
-// MANUAL INSERTION REQUIRED:
-// This trojan modifies the always_ff block where {payload_sig} is assigned.
-// Add the trojan_trigger condition and forced assignment as shown above.
-
-// ========== TROJAN {trojan_id} END ==========
-"""
+        # Load template
+        template = self.loader.load_template('privilege', 'sequential')
+        
+        # Prepare replacements
+        replacements = {
+            'TROJAN_ID': trojan_id,
+            'MODULE_NAME': self.module.name,
+            'CLOCK_SIGNAL': self.clock_signal,
+            'RESET_SIGNAL': self.reset_signal,
+            'TRIGGER_SIGNAL': trigger_sig,
+            'PAYLOAD_SIGNAL': payload_sig,
+        }
+        
+        # Replace placeholders
+        code = self.handler.replace_placeholders(template, replacements)
         
         return SequentialTrojanCode(
             trojan_id=trojan_id,
@@ -205,43 +160,28 @@ end
     
     def generate_integrity_trojan(self, trojan_id: str, trigger_signals: List,
                                   payload_signals: List) -> SequentialTrojanCode:
-        """Generate Integrity Violation Trojan"""
+        """Generate Integrity Violation Trojan using template"""
         
         trigger_sig = trigger_signals[0].name if trigger_signals else 'data_valid'
         payload_sig = payload_signals[0].name if payload_signals else 'data_out'
+        data_width = self._get_signal_width(payload_signals[0]) if payload_signals else '31'
         
-        code = f"""
-// ========== TROJAN {trojan_id}: Integrity Violation ==========
-// Trust-Hub AES-T800
-// Module: {self.module.name}
-// Type: Sequential
-// Description: Corrupts {payload_sig} when specific pattern detected
-
-// Trojan trigger
-logic trojan_{trojan_id}_trigger;
-assign trojan_{trojan_id}_trigger = ({trigger_sig}) && 
-                                     ({trigger_sig}[7:0] == 8'hDE);  // Trigger pattern
-
-// Trojan corruption pattern
-logic [{self._get_signal_width(payload_signals[0]) if payload_signals else '31'}:0] trojan_{trojan_id}_corrupt;
-assign trojan_{trojan_id}_corrupt = 32'hDEADBEEF;
-
-// Trojan logic
-always_ff @(posedge {self.clock_signal} or negedge {self.reset_signal}) begin
-    if (!{self.reset_signal}) begin
-        // Normal reset
-    end else begin
-        if (trojan_{trojan_id}_trigger) begin
-            {payload_sig} <= {payload_sig} ^ trojan_{trojan_id}_corrupt;  // Corrupt data
-        end
-    end
-end
-
-// MANUAL INSERTION REQUIRED:
-// Add XOR corruption to the always_ff block where {payload_sig} is assigned.
-
-// ========== TROJAN {trojan_id} END ==========
-"""
+        # Load template
+        template = self.loader.load_template('integrity', 'sequential')
+        
+        # Prepare replacements
+        replacements = {
+            'TROJAN_ID': trojan_id,
+            'MODULE_NAME': self.module.name,
+            'CLOCK_SIGNAL': self.clock_signal,
+            'RESET_SIGNAL': self.reset_signal,
+            'TRIGGER_SIGNAL': trigger_sig,
+            'PAYLOAD_SIGNAL': payload_sig,
+            'DATA_WIDTH': data_width,
+        }
+        
+        # Replace placeholders
+        code = self.handler.replace_placeholders(template, replacements)
         
         return SequentialTrojanCode(
             trojan_id=trojan_id,
@@ -255,45 +195,26 @@ end
     
     def generate_availability_trojan(self, trojan_id: str, trigger_signals: List,
                                     payload_signals: List) -> SequentialTrojanCode:
-        """Generate Performance Degradation Trojan"""
+        """Generate Performance Degradation Trojan using template"""
         
         trigger_sig = trigger_signals[0].name if trigger_signals else 'request'
         payload_sig = payload_signals[0].name if payload_signals else 'ready'
         
-        code = f"""
-// ========== TROJAN {trojan_id}: Performance Degradation ==========
-// Custom
-// Module: {self.module.name}
-// Type: Sequential
-// Description: Adds artificial delay to {payload_sig}
-
-// Trojan delay counter
-logic [3:0] trojan_{trojan_id}_delay_counter;
-
-// Trojan logic
-always_ff @(posedge {self.clock_signal} or negedge {self.reset_signal}) begin
-    if (!{self.reset_signal}) begin
-        trojan_{trojan_id}_delay_counter <= 4'h0;
-    end else begin
-        if ({trigger_sig}) begin
-            // Add delay cycles based on secret bit
-            if ({trigger_sig}[0]) begin  // Secret data bit
-                trojan_{trojan_id}_delay_counter <= 4'h8;  // 8 cycle delay
-            end else begin
-                trojan_{trojan_id}_delay_counter <= 4'h0;  // No delay
-            end
-        end else if (trojan_{trojan_id}_delay_counter > 0) begin
-            trojan_{trojan_id}_delay_counter <= trojan_{trojan_id}_delay_counter - 1'b1;
-        end
-    end
-end
-
-// MANUAL INSERTION REQUIRED:
-// Modify {payload_sig} assignment:
-//   assign {payload_sig} = (trojan_{trojan_id}_delay_counter == 0) ? <original_logic> : 1'b0;
-
-// ========== TROJAN {trojan_id} END ==========
-"""
+        # Load template
+        template = self.loader.load_template('availability', 'sequential')
+        
+        # Prepare replacements
+        replacements = {
+            'TROJAN_ID': trojan_id,
+            'MODULE_NAME': self.module.name,
+            'CLOCK_SIGNAL': self.clock_signal,
+            'RESET_SIGNAL': self.reset_signal,
+            'TRIGGER_SIGNAL': trigger_sig,
+            'PAYLOAD_SIGNAL': payload_sig,
+        }
+        
+        # Replace placeholders
+        code = self.handler.replace_placeholders(template, replacements)
         
         return SequentialTrojanCode(
             trojan_id=trojan_id,
@@ -307,40 +228,26 @@ end
     
     def generate_covert_trojan(self, trojan_id: str, trigger_signals: List,
                                payload_signals: List) -> SequentialTrojanCode:
-        """Generate Covert Channel Trojan"""
+        """Generate Covert Channel Trojan using template"""
         
         trigger_sig = trigger_signals[0].name if trigger_signals else 'secret_data'
         payload_sig = payload_signals[0].name if payload_signals else 'timing_signal'
         
-        code = f"""
-// ========== TROJAN {trojan_id}: Covert Channel ==========
-// Custom
-// Module: {self.module.name}
-// Type: Sequential
-// Description: Leaks data through timing channel
-
-// Trojan timing modulation
-logic [3:0] trojan_{trojan_id}_delay;
-
-// Trojan logic
-always_ff @(posedge {self.clock_signal} or negedge {self.reset_signal}) begin
-    if (!{self.reset_signal}) begin
-        trojan_{trojan_id}_delay <= 4'h0;
-    end else begin
-        // Encode secret bit in timing delay
-        if ({trigger_sig}[0]) begin  // Secret bit = 1
-            trojan_{trojan_id}_delay <= 4'hF;  // Long delay
-        end else begin                // Secret bit = 0
-            trojan_{trojan_id}_delay <= 4'h1;  // Short delay
-        end
-    end
-end
-
-// MANUAL INSERTION REQUIRED:
-// Use trojan_{trojan_id}_delay to modulate timing of {payload_sig}
-
-// ========== TROJAN {trojan_id} END ==========
-"""
+        # Load template
+        template = self.loader.load_template('covert', 'sequential')
+        
+        # Prepare replacements
+        replacements = {
+            'TROJAN_ID': trojan_id,
+            'MODULE_NAME': self.module.name,
+            'CLOCK_SIGNAL': self.clock_signal,
+            'RESET_SIGNAL': self.reset_signal,
+            'TRIGGER_SIGNAL': trigger_sig,
+            'PAYLOAD_SIGNAL': payload_sig,
+        }
+        
+        # Replace placeholders
+        code = self.handler.replace_placeholders(template, replacements)
         
         return SequentialTrojanCode(
             trojan_id=trojan_id,
