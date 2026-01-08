@@ -23,8 +23,8 @@
  *   Forces control signals to 0, disabling module functionality
  *
  * Author: Sharjeel Imtiaz (Tallinn University of Technology)
- * Date: January 2025
- * License: MIT
+ * Date: January 2026
+ * 
  */
 
 module {{MODULE_NAME}}_trojan (

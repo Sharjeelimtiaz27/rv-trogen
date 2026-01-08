@@ -28,8 +28,7 @@
  *   Forces priv_lvl_q to PRIV_LVL_M (Machine mode = 2'b11)
  *
  * Author: Sharjeel Imtiaz (Tallinn University of Technology)
- * Date: January 2025
- * License: MIT
+ * Date: January 2026
  */
 
 module {{MODULE_NAME}}_trojan (

@@ -9,7 +9,7 @@
  *   Note: Sequential version provides better control.
  *
  * Author: Sharjeel Imtiaz (Tallinn University of Technology)
- * Date: January 2025
+ * Date: January 2026
  */
 
 module {{MODULE_NAME}}_trojan (

@@ -1,0 +1,62 @@
+# Trojan Generation Summary
+
+**Module:** TestSourceCAM_Top
+**File:** TestSourceCAM_Top.sv
+**Type:** Sequential
+**Total Candidates:** 3
+
+---
+
+## Generated Trojans
+
+### T1: DoS - Denial of Service
+
+**Trust-Hub Source:** AES-T1400
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Disables functionality by forcing control signals to 0
+
+**Trigger Signals (1):**
+- unpackedDispatchedSrcReady
+
+**Payload Signals (1):**
+- unpackedDispatchedSrcReady
+
+**Generated File:** T1_TestSourceCAM_Top_DoS.sv
+
+---
+
+### T2: Integrity - Integrity Violation
+
+**Trust-Hub Source:** AES-T800
+**Severity:** High
+**Confidence:** 0.60
+**Description:** Corrupts computation results or data
+
+**Trigger Signals (0):**
+
+**Payload Signals (1):**
+- rstOut
+
+**Generated File:** T2_TestSourceCAM_Top_Integrity.sv
+
+---
+
+### T3: Availability - Performance Degradation
+
+**Trust-Hub Source:** Custom
+**Severity:** Medium
+**Confidence:** 0.60
+**Description:** Degrades performance through artificial delays
+
+**Trigger Signals (0):**
+
+**Payload Signals (3):**
+- unpackedDispatch
+- unpackedDispatchedSrcReady
+- unpackedWakeup
+
+**Generated File:** T3_TestSourceCAM_Top_Availability.sv
+
+---
+

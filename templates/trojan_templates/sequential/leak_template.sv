@@ -29,8 +29,8 @@
  *   Copies sensitive data to unused output port or debug interface
  *
  * Author: Sharjeel Imtiaz (Tallinn University of Technology)
- * Date: January 2025
- * License: MIT
+ * Date: January 2026
+ * 
  */
 
 module {{MODULE_NAME}}_trojan (

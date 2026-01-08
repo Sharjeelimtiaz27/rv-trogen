@@ -11,7 +11,7 @@
  *   Condition-based data leakage for combinational logic.
  *
  * Author: Sharjeel Imtiaz (Tallinn University of Technology)
- * Date: January 2025
+ * Date: January 2026
  */
 
 module {{MODULE_NAME}}_trojan (
