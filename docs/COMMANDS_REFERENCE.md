@@ -287,6 +287,61 @@ security_modules = batch.filter_security_critical(modules)
 batch.print_summary()
 batch.save_summary_json('results.json')
 ```
+### Simulation Setup & Validation â­ NEW (Step 15)
+
+#### One-Time Setup
+```bash
+# Configure simulation environment (interactive wizard)
+python scripts/setup_simulation.py
+
+# This creates: config/simulation_config.py
+# Configure once, use forever
+```
+
+**Setup Options:**
+- Local simulation (if Verilator/QuestaSim installed locally)
+- Remote simulation (university server via SSH)
+- Auto mode (try local, fallback to remote)
+
+**For Remote Simulation:**
+- Prompts for server hostname, username
+- Handles CAD environment managers (e.g., 'cad' menu)
+- Secure password authentication (not stored)
+- SSH/SFTP using Paramiko library
+
+#### Compilation Validation
+```bash
+# Quick compilation check (tests first 10 Trojans)
+python scripts/validate_compilation.py
+
+# Tests Trojans compile on remote server
+# Uses QuestaSim on university HPC cluster
+# 100% success rate achieved
+```
+
+**Output Example:**
+```
+🔐 Connecting to sharjeel@ekleer.pld.ttu.ee...
+Password: ********
+✅ Connected successfully!
+
+📂 Finding generated Trojans...
+Found 929 Trojan files
+
+🧪 Testing compilation (first 10 files)...
+📤 Transferring T1_ibex_alu_Integrity.sv... ✓
+🔧 Compiling T1_ibex_alu_Integrity.sv... ✅
+...
+
+✅ Passed: 10/10
+🎉 All tested Trojans compile successfully!
+```
+
+#### Full Simulation (Coming in Step 16)
+```bash
+# Full simulation with testbenches (not yet implemented)
+python scripts/run_simulations.py
+```
 
 ---
 

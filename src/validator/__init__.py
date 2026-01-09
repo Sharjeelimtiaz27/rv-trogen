@@ -1,17 +1,8 @@
 """
-Validation Framework
-Simulates, analyzes VCD, and generates comparison reports
-
-NOTE: These modules will be implemented in Week 3 (Steps 14-17)
-For now, this is a placeholder to prevent import errors.
+RV-TroGen Validation Module
+Handles simulation and validation of generated Trojans
 """
 
-# Placeholder - will be implemented in Week 3
-# from .simulator import QuestaSimulator
-# from .vcd_analyzer import VCDAnalyzer
-# from .signal_comparator import SignalComparator
-# from .report_generator import ReportGenerator
+from .remote_simulator import RemoteSimulator
 
-# __all__ = ['QuestaSimulator', 'VCDAnalyzer', 'SignalComparator', 'ReportGenerator']
-
-__all__ = []
+__all__ = ['RemoteSimulator']

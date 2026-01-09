@@ -15,3 +15,6 @@ flake8>=4.0.0
 # Documentation
 sphinx>=4.0.0
 sphinx-rtd-theme>=1.0.0
+
+# Step 15: Remote Simulation Framework
+paramiko>=3.0.0

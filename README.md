@@ -1,34 +1,34 @@
-# 🔧 RV-TroGen
+# RV-TroGen
 
 **Automated Hardware Trojan Generation for RISC-V Processors**
 
-[![License: MIT](https://img.shields.io/badge/License-Academic-blue.svg)](LICENSE)
+[![License: Academic](https://img.shields.io/badge/License-Academic-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Status: Beta](https://img.shields.io/badge/status-beta-orange.svg)]()
 
 ---
 
-## 📖 What is RV-TroGen?
+## What is RV-TroGen?
 
 **RV-TroGen** is the first automated framework for systematic hardware Trojan generation specifically designed for RISC-V processors. It helps security researchers and processor designers:
 
-- ✅ **Test security assertions** - Validate formal verification tools with real Trojans
-- ✅ **Evaluate detection methods** - Generate diverse Trojan variants for testing
-- ✅ **Research hardware security** - Systematic exploration of RISC-V vulnerabilities
-- ✅ **Education** - Learn about hardware Trojans through hands-on examples
+- **Test security assertions** - Validate formal verification tools with real Trojans
+- **Evaluate detection methods** - Generate diverse Trojan variants for testing
+- **Research hardware security** - Systematic exploration of RISC-V vulnerabilities
+- **Education** - Learn about hardware Trojans through hands-on examples
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
 ### **Automated Generation**
 First tool to automatically generate hardware Trojans for RISC-V processors - from manual insertion (days) to automated generation (minutes).
 
 ### **Multi-Core Support**
 Works across multiple open-source RISC-V implementations:
-- ✅ lowRISC Ibex (RV32IMC)
-- ✅ OpenHW CVA6 (RV64GC)
-- ✅ RSD (Out-of-order processor)
+- lowRISC Ibex (RV32IMC)
+- OpenHW CVA6 (RV64GC)
+- RSD (Out-of-order processor)
 
 ### **Six Trojan Categories**
 Based on Trust-Hub taxonomy and RISC-V security literature:
@@ -41,17 +41,24 @@ Based on Trust-Hub taxonomy and RISC-V security literature:
 
 ### **Template-Based Generation**
 12 SystemVerilog templates (6 sequential + 6 combinational) providing:
-- ✅ Reproducible pattern encoding
-- ✅ Independent verification
-- ✅ Easy extensibility
-- ✅ Direct comparison with Trust-Hub
+- Reproducible pattern encoding
+- Independent verification
+- Easy extensibility
+- Direct comparison with Trust-Hub
+
+### **Remote Simulation Support**
+Built-in support for university HPC clusters and remote servers:
+- SSH/SFTP integration via Paramiko
+- Automatic CAD environment loading
+- QuestaSim compilation validation
+- Flexible local/remote configuration
 
 ### **Open Source**
 Fully open-source tool for the security research community.
 
 ---
 
-## 🚀 Quick Start (5 Minutes)
+## Quick Start (5 Minutes)
 
 ### Step 1: Install
 ```bash
@@ -65,8 +72,11 @@ python install.py
 # Alternative: Manual install
 python -m pip install -e .
 
+# Install validation dependencies (for Step 15)
+python -m pip install paramiko --break-system-packages
+
 # Verify installation
-python -c "from src.parser import RTLParser; print('✅ Installed successfully!')"
+python -c "from src.parser import RTLParser; print('Installed successfully!')"
 ```
 
 ### Step 2: Parse Your First Module
@@ -77,7 +87,7 @@ python -m src/parser/rtl_parser.py examples/ibex/original/ibex_cs_registers.sv
 
 **Output:**
 ```
-🔍 Parsing: ibex_cs_registers.sv
+Parsing: ibex_cs_registers.sv
 
 ============================================================
 Module: ibex_cs_registers
@@ -89,7 +99,7 @@ Has Reset: True
 ============================================================
 ```
 
-### Step 3: Generate Trojans ⭐ NEW!
+### Step 3: Generate Trojans
 ```bash
 # Generate Trojans for a security-critical module
 python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
@@ -111,11 +121,20 @@ python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
 python scripts/parse_and_rank.py examples/ibex/original --top 5
 ```
 
+### Step 5: Setup Simulation (NEW - Step 15)
+```bash
+# Configure simulation environment (one-time setup)
+python scripts/setup_simulation.py
+
+# Validate that Trojans compile successfully
+python scripts/validate_compilation.py
+```
+
 ---
 
-## 📦 What's Currently Working
+## What's Currently Working
 
-### ✅ **Parser Module (Week 1 - COMPLETE)**
+### **Parser Module (Week 1 - COMPLETE)**
 
 **Parse any Verilog/SystemVerilog file:**
 ```python
@@ -130,23 +149,25 @@ print(f"Inputs: {len(module.inputs)}")
 ```
 
 **Features:**
-- ✅ Extracts all signals (inputs, outputs, internals)
-- ✅ Classifies sequential vs combinational
-- ✅ Detects clock and reset signals
-- ✅ Batch processing for multiple files
-- ✅ Security-critical module identification
+- Extracts all signals (inputs, outputs, internals)
+- Classifies sequential vs combinational
+- Detects clock and reset signals
+- Batch processing for multiple files
+- Security-critical module identification
 
 **Test Coverage:** 74% (19/19 tests passing)
 
-### ✅ **Generator Module (Week 2 Steps 7-14 - COMPLETE)**
+---
 
-- ✅ Pattern library (6 categories)
-- ✅ Sequential/Combinational generators
-- ✅ Smart output organization
-- ✅ Trojan summary reports
-- ✅ **Template library (12 templates)**
-- ✅ **Template integration complete** ← NEW!
-- ✅ **Batch generation for all 3 processors** ← NEW!
+### **Generator Module (Week 2 Steps 7-14 - COMPLETE)**
+
+- Pattern library (6 categories)
+- Sequential/Combinational generators
+- Smart output organization
+- Trojan summary reports
+- Template library (12 templates)
+- Template integration complete
+- Batch generation for all 3 processors
 
 **Results:** 929 Trojans generated across 265 modules
 - Ibex: 154 Trojans (28 modules)
@@ -154,36 +175,37 @@ print(f"Inputs: {len(module.inputs)}")
 - RSD: 399 Trojans (152 modules)
 - Processing time: 4.1 seconds
 - Success rate: 100%
-```
 
 ---
 
-### **✅ Template Library (Step 9 - COMPLETE)**
+### **Template Library (Step 9 - COMPLETE)**
 
 **12 SystemVerilog Templates:**
 - 6 Sequential patterns (always_ff based)
 - 6 Combinational patterns (assign/always_comb based)
 
 **Why Templates?**
-- ✅ **Reproducible**: Fixed .sv files, not black-box code generation
-- ✅ **Verifiable**: Each template can be compiled independently
-- ✅ **Extensible**: Add new patterns by creating new templates
-- ✅ **Comparable**: Direct structural comparison with Trust-Hub
+- **Reproducible**: Fixed .sv files, not black-box code generation
+- **Verifiable**: Each template can be compiled independently
+- **Extensible**: Add new patterns by creating new templates
+- **Comparable**: Direct structural comparison with Trust-Hub
 
 **Template Library:**
 ```
 Sequential:                      Combinational:
-✅ dos_template.sv              ✅ dos_template.sv
-✅ leak_template.sv             ✅ leak_template.sv
-✅ privilege_template.sv        ✅ privilege_template.sv
-✅ integrity_template.sv        ✅ integrity_template.sv
-✅ availability_template.sv     ✅ availability_template.sv
-✅ covert_template.sv           ✅ covert_template.sv
+dos_template.sv                  dos_template.sv
+leak_template.sv                 leak_template.sv
+privilege_template.sv            privilege_template.sv
+integrity_template.sv            integrity_template.sv
+availability_template.sv         availability_template.sv
+covert_template.sv               covert_template.sv
 ```
 
 **See:** [docs/TEMPLATES.md](docs/TEMPLATES.md) for detailed documentation.
 
-### ✅ **Batch Generation (Step 14 - COMPLETE)**
+---
+
+### **Batch Generation (Step 14 - COMPLETE)**
 
 **Generated 929 Trojans in 4.1 seconds:**
 
@@ -195,7 +217,7 @@ Sequential:                      Combinational:
 | **Total** | **265** | **929** | **3.5** |
 
 **Why 929 instead of 1,590?** Intelligent pattern matching only generates Trojans when:
-- Module signals match pattern keywords (confidence ≥ 0.4)
+- Module signals match pattern keywords (confidence >= 0.4)
 - Suitable trigger and/or payload signals exist
 - Module type is compatible with pattern
 
@@ -212,18 +234,58 @@ python scripts/batch_generate.py --processor ibex
 # Dry run (test)
 python scripts/batch_generate.py --dry-run
 ```
-```
-
-### ⏸️ **Validator Module (Week 3 - PLANNED)**
-
-- Simulation integration
-- Signal comparison
-- Behavioral analysis
-- HTML reports with waveforms
 
 ---
 
-## 🛠️ Command-Line Tools
+### **Validator Module (Step 15 - COMPLETE)**
+
+**Remote Simulation Framework:**
+
+Built for researchers working with university HPC clusters or remote servers with expensive EDA tools (QuestaSim, ModelSim, VCS).
+
+**Key Features:**
+- SSH/SFTP connection to remote servers via Paramiko
+- Automatic CAD environment loading (module systems)
+- QuestaSim compilation validation
+- Secure password authentication (not stored)
+- Flexible configuration (local/remote/auto modes)
+
+**Configuration:**
+```bash
+# Interactive setup wizard (one-time)
+python scripts/setup_simulation.py
+
+# Validates Trojans compile on remote server
+python scripts/validate_compilation.py
+```
+
+**Validation Results:**
+- Tested: 10 Trojans on university server
+- Server: QuestaSim 2024.3 (Siemens Graphics 2025)
+- Patterns: DoS, Leak, Privilege, Integrity, Availability, Covert
+- Success rate: 10/10 (100%)
+- Proves syntactic correctness of generated RTL
+
+**Supports:**
+- Local simulation (Verilator, QuestaSim, Icarus)
+- Remote simulation via SSH (university servers)
+- CAD environment managers ('cad', 'module load')
+- Password or SSH key authentication
+
+**Example Setup (University Server):**
+```
+Server: ekleer.pld.ttu.ee
+CAD System: Siemens Graphics 2025
+Access: SSH + password
+Environment: 'cad' menu system
+Result: All Trojans compile successfully
+```
+
+**See:** [docs/SIMULATION_SETUP.md](docs/SIMULATION_SETUP.md) for complete guide.
+
+---
+
+## Command-Line Tools
 ```bash
 # 1. Parse single module
 python -m src/parser/rtl_parser.py <module.sv>
@@ -237,118 +299,146 @@ python -m scripts/batch_parse.py --dir <directory> --security-only
 # 4. Rank by security importance
 python -m scripts/parse_and_rank.py <directory> --top 10
 
-# 5. Generate Trojans 
+# 5. Generate Trojans for single module
 python scripts/generate_trojans.py <module.sv>
 
-# 6. Batch generate for all processors ⭐ NEW!
+# 6. Batch generate for all processors
 python scripts/batch_generate.py                    # All 3 processors
 python scripts/batch_generate.py --processor ibex   # Single processor
 python scripts/batch_generate.py --dry-run          # Test without generating
 
-# 7. Save results to JSON
+# 7. Setup simulation environment (NEW)
+python scripts/setup_simulation.py
+
+# 8. Validate compilation (NEW)
+python scripts/validate_compilation.py
+
+# 9. Save results to JSON
 python -m scripts/batch_parse.py --dir <directory> --save-json
 
-# 8. Run tests
+# 10. Run tests
 python -m pytest tests/ -v
 ```
 
 ---
 
-## 📊 Project Status
+## Project Status
 ```
-✅ Week 1: Parser Implementation (Steps 1-6) - COMPLETE
-   ├── ✅ RTL parser core
-   ├── ✅ Signal extraction
-   ├── ✅ Module classification
-   ├── ✅ Batch processing
-   ├── ✅ Security ranking
-   └── ✅ 19 unit tests (100% passing, 74% coverage)
+Week 1: Parser Implementation (Steps 1-6) - COMPLETE
+   - RTL parser core
+   - Signal extraction
+   - Module classification
+   - Batch processing
+   - Security ranking
+   - 19 unit tests (100% passing, 74% coverage)
 
-✅ Week 2: Generator & Templates (Steps 7-10) - COMPLETE
-   ├── ✅ Pattern library split (6 modules)
-   ├── ✅ Generator split (sequential/combinational)
-   ├── ✅ Wrapper script (generate_trojans.py)
-   ├── ✅ Smart output organization
-   ├── ✅ Template library (12 templates)
-   └── ✅ Generator unit tests (20 tests passing)
+Week 2: Generator & Templates (Steps 7-10) - COMPLETE
+   - Pattern library split (6 modules)
+   - Generator split (sequential/combinational)
+   - Wrapper script (generate_trojans.py)
+   - Smart output organization
+   - Template library (12 templates)
+   - Generator unit tests (20 tests passing)
 
-✅ Week 2: Template Integration & Downloads (Steps 11-14) - COMPLETE
-   ├── ✅ Update generator to use templates (Step 11)
-   ├── ✅ Examples reorganization (Step 12)
-   ├── ✅ RTL download for CVA6 & RSD (Step 13)
-   └── ✅ Batch Trojan generation (Step 14)
-      └── 929 Trojans generated across 265 modules in 4.1 seconds!
+Week 2: Template Integration & Downloads (Steps 11-14) - COMPLETE
+   - Update generator to use templates (Step 11)
+   - Examples reorganization (Step 12)
+   - RTL download for CVA6 & RSD (Step 13)
+   - Batch Trojan generation (Step 14)
+   - 929 Trojans generated across 265 modules in 4.1 seconds
 
-⏸️ Week 3: Validation Framework (Steps 15-19) - PLANNED
-   └── Simulation, comparison, reporting
+Week 3: Validation Framework (Steps 15-19) - IN PROGRESS
+   - Remote simulation framework (Step 15) - COMPLETE
+     * 100% compilation validation on university server
+   - Full simulation with testbenches (Step 16) - PLANNED
+   - VCD analysis and comparison (Step 17) - PLANNED
+   - Validation tests (Step 18) - PLANNED
+   - HTML reports (Step 19) - PLANNED
 
-⏸️ Week 4-5: Polish & Release (Steps 20-30) - PLANNED
-   └── Examples, CI/CD, documentation
+Week 4-5: Polish & Release (Steps 20-30) - PLANNED
+   - Examples, CI/CD, documentation
 ```
 
-**Progress:** 14/30 steps (47%) - Batch generation complete!
+**Progress:** 15/30 steps (50%)
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 ```
 rv-trogen/
 ├── src/
-│   ├── parser/              ✅ COMPLETE (Week 1)
+│   ├── parser/              COMPLETE (Week 1)
 │   │   ├── rtl_parser.py
 │   │   ├── signal_extractor.py
 │   │   └── module_classifier.py
-│   ├── patterns/            ✅ COMPLETE (Week 2)
+│   ├── patterns/            COMPLETE (Week 2)
 │   │   ├── dos_pattern.py
 │   │   ├── leak_pattern.py
 │   │   ├── privilege_pattern.py
 │   │   ├── integrity_pattern.py
 │   │   ├── availability_pattern.py
 │   │   └── covert_pattern.py
-│   ├── generator/           ✅ COMPLETE (Week 2)
+│   ├── generator/           COMPLETE (Week 2)
 │   │   ├── trojan_generator.py
 │   │   ├── sequential_gen.py
-│   │   └── combinational_gen.py
-│   └── validator/           ⏸️ PLANNED (Week 3)
-├── templates/               ✅ NEW! (Step 9)
+│   │   ├── combinational_gen.py
+│   │   ├── template_loader.py
+│   │   └── placeholder_handler.py
+│   └── validator/           IN PROGRESS (Week 3)
+│       ├── __init__.py
+│       └── remote_simulator.py
+├── templates/               COMPLETE (Step 9)
 │   └── trojan_templates/
 │       ├── sequential/ (6 templates)
 │       └── combinational/ (6 templates)
+├── config/                  NEW (Step 15)
+│   └── simulation_config.py
 ├── scripts/
-│   ├── batch_parse.py       ✅ Parser wrapper
-│   ├── parse_and_rank.py    ✅ Security ranking
-│   └── generate_trojans.py  ✅ Generator wrapper
+│   ├── batch_parse.py       Parser wrapper
+│   ├── parse_and_rank.py    Security ranking
+│   ├── generate_trojans.py  Generator wrapper
+│   ├── batch_generate.py    Batch generation
+│   ├── setup_simulation.py  Simulation setup (NEW)
+│   └── validate_compilation.py  Compilation validator (NEW)
 ├── docs/
-│   ├── QUICK_START.md       ✅ Beginner tutorial
-│   ├── COMMANDS_REFERENCE.md ✅ Command guide
-│   ├── TEMPLATES.md         ✅ Template documentation
-│   ├── TRUST_HUB_PATTERNS.md ✅ Pattern library
-│   └── STEP_GUIDE.md        ✅ Progress tracking
+│   ├── QUICK_START.md       Beginner tutorial
+│   ├── COMMANDS_REFERENCE.md Command guide
+│   ├── TEMPLATES.md         Template documentation
+│   ├── TRUST_HUB_PATTERNS.md Pattern library
+│   ├── SIMULATION_SETUP.md  Simulation guide (NEW)
+│   └── STEP_GUIDE.md        Progress tracking
 ├── tests/
-│   └── test_parser.py       ✅ 19 tests
+│   └── test_parser.py       19 tests
 └── examples/
-    └── ibex/
-        ├── original/        ✅ Test modules
-        └── generated_trojans/ ✅ Generated Trojans
+    ├── ibex/
+    │   ├── original/        Test modules
+    │   └── generated_trojans/ Generated Trojans
+    ├── cva6/
+    │   ├── original/        CVA6 RTL
+    │   └── generated_trojans/ Generated Trojans
+    └── rsd/
+        ├── original/        RSD RTL
+        └── generated_trojans/ Generated Trojans
 ```
 
 ---
 
-## 🆚 Comparison with Related Work
+## Comparison with Related Work
 
 | Feature | RV-TroGen (Ours) | Lipp et al. [1] | Trust-Hub [2] | TrojanForge [3] |
 |---------|------------------|-----------------|---------------|-----------------|
 | **Target** | RISC-V (Ibex/CVA6/RSD) | RISC-V (PULPino) | AES/RSA | Generic |
 | **Approach** | Template-based | Manual insertion | Manual benchmarks | ML/RL-based |
-| **Automation** | ✅ Fully automated | ❌ Manual | ❌ Manual | ✅ Automated |
-| **Multi-Core** | ✅ 3 cores | ❌ Single | ❌ Single design | ❌ Generic |
+| **Automation** | Fully automated | Manual | Manual | Automated |
+| **Multi-Core** | 3 cores | Single | Single design | Generic |
 | **Patterns** | 6 categories | 4 types | Various | Black-box |
-| **Templates** | ✅ 12 templates | ❌ | ❌ | ❌ |
-| **Validation** | ✅ Planned | ✅ Silicon | ✅ Benchmarks | ❌ Evasion-focused |
-| **Open-Source** | ✅ Yes | ⚠️ Partial | ❌ No | ❌ No |
-| **Documentation** | ✅ Comprehensive | ⚠️ Paper only | ⚠️ Limited | ⚠️ Paper only |
+| **Templates** | 12 templates | No | No | No |
+| **Validation** | QuestaSim (100%) | Silicon | Benchmarks | Evasion-focused |
+| **Remote Simulation** | Yes (SSH/SFTP) | No | No | No |
+| **Open-Source** | Yes | Partial | No | No |
+| **Documentation** | Comprehensive | Paper only | Limited | Paper only |
 
-**Key Innovation:** First automated, template-based, open-source framework for RISC-V Trojan generation.
+**Key Innovation:** First automated, template-based, open-source framework for RISC-V Trojan generation with remote simulation support.
 
 **References:**
 - [1] Lipp et al., "Tapeout of a RISC-V crypto chip with hardware trojans," ACM CF 2021
@@ -357,7 +447,7 @@ rv-trogen/
 
 ---
 
-## 🎯 Use Cases
+## Use Cases
 
 ### **1. Security Researcher**
 Test your Trojan detection algorithms:
@@ -365,7 +455,10 @@ Test your Trojan detection algorithms:
 # Generate diverse Trojan variants
 python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
 
-# Use generated Trojans to validate your detection tool
+# Validate they compile
+python scripts/validate_compilation.py
+
+# Use generated Trojans to test your detection tool
 ```
 
 ### **2. Processor Designer**
@@ -376,6 +469,9 @@ python scripts/parse_and_rank.py my_processor/rtl --top 5
 
 # Generate test cases for formal verification
 python scripts/generate_trojans.py <critical_module.sv>
+
+# Compile on your simulation server
+python scripts/validate_compilation.py
 ```
 
 ### **3. Educator/Student**
@@ -386,11 +482,14 @@ python -m src/parser/rtl_parser.py examples/ibex/original/ibex_cs_registers.sv
 
 # Generate and study Trojan examples
 python scripts/generate_trojans.py examples/ibex/original/ibex_alu.sv
+
+# See how they compile
+python scripts/validate_compilation.py
 ```
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 ### **Getting Started:**
 - [Quick Start Guide](docs/QUICK_START.md) - 15-minute tutorial
@@ -398,13 +497,14 @@ python scripts/generate_trojans.py examples/ibex/original/ibex_alu.sv
 - [Step-by-Step Progress](docs/STEP_GUIDE.md) - Development roadmap
 
 ### **Technical Details:**
-- [Template Library](docs/TEMPLATES.md) - Template documentation ⭐ NEW!
+- [Template Library](docs/TEMPLATES.md) - Template documentation
+- [Simulation Setup](docs/SIMULATION_SETUP.md) - Remote simulation guide (NEW)
 - [Trust-Hub Patterns](docs/TRUST_HUB_PATTERNS.md) - Pattern library with citations
 - [Parser Architecture](docs/parser/PARSER_ARCHITECTURE.md) - Implementation details
 
 ---
 
-## 🧪 Testing & Validation
+## Testing & Validation
 ```bash
 # Run all tests
 python -m pytest tests/ -v
@@ -415,37 +515,66 @@ python -m pytest tests/ -v
 python -m pytest --cov=src/parser tests/
 
 # Expected: 74% coverage
+
+# Validate Trojan compilation
+python scripts/validate_compilation.py
+
+# Expected: 10/10 passed (100%)
 ```
 
 ---
 
-## 🤝 Contributing
+## Dependencies
+
+### Core Dependencies
+```bash
+pytest>=7.0.0
+pytest-cov>=3.0.0
+```
+
+### Validation Dependencies (Step 15)
+```bash
+paramiko>=3.0.0  # SSH/SFTP for remote simulation
+```
+
+### Installation
+```bash
+# Core installation
+python -m pip install -e .
+
+# Add validation support
+python -m pip install paramiko --break-system-packages
+```
+
+---
+
+## Contributing
 
 We welcome contributions! Current needs:
 
 **High Priority:**
-- Testing on CVA6 and RSD cores
-- Template validation (Step 10)
-- Generator template integration (Step 11)
+- Full simulation with testbenches (Step 16)
+- VCD waveform analysis (Step 17)
+- Testing on more processors
 
 **Medium Priority:**
 - Additional Trojan patterns
-- Validation framework (Week 3)
+- Local simulation support (Verilator)
 - Documentation improvements
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ---
 
-## 📜 License
+## License
 
 **Academic and Research Use Only**
 
 This is a PhD research project from Tallinn University of Technology.
 
-- ✅ Free for academic research and education
-- ✅ Cite our paper if you use it
-- ❌ Commercial use requires permission
+- Free for academic research and education
+- Cite our paper if you use it
+- Commercial use requires permission
 
 For inquiries: sharjeel.imtiaz@taltech.ee
 
@@ -453,7 +582,7 @@ See [LICENSE](LICENSE) for full terms.
 
 ---
 
-## 📧 Contact & Support
+## Contact & Support
 
 - **Author:** Sharjeel Imtiaz
 - **Email:** sharjeel.imtiaz@taltech.ee
@@ -463,7 +592,7 @@ See [LICENSE](LICENSE) for full terms.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 This work builds upon:
 - **Trust-Hub** - Hardware Trojan benchmarks and taxonomy
@@ -481,7 +610,7 @@ See [docs/TRUST_HUB_PATTERNS.md](docs/TRUST_HUB_PATTERNS.md) for complete refere
 
 ---
 
-## 📝 Citation
+## Citation
 
 If you use RV-TroGen in your research, please cite:
 ```bibtex
@@ -497,27 +626,27 @@ If you use RV-TroGen in your research, please cite:
 
 ---
 
-## ⚖️ Ethical Use
+## Ethical Use
 
 **Important:** This tool is designed for:
-- ✅ Security research and testing
-- ✅ Educational purposes
-- ✅ Validating detection methods
-- ✅ Improving processor security
+- Security research and testing
+- Educational purposes
+- Validating detection methods
+- Improving processor security
 
 **Not intended for:**
-- ❌ Malicious hardware insertion
-- ❌ Compromising production systems
-- ❌ Any illegal activities
+- Malicious hardware insertion
+- Compromising production systems
+- Any illegal activities
 
 Users are responsible for ethical and legal use of this software.
 
 ---
 
 **Current Version:** 1.0.0-beta  
-**Last Updated:** January 2026  
-**Status:** Active Development (47% Complete - Step 14 Done - 929 Trojans Generated!)
+**Last Updated:** January 9, 2026  
+**Status:** Active Development (50% Complete - Step 15 Done - Remote Simulation Working!)
 
 ---
 
-**⭐ Star this repo if you find it useful!**
+**Star this repo if you find it useful!**
