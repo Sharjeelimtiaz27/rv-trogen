@@ -43,7 +43,7 @@ REMOTE_SIMULATOR = {
     
     # Simulator
     'tool': 'questasim',
-    'questasim_path': 'qsim',
+    'questasim_path': 'vsim',
     'remote_work_dir': '/home/sharjeel/sharjeelphd/Research/rv_trogen',
     
     # Transfer

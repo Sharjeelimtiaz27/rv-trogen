@@ -1,0 +1,18 @@
+VCD WAVEFORM COMPARISON REPORT
+======================================================================
+
+Original VCD: simulation_results\vcd\ibex_csr_original.vcd
+Trojan VCD: simulation_results\vcd\ibex_csr_trojan.vcd
+Time Range: 30120 - 30130 ns
+
+Total signals compared: 10
+Signals with differences: 1
+
+DETAILED DIFFERENCES:
+======================================================================
+
+Signal: rd_data_o
+  Number of differences: 1
+  Time points with differences:
+    Time  30125 ns: Original=0xef8d64df  Trojan=0x3120da30  (XOR=0xdeadbeef)
+

