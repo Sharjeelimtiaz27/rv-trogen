@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Main Trojan Generator - Orchestrator
-Dispatches to Sequential or Combinational generator based on module type
+Main Trojan Generator - FIXED VERSION
+STRICT signal matching - only generates if REAL signals found
+Skips patterns with no matching signals
 """
 
 import sys
@@ -19,13 +20,10 @@ from src.generator.combinational_gen import CombinationalGenerator
 
 class TrojanGenerator:
     """
-    Main Trojan Generator
+    Main Trojan Generator - STRICT MODE
     
-    Orchestrates Trojan generation by:
-    1. Parsing the RTL module
-    2. Matching signals to patterns
-    3. Dispatching to appropriate generator (seq/comb)
-    4. Generating SystemVerilog Trojan code
+    Only generates trojans when REAL matching signals are found
+    NO fallbacks to hardcoded signal names
     """
     
     def __init__(self, rtl_file: str):
@@ -41,7 +39,7 @@ class TrojanGenerator:
         
     def parse_module(self):
         """Parse the RTL module"""
-        print(f"🔍 Parsing: {self.rtl_file.name}")
+        print(f"📄 Parsing: {self.rtl_file.name}")
         
         parser = RTLParser(str(self.rtl_file))
         self.module = parser.parse()
@@ -51,18 +49,19 @@ class TrojanGenerator:
         print(f"   Signals: {len(self.module.get_all_signals())}")
     
     def find_candidates(self):
-        """Find Trojan candidates by matching signals to patterns"""
-        print(f"\n🎯 Finding Trojan candidates...")
+        """
+        Find Trojan candidates by matching signals to patterns
+        
+        STRICT MODE: Only adds candidate if BOTH trigger AND payload signals found
+        """
+        print(f"\n🎯 Finding Trojan candidates (STRICT MODE)...")
         
         patterns = get_all_patterns()
         all_signals = self.module.get_all_signals()
         
         for pattern in patterns:
-            # Calculate confidence score
-            trigger_matches = []
-            payload_matches = []
-            
             # Match trigger signals
+            trigger_matches = []
             for signal in all_signals:
                 signal_name_lower = signal.name.lower()
                 for keyword in pattern.trigger_keywords:
@@ -71,6 +70,7 @@ class TrojanGenerator:
                         break
             
             # Match payload signals
+            payload_matches = []
             for signal in all_signals:
                 signal_name_lower = signal.name.lower()
                 for keyword in pattern.payload_keywords:
@@ -78,41 +78,48 @@ class TrojanGenerator:
                         payload_matches.append(signal)
                         break
             
-            # Calculate confidence
-            confidence = 0.0
-            if trigger_matches:
-                confidence += 0.4
-            if payload_matches:
-                confidence += 0.4
-            
-            # Check module type compatibility
-            if pattern.preferred_module_type == 'both':
-                confidence += 0.2
-            elif pattern.preferred_module_type == 'sequential' and self.module.is_sequential:
-                confidence += 0.2
-            elif pattern.preferred_module_type == 'combinational' and not self.module.is_sequential:
-                confidence += 0.2
-            
-            # Only add if we have at least some signals
-            if confidence >= 0.4 and (trigger_matches or payload_matches):
+            # STRICT: Only add if we have BOTH trigger AND payload signals
+            if trigger_matches and payload_matches:
+                # Calculate confidence score
+                confidence = 0.0
+                
+                # Signal matching
+                confidence += 0.4  # Has triggers
+                confidence += 0.4  # Has payloads
+                
+                # Module type compatibility
+                if pattern.preferred_module_type == 'both':
+                    confidence += 0.2
+                elif pattern.preferred_module_type == 'sequential' and self.module.is_sequential:
+                    confidence += 0.2
+                elif pattern.preferred_module_type == 'combinational' and not self.module.is_sequential:
+                    confidence += 0.2
+                
                 self.candidates.append({
                     'pattern': pattern,
                     'confidence': confidence,
                     'trigger_signals': trigger_matches,
                     'payload_signals': payload_matches
                 })
+            else:
+                # SKIP - Not enough signals
+                print(f"   ⊘ Skipped {pattern.name}: ", end="")
+                if not trigger_matches:
+                    print(f"No trigger signals (need: {', '.join(pattern.trigger_keywords[:3])}...)")
+                elif not payload_matches:
+                    print(f"No payload signals (need: {', '.join(pattern.payload_keywords[:3])}...)")
         
         # Sort by confidence
         self.candidates.sort(key=lambda x: x['confidence'], reverse=True)
         
-        print(f"   Found {len(self.candidates)} candidates")
+        print(f"   ✓ Found {len(self.candidates)} valid candidates")
         
         # Print summary
         for i, candidate in enumerate(self.candidates, 1):
             print(f"\n   [{i}] {candidate['pattern'].name}: {candidate['pattern'].category}")
             print(f"       Confidence: {candidate['confidence']:.2f}")
-            print(f"       Triggers: {len(candidate['trigger_signals'])} signals")
-            print(f"       Payloads: {len(candidate['payload_signals'])} signals")
+            print(f"       Triggers: {len(candidate['trigger_signals'])} signals → {[s.name for s in candidate['trigger_signals'][:3]]}")
+            print(f"       Payloads: {len(candidate['payload_signals'])} signals → {[s.name for s in candidate['payload_signals'][:3]]}")
     
     def generate_trojans(self, output_dir: str = "generated_trojans"):
         """
@@ -123,6 +130,8 @@ class TrojanGenerator:
         """
         if not self.candidates:
             print("\n⚠️  No candidates found. Cannot generate Trojans.")
+            print("    This module may not have security-critical signals.")
+            print("    Or signal names don't match pattern keywords.")
             return
         
         output_path = Path(output_dir)
@@ -169,6 +178,9 @@ class TrojanGenerator:
                 print(f"\n   ✓ {trojan_id}: {pattern_name} → {filename}")
                 print(f"      {trojan_code.description}")
                 
+            except ValueError as e:
+                # This should rarely happen now with STRICT matching
+                print(f"\n   ✗ {trojan_id}: {pattern_name} - Skipped: {e}")
             except Exception as e:
                 print(f"\n   ✗ {trojan_id}: {pattern_name} - Error: {e}")
         
@@ -195,7 +207,7 @@ class TrojanGenerator:
             for i, candidate in enumerate(self.candidates, 1):
                 pattern = candidate['pattern']
                 f.write(f"### T{i}: {pattern.name} - {pattern.category}\n\n")
-                f.write(f"**Trust-Hub Source:** {pattern.trust_hub_source}\n")
+                f.write(f"**Trust-Hub Status:** {pattern.trust_hub_status}\n")
                 f.write(f"**Severity:** {pattern.severity}\n")
                 f.write(f"**Confidence:** {candidate['confidence']:.2f}\n")
                 f.write(f"**Description:** {pattern.description}\n\n")
@@ -225,7 +237,7 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(
-        description='Generate hardware Trojans for RTL modules',
+        description='Generate hardware Trojans for RTL modules (STRICT MODE)',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -255,7 +267,7 @@ Examples:
     
     # Generate Trojans
     print("="*60)
-    print("TROJAN GENERATOR")
+    print("TROJAN GENERATOR (STRICT MODE)")
     print("="*60)
     
     gen = TrojanGenerator(args.rtl_file)
@@ -263,7 +275,7 @@ Examples:
     # Step 1: Parse
     gen.parse_module()
     
-    # Step 2: Find candidates
+    # Step 2: Find candidates (STRICT)
     gen.find_candidates()
     
     # Step 3: Generate
@@ -275,7 +287,10 @@ Examples:
             gen.generate_summary_report(args.output)
     else:
         print("\n⚠️  No Trojan candidates found for this module.")
-        print("    This module may not have security-critical signals.")
+        print("    Possible reasons:")
+        print("    - Signal names don't match pattern keywords")
+        print("    - Module doesn't have security-critical signals")
+        print("    - Try different module (e.g., CSR, PMP, controller)")
     
     print("\n" + "="*60)
 

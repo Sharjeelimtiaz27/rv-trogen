@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-Sequential Trojan Generator
-Generates Trojans for sequential modules (always_ff, clocked logic)
-Uses template-based generation approach
+Sequential Trojan Generator - FIXED VERSION
+NO FALLBACKS - Uses ONLY real signals from parsed RTL
 """
 
 from typing import Dict, List
@@ -29,16 +28,8 @@ class SequentialGenerator:
     """
     Generates Trojans for Sequential Modules using Templates
     
-    Sequential modules have:
-    - Clock signal (clk)
-    - Reset signal (rst)
-    - State (registers, flip-flops)
-    - always_ff blocks
-    
-    Trojan Generation Strategy:
-    - Load template from templates/trojan_templates/sequential/
-    - Replace placeholders with actual signal names
-    - Generate complete Trojan code
+    STRICT MODE: Only generates if REAL signals exist
+    NO FALLBACKS to hardcoded signal names
     """
     
     def __init__(self, module):
@@ -58,15 +49,22 @@ class SequentialGenerator:
         
     def generate_dos_trojan(self, trojan_id: str, trigger_signals: List, 
                            payload_signals: List) -> SequentialTrojanCode:
-        """Generate DoS Trojan using template"""
+        """Generate DoS Trojan using template - STRICT MODE"""
         
-        trigger_sig = trigger_signals[0].name if trigger_signals else 'valid_signal'
-        payload_sig = payload_signals[0].name if payload_signals else 'ready_signal'
+        # STRICT: Require both trigger and payload signals
+        if not trigger_signals:
+            raise ValueError("DoS trojan requires trigger signal (enable/valid/ready)")
+        if not payload_signals:
+            raise ValueError("DoS trojan requires payload signal to disable")
+        
+        # Use REAL signals from module
+        trigger_sig = trigger_signals[0].name
+        payload_sig = payload_signals[0].name
         
         # Load template
         template = self.loader.load_template('dos', 'sequential')
         
-        # Prepare replacements
+        # Prepare replacements with REAL signal names
         replacements = {
             'TROJAN_ID': trojan_id,
             'MODULE_NAME': self.module.name,
@@ -74,7 +72,6 @@ class SequentialGenerator:
             'RESET_SIGNAL': self.reset_signal,
             'TRIGGER_SIGNAL': trigger_sig,
             'PAYLOAD_SIGNAL': payload_sig,
-            'COUNTER_THRESHOLD': '32\'hFFFF',
         }
         
         # Replace placeholders
@@ -87,16 +84,22 @@ class SequentialGenerator:
             trigger_signals=[s.name for s in trigger_signals],
             payload_signals=[s.name for s in payload_signals],
             code=code,
-            description=f"DoS trojan disabling {payload_sig}"
+            description=f"DoS trojan: disables {payload_sig} after {trigger_sig} activates 1000 times"
         )
     
     def generate_leak_trojan(self, trojan_id: str, trigger_signals: List,
                             payload_signals: List) -> SequentialTrojanCode:
-        """Generate Information Leakage Trojan using template"""
+        """Generate Information Leakage Trojan - STRICT MODE"""
         
-        trigger_sig = trigger_signals[0].name if trigger_signals else 'debug_mode'
-        payload_sig = payload_signals[0].name if payload_signals else 'secret_data'
-        data_width = self._get_signal_width(payload_signals[0]) if payload_signals else '31'
+        # STRICT: Require both signals
+        if not trigger_signals:
+            raise ValueError("Leak trojan requires trigger signal")
+        if not payload_signals:
+            raise ValueError("Leak trojan requires payload signal (secret data to leak)")
+        
+        # Use REAL signals
+        trigger_sig = trigger_signals[0].name
+        payload_sig = payload_signals[0].name
         
         # Load template
         template = self.loader.load_template('leak', 'sequential')
@@ -109,7 +112,6 @@ class SequentialGenerator:
             'RESET_SIGNAL': self.reset_signal,
             'TRIGGER_SIGNAL': trigger_sig,
             'PAYLOAD_SIGNAL': payload_sig,
-            'DATA_WIDTH': data_width,
         }
         
         # Replace placeholders
@@ -122,15 +124,22 @@ class SequentialGenerator:
             trigger_signals=[s.name for s in trigger_signals],
             payload_signals=[s.name for s in payload_signals],
             code=code,
-            description=f"Leaks {payload_sig} through debug channel"
+            description=f"Leak trojan: leaks {payload_sig} when {trigger_sig} activates"
         )
     
     def generate_privilege_trojan(self, trojan_id: str, trigger_signals: List,
                                   payload_signals: List) -> SequentialTrojanCode:
-        """Generate Privilege Escalation Trojan using template"""
+        """Generate Privilege Escalation Trojan - STRICT MODE"""
         
-        trigger_sig = 'csr_we_int' if any('csr' in s.name.lower() for s in trigger_signals) else trigger_signals[0].name if trigger_signals else 'write_enable'
-        payload_sig = payload_signals[0].name if payload_signals else 'priv_lvl_q'
+        # STRICT: Require both signals
+        if not trigger_signals:
+            raise ValueError("Privilege trojan requires trigger signal (CSR write)")
+        if not payload_signals:
+            raise ValueError("Privilege trojan requires payload signal (privilege level)")
+        
+        # Use REAL signals
+        trigger_sig = trigger_signals[0].name
+        payload_sig = payload_signals[0].name
         
         # Load template
         template = self.loader.load_template('privilege', 'sequential')
@@ -155,16 +164,22 @@ class SequentialGenerator:
             trigger_signals=[s.name for s in trigger_signals],
             payload_signals=[s.name for s in payload_signals],
             code=code,
-            description=f"Escalates privilege via CSR backdoor"
+            description=f"Privilege trojan: escalates {payload_sig} to M-mode"
         )
     
     def generate_integrity_trojan(self, trojan_id: str, trigger_signals: List,
                                   payload_signals: List) -> SequentialTrojanCode:
-        """Generate Integrity Violation Trojan using template"""
+        """Generate Integrity Violation Trojan - STRICT MODE"""
         
-        trigger_sig = trigger_signals[0].name if trigger_signals else 'data_valid'
-        payload_sig = payload_signals[0].name if payload_signals else 'data_out'
-        data_width = self._get_signal_width(payload_signals[0]) if payload_signals else '31'
+        # STRICT: Require both signals
+        if not trigger_signals:
+            raise ValueError("Integrity trojan requires trigger signal")
+        if not payload_signals:
+            raise ValueError("Integrity trojan requires payload signal (data to corrupt)")
+        
+        # Use REAL signals
+        trigger_sig = trigger_signals[0].name
+        payload_sig = payload_signals[0].name
         
         # Load template
         template = self.loader.load_template('integrity', 'sequential')
@@ -177,7 +192,6 @@ class SequentialGenerator:
             'RESET_SIGNAL': self.reset_signal,
             'TRIGGER_SIGNAL': trigger_sig,
             'PAYLOAD_SIGNAL': payload_sig,
-            'DATA_WIDTH': data_width,
         }
         
         # Replace placeholders
@@ -190,15 +204,22 @@ class SequentialGenerator:
             trigger_signals=[s.name for s in trigger_signals],
             payload_signals=[s.name for s in payload_signals],
             code=code,
-            description=f"Corrupts {payload_sig} with XOR pattern"
+            description=f"Integrity trojan: corrupts {payload_sig} with XOR mask"
         )
     
     def generate_availability_trojan(self, trojan_id: str, trigger_signals: List,
                                     payload_signals: List) -> SequentialTrojanCode:
-        """Generate Performance Degradation Trojan using template"""
+        """Generate Performance Degradation Trojan - STRICT MODE"""
         
-        trigger_sig = trigger_signals[0].name if trigger_signals else 'request'
-        payload_sig = payload_signals[0].name if payload_signals else 'ready'
+        # STRICT: Require both signals
+        if not trigger_signals:
+            raise ValueError("Availability trojan requires trigger signal")
+        if not payload_signals:
+            raise ValueError("Availability trojan requires payload signal (ready/valid to delay)")
+        
+        # Use REAL signals
+        trigger_sig = trigger_signals[0].name
+        payload_sig = payload_signals[0].name
         
         # Load template
         template = self.loader.load_template('availability', 'sequential')
@@ -223,15 +244,22 @@ class SequentialGenerator:
             trigger_signals=[s.name for s in trigger_signals],
             payload_signals=[s.name for s in payload_signals],
             code=code,
-            description=f"Delays {payload_sig} by 8 cycles"
+            description=f"Availability trojan: delays {payload_sig} by 8 cycles"
         )
     
     def generate_covert_trojan(self, trojan_id: str, trigger_signals: List,
                                payload_signals: List) -> SequentialTrojanCode:
-        """Generate Covert Channel Trojan using template"""
+        """Generate Covert Channel Trojan - STRICT MODE"""
         
-        trigger_sig = trigger_signals[0].name if trigger_signals else 'secret_data'
-        payload_sig = payload_signals[0].name if payload_signals else 'timing_signal'
+        # STRICT: Require both signals
+        if not trigger_signals:
+            raise ValueError("Covert trojan requires trigger signal")
+        if not payload_signals:
+            raise ValueError("Covert trojan requires payload signal (secret data to transmit)")
+        
+        # Use REAL signals
+        trigger_sig = trigger_signals[0].name
+        payload_sig = payload_signals[0].name
         
         # Load template
         template = self.loader.load_template('covert', 'sequential')
@@ -256,14 +284,8 @@ class SequentialGenerator:
             trigger_signals=[s.name for s in trigger_signals],
             payload_signals=[s.name for s in payload_signals],
             code=code,
-            description=f"Timing covert channel"
+            description=f"Covert trojan: timing channel using {payload_sig}"
         )
-    
-    def _get_signal_width(self, signal) -> str:
-        """Get signal width for array indexing"""
-        if signal.is_vector:
-            return str(signal.width - 1)
-        return '0'
     
     def generate(self, pattern_name: str, trojan_id: str, 
                 trigger_signals: List, payload_signals: List) -> SequentialTrojanCode:
@@ -273,11 +295,14 @@ class SequentialGenerator:
         Args:
             pattern_name: Name of Trojan pattern (DoS, Leak, etc.)
             trojan_id: Unique ID for this Trojan
-            trigger_signals: List of trigger Signal objects
-            payload_signals: List of payload Signal objects
+            trigger_signals: List of trigger Signal objects (MUST NOT BE EMPTY)
+            payload_signals: List of payload Signal objects (MUST NOT BE EMPTY)
         
         Returns:
             SequentialTrojanCode object
+            
+        Raises:
+            ValueError: If no matching signals found
         """
         
         generators = {

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-Combinational Trojan Generator
-Generates Trojans for combinational modules (always_comb, assign statements)
-Uses template-based generation approach
+Combinational Trojan Generator - FIXED VERSION
+NO FALLBACKS - Uses ONLY real signals from parsed RTL
 """
 
 from typing import Dict, List
@@ -28,16 +27,8 @@ class CombinationalGenerator:
     """
     Generates Trojans for Combinational Modules using Templates
     
-    Combinational modules have:
-    - No clock signal
-    - No state
-    - always_comb blocks or continuous assignments
-    - Pure logic functions
-    
-    Trojan Generation Strategy:
-    - Load template from templates/trojan_templates/combinational/
-    - Replace placeholders with actual signal names
-    - Generate complete Trojan code
+    STRICT MODE: Only generates if REAL signals exist
+    NO FALLBACKS to hardcoded signal names
     """
     
     def __init__(self, module):
@@ -55,10 +46,17 @@ class CombinationalGenerator:
     
     def generate_dos_trojan(self, trojan_id: str, trigger_signals: List,
                            payload_signals: List) -> CombinationalTrojanCode:
-        """Generate DoS Trojan using template"""
+        """Generate DoS Trojan - STRICT MODE"""
         
-        trigger_sig = trigger_signals[0].name if trigger_signals else 'enable'
-        payload_sig = payload_signals[0].name if payload_signals else 'valid_out'
+        # STRICT: Require both signals
+        if not trigger_signals:
+            raise ValueError("DoS trojan requires trigger signal")
+        if not payload_signals:
+            raise ValueError("DoS trojan requires payload signal to disable")
+        
+        # Use REAL signals
+        trigger_sig = trigger_signals[0].name
+        payload_sig = payload_signals[0].name
         
         # Load template
         template = self.loader.load_template('dos', 'combinational')
@@ -81,16 +79,22 @@ class CombinationalGenerator:
             trigger_signals=[s.name for s in trigger_signals],
             payload_signals=[s.name for s in payload_signals],
             code=code,
-            description=f"DoS trojan disabling {payload_sig}"
+            description=f"DoS trojan: disables {payload_sig} on pattern match"
         )
     
     def generate_leak_trojan(self, trojan_id: str, trigger_signals: List,
                             payload_signals: List) -> CombinationalTrojanCode:
-        """Generate Information Leakage Trojan using template"""
+        """Generate Information Leakage Trojan - STRICT MODE"""
         
-        trigger_sig = trigger_signals[0].name if trigger_signals else 'debug_mode'
-        payload_sig = payload_signals[0].name if payload_signals else 'secret_data'
-        data_width = self._get_signal_width(payload_signals[0]) if payload_signals else '31'
+        # STRICT: Require both signals
+        if not trigger_signals:
+            raise ValueError("Leak trojan requires trigger signal")
+        if not payload_signals:
+            raise ValueError("Leak trojan requires payload signal (secret data)")
+        
+        # Use REAL signals
+        trigger_sig = trigger_signals[0].name
+        payload_sig = payload_signals[0].name
         
         # Load template
         template = self.loader.load_template('leak', 'combinational')
@@ -101,7 +105,6 @@ class CombinationalGenerator:
             'MODULE_NAME': self.module.name,
             'TRIGGER_SIGNAL': trigger_sig,
             'PAYLOAD_SIGNAL': payload_sig,
-            'DATA_WIDTH': data_width,
         }
         
         # Replace placeholders
@@ -114,15 +117,22 @@ class CombinationalGenerator:
             trigger_signals=[s.name for s in trigger_signals],
             payload_signals=[s.name for s in payload_signals],
             code=code,
-            description=f"Leaks {payload_sig} combinationally"
+            description=f"Leak trojan: leaks {payload_sig} on trigger"
         )
     
     def generate_privilege_trojan(self, trojan_id: str, trigger_signals: List,
                                   payload_signals: List) -> CombinationalTrojanCode:
-        """Generate Privilege Escalation Trojan using template"""
+        """Generate Privilege Escalation Trojan - STRICT MODE"""
         
-        trigger_sig = trigger_signals[0].name if trigger_signals else 'addr_in'
-        payload_sig = payload_signals[0].name if payload_signals else 'access_fault'
+        # STRICT: Require both signals
+        if not trigger_signals:
+            raise ValueError("Privilege trojan requires trigger signal")
+        if not payload_signals:
+            raise ValueError("Privilege trojan requires payload signal (privilege level)")
+        
+        # Use REAL signals
+        trigger_sig = trigger_signals[0].name
+        payload_sig = payload_signals[0].name
         
         # Load template
         template = self.loader.load_template('privilege', 'combinational')
@@ -145,16 +155,22 @@ class CombinationalGenerator:
             trigger_signals=[s.name for s in trigger_signals],
             payload_signals=[s.name for s in payload_signals],
             code=code,
-            description=f"Backdoor address bypass"
+            description=f"Privilege trojan: escalates {payload_sig} to M-mode"
         )
     
     def generate_integrity_trojan(self, trojan_id: str, trigger_signals: List,
                                   payload_signals: List) -> CombinationalTrojanCode:
-        """Generate Integrity Violation Trojan using template"""
+        """Generate Integrity Violation Trojan - STRICT MODE"""
         
-        trigger_sig = trigger_signals[0].name if trigger_signals else 'data_in'
-        payload_sig = payload_signals[0].name if payload_signals else 'data_out'
-        data_width = self._get_signal_width(payload_signals[0]) if payload_signals else '31'
+        # STRICT: Require both signals
+        if not trigger_signals:
+            raise ValueError("Integrity trojan requires trigger signal")
+        if not payload_signals:
+            raise ValueError("Integrity trojan requires payload signal (data to corrupt)")
+        
+        # Use REAL signals
+        trigger_sig = trigger_signals[0].name
+        payload_sig = payload_signals[0].name
         
         # Load template
         template = self.loader.load_template('integrity', 'combinational')
@@ -165,7 +181,6 @@ class CombinationalGenerator:
             'MODULE_NAME': self.module.name,
             'TRIGGER_SIGNAL': trigger_sig,
             'PAYLOAD_SIGNAL': payload_sig,
-            'DATA_WIDTH': data_width,
         }
         
         # Replace placeholders
@@ -178,15 +193,22 @@ class CombinationalGenerator:
             trigger_signals=[s.name for s in trigger_signals],
             payload_signals=[s.name for s in payload_signals],
             code=code,
-            description=f"Corrupts {payload_sig} conditionally"
+            description=f"Integrity trojan: corrupts {payload_sig} conditionally"
         )
     
     def generate_availability_trojan(self, trojan_id: str, trigger_signals: List,
                                     payload_signals: List) -> CombinationalTrojanCode:
-        """Generate Performance Degradation Trojan using template"""
+        """Generate Performance Degradation Trojan - STRICT MODE"""
         
-        trigger_sig = trigger_signals[0].name if trigger_signals else 'request'
-        payload_sig = payload_signals[0].name if payload_signals else 'ready'
+        # STRICT: Require both signals
+        if not trigger_signals:
+            raise ValueError("Availability trojan requires trigger signal")
+        if not payload_signals:
+            raise ValueError("Availability trojan requires payload signal (ready/valid)")
+        
+        # Use REAL signals
+        trigger_sig = trigger_signals[0].name
+        payload_sig = payload_signals[0].name
         
         # Load template
         template = self.loader.load_template('availability', 'combinational')
@@ -209,15 +231,22 @@ class CombinationalGenerator:
             trigger_signals=[s.name for s in trigger_signals],
             payload_signals=[s.name for s in payload_signals],
             code=code,
-            description=f"Conditional slow path"
+            description=f"Availability trojan: conditionally delays {payload_sig}"
         )
     
     def generate_covert_trojan(self, trojan_id: str, trigger_signals: List,
                                payload_signals: List) -> CombinationalTrojanCode:
-        """Generate Covert Channel Trojan using template"""
+        """Generate Covert Channel Trojan - STRICT MODE"""
         
-        trigger_sig = trigger_signals[0].name if trigger_signals else 'secret_bit'
-        payload_sig = payload_signals[0].name if payload_signals else 'output_signal'
+        # STRICT: Require both signals
+        if not trigger_signals:
+            raise ValueError("Covert trojan requires trigger signal")
+        if not payload_signals:
+            raise ValueError("Covert trojan requires payload signal (secret data)")
+        
+        # Use REAL signals
+        trigger_sig = trigger_signals[0].name
+        payload_sig = payload_signals[0].name
         
         # Load template
         template = self.loader.load_template('covert', 'combinational')
@@ -240,14 +269,8 @@ class CombinationalGenerator:
             trigger_signals=[s.name for s in trigger_signals],
             payload_signals=[s.name for s in payload_signals],
             code=code,
-            description=f"Covert bit encoding"
+            description=f"Covert trojan: encodes {payload_sig} into output"
         )
-    
-    def _get_signal_width(self, signal) -> str:
-        """Get signal width for array indexing"""
-        if signal.is_vector:
-            return str(signal.width - 1)
-        return '0'
     
     def generate(self, pattern_name: str, trojan_id: str,
                 trigger_signals: List, payload_signals: List) -> CombinationalTrojanCode:
@@ -257,11 +280,14 @@ class CombinationalGenerator:
         Args:
             pattern_name: Name of Trojan pattern
             trojan_id: Unique ID for this Trojan
-            trigger_signals: List of trigger Signal objects
-            payload_signals: List of payload Signal objects
+            trigger_signals: List of trigger Signal objects (MUST NOT BE EMPTY)
+            payload_signals: List of payload Signal objects (MUST NOT BE EMPTY)
         
         Returns:
             CombinationalTrojanCode object
+            
+        Raises:
+            ValueError: If no matching signals found
         """
         
         generators = {

