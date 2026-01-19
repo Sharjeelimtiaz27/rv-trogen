@@ -13,7 +13,7 @@ This document clarifies our relationship to Trust-Hub's performance degradation 
 ### What Trust-Hub Has:
 
 ✅ **Category exists:** "Functionality" → "Performance Degradation"
-- Listed in taxonomy: https://trust-hub.org/resources/overview
+- Listed in taxonomy: https://trust-hub.org/#/benchmarks/chip-level-trojan
 - Multiple benchmark examples available
 
 ### What Trust-Hub Performance Examples Are:
