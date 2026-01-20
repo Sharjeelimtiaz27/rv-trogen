@@ -36,7 +36,7 @@ Based on Trust-Hub taxonomy and RISC-V security literature:
 2. **Information Leakage** - Based on Trust-Hub RSA-T600
 3. **Privilege Escalation** - RISC-V M/S/U mode attacks
 4. **Data Integrity** - Based on Trust-Hub AES-T800
-5. **Performance Degradation** - LSU stalling attacks
+5. **Performance Degradation** - LSU stalling attacks (RTL-level, based on Boraten & Kodi 2016)
 6. **Covert Channels** - Timing-based information exfiltration
 
 ### **Template-Based Generation**
@@ -471,26 +471,34 @@ rv-trogen/
 
 ## Comparison with Related Work
 
-| Feature | RV-TroGen (Ours) | Lipp et al. [1] | Trust-Hub [2] | TrojanForge [3] |
-|---------|------------------|-----------------|---------------|-----------------|
-| **Target** | RISC-V (Ibex/CVA6/RSD) | RISC-V (PULPino) | AES/RSA | Generic |
-| **Approach** | Template-based | Manual insertion | Manual benchmarks | ML/RL-based |
-| **Automation** | Fully automated | Manual | Manual | Automated |
-| **Multi-Core** | 3 cores | Single | Single design | Generic |
-| **Patterns** | 6 categories | 4 types | Various | Black-box |
-| **Templates** | 12 templates | No | No | No |
-| **Validation** | QuestaSim (100%) | Silicon | Benchmarks | Evasion-focused |
-| **Simulation** | Complete workflow ✅ | Manual | N/A | N/A |
-| **VCD Analysis** | Time-filtered ✅ | No | No | No |
-| **Open-Source** | Yes | Partial | No | No |
-| **Documentation** | Comprehensive | Paper only | Limited | Paper only |
+| Feature | **RV-TroGen (Ours)** | **Lipp et al. [1]** | **0ena/riscv-hw-trojans [2]** | **TrojanForge [3]** | **ChatGPT Trojans [4]** | **Trust-Hub [5]** |
+|---------|---------------------|-----------------|---------------------------|-----------------|---------------------|---------------|
+| **Target** | RISC-V (Ibex/CVA6/RSD) | RISC-V (PULPino) | RISC-V (Generic) | Generic (AES/RSA) | RISC-V (Interrupts) | AES/RSA/Others |
+| **Approach** | Template-based | Manual insertion | Manual insertion | ML/RL-based | LLM-based (ChatGPT) | Manual benchmarks |
+| **Automation** | ✅ Fully automated | ❌ Manual | ❌ Manual | ✅ Automated | ⚠️ Semi-automated | ❌ Manual |
+| **Multi-Core** | ✅ 3 cores (265 modules) | ❌ Single core | ⚠️ Generic (untested) | ❌ Single design | ❌ Single module | ❌ Single design |
+| **RTL-Level** | ✅ Yes (SystemVerilog) | ✅ Yes | ✅ Yes | ⚠️ Gate-level focus | ✅ Yes | ⚠️ Mixed (mostly gate) |
+| **Patterns** | ✅ 6 categories | ⚠️ 4 types | ⚠️ 3 examples | ⚠️ Black-box (RL) | ⚠️ 1 type (interrupt) | ✅ Multiple |
+| **Templates** | ✅ 12 templates (.sv) | ❌ No | ❌ No | ❌ No (RL policy) | ❌ No (LLM prompts) | ❌ No |
+| **Validation** | ✅ QuestaSim (100%) | ✅ Silicon tapeout | ⚠️ Not reported | ⚠️ Evasion metrics | ⚠️ Not reported | ✅ Benchmarks |
+| **Simulation** | ✅ Complete workflow | ❌ Manual | ❌ Manual | ❌ N/A | ❌ Not reported | ❌ N/A |
+| **VCD Analysis** | ✅ Time-filtered plots | ❌ No | ❌ No | ❌ No | ❌ No | ❌ N/A |
+| **Reproducibility** | ✅ Templates + scripts | ⚠️ Partial (paper) | ✅ Code available | ⚠️ RL model dependent | ⚠️ LLM dependent | ✅ Benchmarks |
+| **Open-Source** | ✅ Full (MIT) | ⚠️ Partial | ✅ Yes | ❌ No (paper only) | ❌ Not public | ❌ No (registration) |
+| **Generated Trojans** | ✅ 929 (3 processors) | ⚠️ 4 (manual) | ⚠️ 3 examples | ⚠️ Unknown | ⚠️ 1 example | ✅ 90+ benchmarks |
+| **Performance** | ✅ 4.1s (265 modules) | ❌ N/A | ❌ N/A | ⚠️ Hours (training) | ⚠️ Slow (LLM API) | ❌ N/A |
+| **Year** | 2026 | 2021 | 2020 | 2024 | 2023 | 2008-present |
 
 **Key Innovation:** First automated, template-based, open-source framework for RISC-V Trojan generation with complete simulation and validation workflow.
 
+**Note on Performance Degradation:** Trust-Hub includes performance degradation in their taxonomy, but examples are primarily gate-level. Our template provides RTL-level implementation specifically for RISC-V based on Boraten & Kodi (IPDPS 2016).
+
 **References:**
-- [1] Lipp et al., "Tapeout of a RISC-V crypto chip with hardware trojans," ACM CF 2021
-- [2] Trust-Hub: https://trust-hub.org
-- [3] TrojanForge: "Adversarial Hardware Trojan Examples with Reinforcement Learning," arXiv 2024
+- [1] M. Lipp et al., "Tapeout of a RISC-V crypto chip with hardware trojans," ACM CF 2021
+- [2] 0ena, "RISC-V Hardware Trojans," GitHub, 2020. https://github.com/0ena/riscv-hw-trojans
+- [3] K. Hui et al., "Adversarial Hardware Trojan Examples with Reinforcement Learning," arXiv 2024
+- [4] H. Pearce et al., "Leveraging Large Language Models for Hardware Trojan Detection," HOST 2023
+- [5] Trust-Hub, "Hardware Trojan Benchmarks," https://trust-hub.org
 
 ---
 
@@ -692,7 +700,7 @@ Users are responsible for ethical and legal use of this software.
 ---
 
 **Current Version:** 1.6.0  
-**Last Updated:** January 13, 2026  
+**Last Updated:** January 19, 2026  
 **Status:** Active Development (63% Complete - Steps 1-19 Done - Complete Simulation Workflow Working!)
 
 ---

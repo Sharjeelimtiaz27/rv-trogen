@@ -143,6 +143,23 @@ assign data_out = trojan_trigger ? (data_in ^ CORRUPTION) : data_in;
 
 ## Pattern 5: Performance Degradation (Availability Attack)
 
+
+**Note on Trust-Hub:**
+Trust-Hub includes "Performance Degradation" in their taxonomy with
+multiple gate-level examples. Our template differs by providing an
+RTL-level implementation specifically for RISC-V processors.
+
+**Our Source:**
+- Boraten & Kodi (IEEE IPDPS 2016)
+- NoC performance degradation methodology
+- Adapted for RISC-V LSU operations
+
+**Trust-Hub Examples:**
+- Primarily gate-level
+- Focus on switching activity and power
+- Designed for AES/RSA circuits
+- See: https://trust-hub.org/#/benchmarks/chip-level-trojan
+
 **Literature Source:** Boraten & Kodi (2016), Hoque et al. (2020), Mukherjee et al. (2023)
 
 **Description:** Degrades RISC-V processor performance through artificial delays in Load/Store Unit
