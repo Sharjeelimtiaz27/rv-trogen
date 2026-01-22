@@ -46,7 +46,7 @@ Based on Trust-Hub taxonomy and RISC-V security literature:
 - Easy extensibility
 - Direct comparison with Trust-Hub
 
-### **Complete Simulation Workflow** ✨ NEW!
+### **Complete Simulation Workflow**
 End-to-end trojan validation with:
 - Simple parser handling parameterized modules
 - Dynamic testbench generation (any module)
@@ -67,11 +67,8 @@ Fully open-source tool for the security research community.
 git clone https://github.com/sharjeelimtiaz27/rv-trogen.git
 cd rv-trogen
 
-# Install package (shows welcome banner)
+# Install package
 python install.py
-
-# Alternative: Manual install
-python -m pip install -e .
 
 # Verify installation
 python -c "from src.parser import RTLParser; print('Installed successfully!')"
@@ -113,7 +110,7 @@ python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
 #   └── ibex_cs_registers_trojan_summary.md
 ```
 
-### Step 4: Integrate Trojan & Generate Testbenches ✨ NEW!
+### Step 4: Integrate Trojan & Generate Testbenches
 ```bash
 # Complete integration: trojan insertion + testbench generation
 python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
@@ -124,7 +121,7 @@ python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
 #   - testbenches/ibex/tb_ibex_csr_trojan.sv         (trojan)
 ```
 
-### Step 5: Simulate & Validate ✨ NEW!
+### Step 5: Simulate & Validate
 ```bash
 # Upload to server, compile, simulate (see docs/SIMULATION_SETUP.md)
 # Then download VCD files and analyze:
@@ -138,192 +135,8 @@ python scripts/analyze_vcd.py --start 9000 --end 12000
 
 ---
 
-## What's Currently Working
-
-### **Parser Module (Week 1 - COMPLETE)**
-
-**Parse any Verilog/SystemVerilog file:**
-```python
-from src.parser import RTLParser
-
-parser = RTLParser('your_module.sv')
-module = parser.parse()
-
-print(f"Module: {module.name}")
-print(f"Type: {'Sequential' if module.is_sequential else 'Combinational'}")
-print(f"Inputs: {len(module.inputs)}")
-```
-
-**Features:**
-- Extracts all signals (inputs, outputs, internals)
-- Classifies sequential vs combinational
-- Detects clock and reset signals
-- Batch processing for multiple files
-- Security-critical module identification
-
-**Test Coverage:** 74% (19/19 tests passing)
-
----
-
-### **Generator Module (Week 2 Steps 7-14 - COMPLETE)**
-
-- Pattern library (6 categories)
-- Sequential/Combinational generators
-- Smart output organization
-- Trojan summary reports
-- Template library (12 templates)
-- Template integration complete
-- Batch generation for all 3 processors
-
-**Results:** 929 Trojans generated across 265 modules
-- Ibex: 154 Trojans (28 modules)
-- CVA6: 376 Trojans (85 modules)
-- RSD: 399 Trojans (152 modules)
-- Processing time: 4.1 seconds
-- Success rate: 100%
-
----
-
-### **Template Library (Step 9 - COMPLETE)**
-
-**12 SystemVerilog Templates:**
-- 6 Sequential patterns (always_ff based)
-- 6 Combinational patterns (assign/always_comb based)
-
-**Why Templates?**
-- **Reproducible**: Fixed .sv files, not black-box code generation
-- **Verifiable**: Each template can be compiled independently
-- **Extensible**: Add new patterns by creating new templates
-- **Comparable**: Direct structural comparison with Trust-Hub
-
-**Template Library:**
-```
-Sequential:                      Combinational:
-dos_template.sv                  dos_template.sv
-leak_template.sv                 leak_template.sv
-privilege_template.sv            privilege_template.sv
-integrity_template.sv            integrity_template.sv
-availability_template.sv         availability_template.sv
-covert_template.sv               covert_template.sv
-```
-
-**See:** [docs/TEMPLATES.md](docs/TEMPLATES.md) for detailed documentation.
-
----
-
-### **Batch Generation (Step 14 - COMPLETE)**
-
-**Generated 929 Trojans in 4.1 seconds:**
-
-| Processor | Modules | Trojans | Avg per Module |
-|-----------|---------|---------|----------------|
-| Ibex | 28 | 154 | 5.5 |
-| CVA6 | 85 | 376 | 4.4 |
-| RSD | 152 | 399 | 2.6 |
-| **Total** | **265** | **929** | **3.5** |
-
-**Why 929 instead of 1,590?** Intelligent pattern matching only generates Trojans when:
-- Module signals match pattern keywords (confidence >= 0.4)
-- Suitable trigger and/or payload signals exist
-- Module type is compatible with pattern
-
-This produces higher-quality, targeted Trojans rather than blind enumeration.
-
-**Batch Generation Commands:**
-```bash
-# Generate all
-python scripts/batch_generate.py
-
-# Single processor
-python scripts/batch_generate.py --processor ibex
-
-# Dry run (test)
-python scripts/batch_generate.py --dry-run
-```
-
----
-
-### **Simulation & Validation (Steps 16-19 - COMPLETE)** ✨ NEW!
-
-**Complete End-to-End Workflow Proven:**
-
-Built for researchers working with university HPC clusters and expensive EDA tools (QuestaSim, ModelSim, VCS).
-
-#### **Core Components:**
-
-1. **Simple Parser** (`scripts/simple_parser.py`)
-   - Handles parameterized modules correctly
-   - Evaluates `[Width-1:0]` expressions
-   - No garbage signals, correct widths
-   ```python
-   from simple_parser import SimpleModuleParser
-   parser = SimpleModuleParser('ibex_csr.sv')
-   module = parser.parse()
-   # Correctly evaluates: [Width-1:0] → [31:0] ✅
-   ```
-
-2. **Dynamic Testbench Generator** (`scripts/dynamic_testbench_generator.py`)
-   - Works with ANY module (no hardcoding)
-   - Auto-detects clock, reset, signals
-   - Generates correct signal widths
-   - 2000 test cycles (triggers trojan at 1000)
-   ```bash
-   # Generates perfect testbenches automatically
-   python scripts/dynamic_testbench_generator.py <module.sv>
-   ```
-
-3. **Trojan Integration** (`scripts/prepare_simulation.py`)
-   - Inserts trojan trigger logic
-   - Modifies signal assignments for payload
-   - Example payload: `rd_data_o = trojan_active ? (rdata_q ^ 0xDEADBEEF) : rdata_q`
-   - Generates both testbenches
-   ```bash
-   # One command does everything!
-   python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
-   ```
-
-4. **VCD Analyzer** (`scripts/analyze_vcd.py`)
-   - Parses and compares VCD files
-   - Time range filtering (zoom to trigger region)
-   - Generates waveform plots
-   - Highlights differences in yellow
-   ```bash
-   # Full analysis
-   python scripts/analyze_vcd.py
-   
-   # Zoom to trigger region
-   python scripts/analyze_vcd.py --start 9000 --end 12000
-   ```
-
-#### **Validation Results:**
-
-**Tested On:**
-- **Server:** ekleer.pld.ttu.ee (Tallinn University HPC)
-- **Tool:** Siemens QuestaSim 2024.3
-- **Module:** ibex_csr (with parameters)
-
-**Results:**
-- ✅ Compilation: 100% success (0 errors, 0 warnings)
-- ✅ Simulation: Both modules run to completion
-- ✅ VCD files: Generated successfully (645KB original, 682KB trojan)
-- ✅ Trojan trigger: Activates at cycle 1000 (10000ns)
-- ✅ Payload: rd_data_o corrupted (XOR with 0xDEADBEEF)
-- ✅ Analysis: 3000+ time points with differences
-- ✅ Proof: Original=0x12345678, Trojan=0xCDEF3397, XOR=0xDEADBEEF ✅
-
-**Manual Workflow (Proven):**
-1. Generate trojan + testbenches locally
-2. Upload to server via SCP
-3. SSH to server, compile with vlog
-4. Simulate with vsim (generates VCD)
-5. Download VCD files
-6. Analyze with time filtering
-
-**See:** [docs/SIMULATION_SETUP.md](docs/SIMULATION_SETUP.md) for complete workflow.
-
----
-
 ## Command-Line Tools
+
 ```bash
 # 1. Parse single module
 python -m src/parser/rtl_parser.py <module.sv>
@@ -335,7 +148,7 @@ python -m scripts/batch_parse.py --dir <directory>
 python -m scripts/batch_parse.py --dir <directory> --security-only
 
 # 4. Rank by security importance
-python -m scripts/parse_and_rank.py <directory> --top 10
+python scripts/parse_and_rank.py <directory> --top 5
 
 # 5. Generate Trojans for single module
 python scripts/generate_trojans.py <module.sv>
@@ -343,162 +156,49 @@ python scripts/generate_trojans.py <module.sv>
 # 6. Batch generate for all processors
 python scripts/batch_generate.py                    # All 3 processors
 python scripts/batch_generate.py --processor ibex   # Single processor
-python scripts/batch_generate.py --dry-run          # Test without generating
 
-# 7. Integrate trojan + generate testbenches (NEW)
+# 7. Integrate trojan + generate testbenches
 python scripts/prepare_simulation.py <module.sv>
 
-# 8. Analyze VCD files (NEW)
-python scripts/analyze_vcd.py                       # Full waveform
-python scripts/analyze_vcd.py --start 9000 --end 12000  # Zoom
+# 8. Analyze VCD files
+python scripts/analyze_vcd.py --start 9000 --end 12000
 
-# 9. Save results to JSON
-python -m scripts/batch_parse.py --dir <directory> --save-json
-
-# 10. Run tests
+# 9. Run tests
 python -m pytest tests/ -v
-```
-
----
-
-## Project Status
-```
-Week 1: Parser Implementation (Steps 1-6) - COMPLETE ✅
-   - RTL parser core
-   - Signal extraction
-   - Module classification
-   - Batch processing
-   - Security ranking
-   - 19 unit tests (100% passing, 74% coverage)
-
-Week 2: Generator & Templates (Steps 7-10) - COMPLETE ✅
-   - Pattern library split (6 modules)
-   - Generator split (sequential/combinational)
-   - Wrapper script (generate_trojans.py)
-   - Smart output organization
-   - Template library (12 templates)
-   - Generator unit tests (20 tests passing)
-
-Week 2-3: Template Integration & Downloads (Steps 11-14) - COMPLETE ✅
-   - Update generator to use templates (Step 11)
-   - Examples reorganization (Step 12)
-   - RTL download for CVA6 & RSD (Step 13)
-   - Batch Trojan generation (Step 14)
-   - 929 Trojans generated across 265 modules in 4.1 seconds
-
-Week 3: Simulation & Validation (Steps 16-19) - COMPLETE ✅
-   - Simple parser for parameterized modules (Step 16)
-   - Dynamic testbench generation (Step 16)
-   - Trojan integration with payload (Step 17)
-   - VCD analysis with time filtering (Step 19)
-   - Manual workflow proven on university server
-   - 100% compilation success, trojan validated!
-
-Week 4-5: Analysis & Polish (Steps 20-30) - PLANNED
-   - Statistical analysis (Step 20)
-   - Detectability scoring (Step 21)
-   - Performance impact (Step 22)
-   - Trust-Hub comparison (Step 23)
-   - HTML reports (Step 24)
-   - Examples, CI/CD, documentation (Steps 25-30)
-```
-
-**Progress:** 19/30 steps (63%) ✅
-
----
-
-## Project Structure
-```
-rv-trogen/
-├── src/
-│   ├── parser/              COMPLETE (Week 1)
-│   │   ├── rtl_parser.py
-│   │   ├── signal_extractor.py
-│   │   └── module_classifier.py
-│   ├── patterns/            COMPLETE (Week 2)
-│   │   ├── dos_pattern.py
-│   │   ├── leak_pattern.py
-│   │   ├── privilege_pattern.py
-│   │   ├── integrity_pattern.py
-│   │   ├── availability_pattern.py
-│   │   └── covert_pattern.py
-│   ├── generator/           COMPLETE (Week 2)
-│   │   ├── trojan_generator.py
-│   │   ├── sequential_gen.py
-│   │   ├── combinational_gen.py
-│   │   ├── template_loader.py
-│   │   └── placeholder_handler.py
-│   └── validator/           COMPLETE (Week 3)
-│       └── testbench_generator.py
-├── templates/               COMPLETE (Step 9)
-│   └── trojan_templates/
-│       ├── sequential/ (6 templates)
-│       └── combinational/ (6 templates)
-├── scripts/
-│   ├── batch_parse.py       Parser wrapper
-│   ├── parse_and_rank.py    Security ranking
-│   ├── generate_trojans.py  Generator wrapper
-│   ├── batch_generate.py    Batch generation
-│   ├── simple_parser.py     Simple parameter parser (NEW)
-│   ├── dynamic_testbench_generator.py  Testbench gen (NEW)
-│   ├── prepare_simulation.py  Trojan integration (NEW)
-│   └── analyze_vcd.py       VCD analyzer (NEW)
-├── docs/
-│   ├── QUICK_START.md       Beginner tutorial
-│   ├── COMMANDS_REFERENCE.md Command guide (UPDATED)
-│   ├── TEMPLATES.md         Template documentation
-│   ├── TRUST_HUB_PATTERNS.md Pattern library
-│   ├── SIMULATION_SETUP.md  Simulation workflow (UPDATED)
-│   └── STEP_GUIDE.md        Progress tracking (UPDATED)
-├── tests/
-│   └── test_parser.py       19 tests
-├── testbenches/             NEW (Step 16)
-│   └── ibex/                Auto-generated testbenches
-└── examples/
-    ├── ibex/
-    │   ├── original/        Test modules
-    │   ├── generated_trojans/ Generated Trojans
-    │   └── trojaned_rtl/    Integrated Trojans (NEW)
-    ├── cva6/
-    │   ├── original/        CVA6 RTL
-    │   └── generated_trojans/ Generated Trojans
-    └── rsd/
-        ├── original/        RSD RTL
-        └── generated_trojans/ Generated Trojans
 ```
 
 ---
 
 ## Comparison with Related Work
 
-| Feature | **RV-TroGen (Ours)** | **Lipp et al. [1]** | **0ena/riscv-hw-trojans [2]** | **TrojanForge [3]** | **ChatGPT Trojans [4]** | **Trust-Hub [5]** |
-|---------|---------------------|-----------------|---------------------------|-----------------|---------------------|---------------|
-| **Target** | RISC-V (Ibex/CVA6/RSD) | RISC-V (PULPino) | RISC-V (Generic) | Generic (AES/RSA) | RISC-V (Interrupts) | AES/RSA/Others |
-| **Approach** | Template-based | Manual insertion | Manual insertion | ML/RL-based | LLM-based (ChatGPT) | Manual benchmarks |
-| **Automation** | ✅ Fully automated | ❌ Manual | ❌ Manual | ✅ Automated | ⚠️ Semi-automated | ❌ Manual |
-| **Multi-Core** | ✅ 3 cores (265 modules) | ❌ Single core | ⚠️ Generic (untested) | ❌ Single design | ❌ Single module | ❌ Single design |
-| **RTL-Level** | ✅ Yes (SystemVerilog) | ✅ Yes | ✅ Yes | ⚠️ Gate-level focus | ✅ Yes | ⚠️ Mixed (mostly gate) |
-| **Patterns** | ✅ 6 categories | ⚠️ 4 types | ⚠️ 3 examples | ⚠️ Black-box (RL) | ⚠️ 1 type (interrupt) | ✅ Multiple |
-| **Templates** | ✅ 12 templates (.sv) | ❌ No | ❌ No | ❌ No (RL policy) | ❌ No (LLM prompts) | ❌ No |
-| **Validation** | ✅ QuestaSim (100%) | ✅ Silicon tapeout | ⚠️ Not reported | ⚠️ Evasion metrics | ⚠️ Not reported | ✅ Benchmarks |
-| **Simulation** | ✅ Complete workflow | ❌ Manual | ❌ Manual | ❌ N/A | ❌ Not reported | ❌ N/A |
-| **VCD Analysis** | ✅ Time-filtered plots | ❌ No | ❌ No | ❌ No | ❌ No | ❌ N/A |
-| **Reproducibility** | ✅ Templates + scripts | ⚠️ Partial (paper) | ✅ Code available | ⚠️ RL model dependent | ⚠️ LLM dependent | ✅ Benchmarks |
-| **Open-Source** | ✅ Full (MIT) | ⚠️ Partial | ✅ Yes | ❌ No (paper only) | ❌ Not public | ❌ No (registration) |
-| **Generated Trojans** | ✅ 929 (3 processors) | ⚠️ 4 (manual) | ⚠️ 3 examples | ⚠️ Unknown | ⚠️ 1 example | ✅ 90+ benchmarks |
-| **Performance** | ✅ 4.1s (265 modules) | ❌ N/A | ❌ N/A | ⚠️ Hours (training) | ⚠️ Slow (LLM API) | ❌ N/A |
-| **Year** | 2026 | 2021 | 2020 | 2024 | 2023 | 2008-present |
+| Feature | **RV-TroGen (Ours)** | **TrojanForge [1]** | **SENTAUR [2]** | **0ena/riscv-hw-trojans [3]** | **Trust-Hub [4]** |
+|---------|---------------------|-----------------|-----------------|---------------------------|---------------|
+| **Target** | RISC-V (Ibex/CVA6/RSD) | Generic (AES/RSA) | Generic | RISC-V (Generic) | AES/RSA/Others |
+| **Approach** | Template-based | ML/RL-based | LLM-based (GPT-4) | Manual insertion | Manual benchmarks |
+| **Automation** | ✅ Fully automated | ✅ Automated | ⚠️ Semi-automated | ❌ Manual | ❌ Manual |
+| **Multi-Core** | ✅ 3 cores (265 modules) | ❌ Single design | ❌ Not tested | ⚠️ Generic (untested) | ❌ Single design |
+| **RTL-Level** | ✅ Yes (SystemVerilog) | ⚠️ Gate-level focus | ✅ Yes (Verilog) | ✅ Yes | ⚠️ Mixed (mostly gate) |
+| **Patterns** | ✅ 6 categories | ⚠️ Black-box (RL) | ⚠️ 4 types | ⚠️ 3 examples | ✅ Multiple |
+| **Templates** | ✅ 12 templates (.sv) | ❌ No (RL policy) | ❌ No (LLM prompts) | ❌ No | ❌ No |
+| **Validation** | ✅ QuestaSim (100%) | ⚠️ Evasion metrics | ⚠️ Detection evasion | ⚠️ Not reported | ✅ Benchmarks |
+| **Simulation** | ✅ Complete workflow | ❌ N/A | ❌ Not reported | ❌ Manual | ❌ N/A |
+| **VCD Analysis** | ✅ Time-filtered plots | ❌ No | ❌ No | ❌ No | ❌ N/A |
+| **Reproducibility** | ✅ Templates + scripts | ⚠️ RL model dependent | ⚠️ LLM dependent | ✅ Code available | ✅ Benchmarks |
+| **Open-Source** | ✅ Full (MIT) | ❌ No (paper only) | ❌ No (paper only) | ✅ Yes | ❌ No (registration) |
+| **Generated Trojans** | ✅ 929 (3 processors) | ⚠️ Unknown | ⚠️ Evaluated on 4 | ⚠️ 3 examples | ✅ 90+ benchmarks |
+| **Performance** | ✅ 4.1s (265 modules) | ⚠️ Hours (RL training) | ⚠️ Slow (LLM API) | ❌ N/A | ❌ N/A |
+| **Cost** | ✅ Free | ❌ Unknown | ⚠️ LLM API costs | ✅ Free | ❌ Registration |
+| **Year** | 2026 | 2024 | 2024 | 2020 | 2008-present |
 
 **Key Innovation:** First automated, template-based, open-source framework for RISC-V Trojan generation with complete simulation and validation workflow.
 
-**Note on Performance Degradation:** Trust-Hub includes performance degradation in their taxonomy, but examples are primarily gate-level. Our template provides RTL-level implementation specifically for RISC-V based on Boraten & Kodi (IPDPS 2016).
+**Note:** Trust-Hub includes performance degradation in their taxonomy, but examples are primarily gate-level. Our template provides RTL-level implementation specifically for RISC-V based on Boraten & Kodi (IPDPS 2016).
 
 **References:**
-- [1] M. Lipp et al., "Tapeout of a RISC-V crypto chip with hardware trojans," ACM CF 2021
-- [2] 0ena, "RISC-V Hardware Trojans," GitHub, 2020. https://github.com/0ena/riscv-hw-trojans
-- [3] K. Hui et al., "Adversarial Hardware Trojan Examples with Reinforcement Learning," arXiv 2024
-- [4] H. Pearce et al., "Leveraging Large Language Models for Hardware Trojan Detection," HOST 2023
-- [5] Trust-Hub, "Hardware Trojan Benchmarks," https://trust-hub.org
+- [1] K. Hui et al., "TrojanForge: Generating Adversarial Hardware Trojan Examples Using Reinforcement Learning," arXiv:2405.15184, 2024. https://arxiv.org/abs/2405.15184
+- [2] J. Bhandari et al., "SENTAUR: Security EnhaNced Trojan Assessment Using LLMs Against Undesirable Revisions," arXiv:2407.12352, 2024. https://arxiv.org/pdf/2407.12352
+- [3] 0ena, "RISC-V Hardware Trojans," GitHub, 2020. https://github.com/0ena/riscv-hw-trojans
+- [4] Trust-Hub, "Hardware Trojan Benchmarks," https://trust-hub.org
 
 ---
 
@@ -557,40 +257,35 @@ python scripts/analyze_vcd.py
 - [Template Library](docs/TEMPLATES.md) - Template documentation
 - [Simulation Setup](docs/SIMULATION_SETUP.md) - Complete workflow guide
 - [Trust-Hub Patterns](docs/TRUST_HUB_PATTERNS.md) - Pattern library with citations
-- [Parser Architecture](docs/parser/PARSER_ARCHITECTURE.md) - Implementation details
 
 ---
 
 ## Testing & Validation
+
 ```bash
 # Run all tests
 python -m pytest tests/ -v
 
-# Expected: 19 passed
-
 # Run with coverage
 python -m pytest --cov=src/parser tests/
 
-# Expected: 74% coverage
-
 # Validate trojan integration and simulation
 python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
-# Then simulate on server and analyze results
 ```
+
+**Test Coverage:** 74% (19/19 tests passing)
 
 ---
 
 ## Dependencies
 
-### Core Dependencies
 ```bash
+# Core dependencies
 pytest>=7.0.0
 pytest-cov>=3.0.0
-```
 
-### Simulation Dependencies (Steps 16-19)
-```bash
-matplotlib>=3.5.0  # VCD plotting
+# Simulation support
+matplotlib>=3.5.0
 ```
 
 ### Installation
@@ -604,21 +299,28 @@ python -m pip install matplotlib
 
 ---
 
+## Results
+
+**Generated 929 Trojans across 3 RISC-V processors in 4.1 seconds:**
+
+| Processor | Modules | Trojans | Avg per Module |
+|-----------|---------|---------|----------------|
+| Ibex | 28 | 154 | 5.5 |
+| CVA6 | 85 | 376 | 4.4 |
+| RSD | 152 | 399 | 2.6 |
+| **Total** | **265** | **929** | **3.5** |
+
+**Validation Results:**
+- ✅ Compilation: 100% success (QuestaSim 2024.3)
+- ✅ Simulation: Both original and trojan modules run to completion
+- ✅ VCD Analysis: 3000+ time points with differences detected
+- ✅ Payload Verification: XOR corruption confirmed (0xDEADBEEF)
+
+---
+
 ## Contributing
 
-We welcome contributions! Current needs:
-
-**High Priority:**
-- Testing on more processors
-- Additional testbench patterns
-- Performance metrics
-
-**Medium Priority:**
-- Additional Trojan patterns
-- Local simulation support (Verilator)
-- Documentation improvements
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ---
 
@@ -658,9 +360,8 @@ This work builds upon:
 
 Key papers that informed our work:
 - Bailey (2017) - RISC-V privilege escalation exploits
-- Lipp et al. (2021) - RISC-V Trojan tapeout case study
-- Lin et al. (2009) - Trojan side-channel engineering
 - Boraten & Kodi (2016) - Performance degradation attacks
+- Lin et al. (2009) - Trojan side-channel engineering
 
 See [docs/TRUST_HUB_PATTERNS.md](docs/TRUST_HUB_PATTERNS.md) for complete references.
 
@@ -700,8 +401,7 @@ Users are responsible for ethical and legal use of this software.
 ---
 
 **Current Version:** 1.6.0  
-**Last Updated:** January 19, 2026  
-**Status:** Active Development (63% Complete - Steps 1-19 Done - Complete Simulation Workflow Working!)
+**Last Updated:** January 19, 2026
 
 ---
 
