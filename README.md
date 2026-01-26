@@ -32,12 +32,12 @@ Works across multiple open-source RISC-V implementations:
 
 ### **Six Trojan Categories**
 Based on Trust-Hub taxonomy and RISC-V security literature:
-1. **Denial of Service** (DoS) - Based on Trust-Hub AES-T1400
-2. **Information Leakage** - Based on Trust-Hub RSA-T600
-3. **Privilege Escalation** - RISC-V M/S/U mode attacks
-4. **Data Integrity** - Based on Trust-Hub AES-T800
-5. **Performance Degradation** - LSU stalling attacks (RTL-level, based on Boraten & Kodi 2016)
-6. **Covert Channels** - Timing-based information exfiltration
+1. **Denial of Service** (DoS) - Based on Trust-Hub AES-T1800 & AES-T1900 (functionality-based DoS)
+2. **Information Leakage** - Based on Trust-Hub AES-T1000 & AES-T1100 (key/data leakage)
+3. **Privilege Escalation** - RISC-V M/S/U mode attacks (Bailey 2017)
+4. **Data Integrity** - Based on Trust-Hub AES-T2300 & AES-T2400 (state corruption)
+5. **Performance Degradation** - Based on Trust-Hub MEMCTRL-T100 & S35932-T300
+6. **Covert Channels** - Timing-based exfiltration (Lin et al. 2009)
 
 ### **Template-Based Generation**
 12 SystemVerilog templates (6 sequential + 6 combinational) providing:
@@ -171,24 +171,24 @@ python -m pytest tests/ -v
 
 ## Comparison with Related Work
 
-| Feature | **RV-TroGen (Ours)** | **TrojanForge [1]** | **SENTAUR [2]** | **0ena/riscv-hw-trojans [3]** | **Trust-Hub [4]** |
-|---------|---------------------|-----------------|-----------------|---------------------------|---------------|
-| **Target** | RISC-V (Ibex/CVA6/RSD) | Generic (AES/RSA) | Generic | RISC-V (Generic) | AES/RSA/Others |
-| **Approach** | Template-based | ML/RL-based | LLM-based (GPT-4) | Manual insertion | Manual benchmarks |
-| **Automation** | ✅ Fully automated | ✅ Automated | ⚠️ Semi-automated | ❌ Manual | ❌ Manual |
-| **Multi-Core** | ✅ 3 cores (265 modules) | ❌ Single design | ❌ Not tested | ⚠️ Generic (untested) | ❌ Single design |
-| **RTL-Level** | ✅ Yes (SystemVerilog) | ⚠️ Gate-level focus | ✅ Yes (Verilog) | ✅ Yes | ⚠️ Mixed (mostly gate) |
-| **Patterns** | ✅ 6 categories | ⚠️ Black-box (RL) | ⚠️ 4 types | ⚠️ 3 examples | ✅ Multiple |
-| **Templates** | ✅ 12 templates (.sv) | ❌ No (RL policy) | ❌ No (LLM prompts) | ❌ No | ❌ No |
-| **Validation** | ✅ QuestaSim (100%) | ⚠️ Evasion metrics | ⚠️ Detection evasion | ⚠️ Not reported | ✅ Benchmarks |
-| **Simulation** | ✅ Complete workflow | ❌ N/A | ❌ Not reported | ❌ Manual | ❌ N/A |
-| **VCD Analysis** | ✅ Time-filtered plots | ❌ No | ❌ No | ❌ No | ❌ N/A |
-| **Reproducibility** | ✅ Templates + scripts | ⚠️ RL model dependent | ⚠️ LLM dependent | ✅ Code available | ✅ Benchmarks |
-| **Open-Source** | ✅ Full (MIT) | ❌ No (paper only) | ❌ No (paper only) | ✅ Yes | ❌ No (registration) |
-| **Generated Trojans** | ✅ 929 (3 processors) | ⚠️ Unknown | ⚠️ Evaluated on 4 | ⚠️ 3 examples | ✅ 90+ benchmarks |
-| **Performance** | ✅ 4.1s (265 modules) | ⚠️ Hours (RL training) | ⚠️ Slow (LLM API) | ❌ N/A | ❌ N/A |
-| **Cost** | ✅ Free | ❌ Unknown | ⚠️ LLM API costs | ✅ Free | ❌ Registration |
-| **Year** | 2026 | 2024 | 2024 | 2020 | 2008-present |
+| Feature | **RV-TroGen (Ours)** | **TrojanForge [1]** | **SENTAUR [2]** | **0ena [3]** | **SoC-HTs [4]** | **Trust-Hub [5]** |
+|---------|---------------------|-----------------|-----------------|------------|---------------|---------------|
+| **Target** | RISC-V (3 cores) | Generic | Generic | RISC-V | Ariane SoC | AES/RSA |
+| **Approach** | Template-based | RL-based | LLM (GPT-4) | Manual | Manual | Manual |
+| **Automation** | ✅ Full | ✅ Automated | ⚠️ Semi | ❌ Manual | ❌ Manual | ❌ Manual |
+| **Multi-Core** | ✅ 3 cores (265 mod) | ❌ Single | ❌ Untested | ⚠️ Generic | ❌ Single SoC | ❌ Single |
+| **RTL-Level** | ✅ Yes (SV) | ⚠️ Gate-focus | ✅ Yes | ✅ Yes | ⚠️ SoC (AXI) | ⚠️ Mixed |
+| **Attack Surface** | Processor (CSR/LSU) | Generic | Generic | Generic | AXI protocol | Crypto ops |
+| **Patterns** | ✅ 6 categories | ⚠️ Black-box | ⚠️ 4 types | ⚠️ 3 examples | ⚠️ 3 types | ✅ Multiple |
+| **Templates** | ✅ 12 (.sv files) | ❌ RL policy | ❌ LLM prompts | ❌ No | ❌ No | ❌ No |
+| **Validation** | ✅ QuestaSim (100%) | ⚠️ Evasion | ⚠️ Detection | ⚠️ Not reported | ✅ FPGA+GNN | ✅ Benchmarks |
+| **Simulation** | ✅ Complete workflow | ❌ N/A | ❌ Not reported | ❌ Manual | ✅ Behavioral | ❌ N/A |
+| **Detection Focus** | ⚠️ Secondary | ⚠️ Primary | ⚠️ Primary | ❌ No | ✅ Primary | ✅ Benchmarks |
+| **Open-Source** | ✅ Full (MIT) | ❌ No | ❌ No | ✅ Yes | ✅ 3 HTs | ❌ Registration |
+| **Generated HTs** | ✅ 929 | ⚠️ Unknown | ⚠️ 4 | ⚠️ 3 | ⚠️ 3 | ✅ 90+ |
+| **Performance** | ✅ 4.1s | ⚠️ Hours | ⚠️ Slow | ❌ N/A | ❌ Manual | ❌ N/A |
+| **Cost** | ✅ Free | ❌ Unknown | ⚠️ API costs | ✅ Free | ✅ Free | ❌ Paid |
+| **Year** | 2026 | 2024 | 2024 | 2020 | 2023 | 2008-now |
 
 **Key Innovation:** First automated, template-based, open-source framework for RISC-V Trojan generation with complete simulation and validation workflow.
 
@@ -198,7 +198,8 @@ python -m pytest tests/ -v
 - [1] K. Hui et al., "TrojanForge: Generating Adversarial Hardware Trojan Examples Using Reinforcement Learning," arXiv:2405.15184, 2024. https://arxiv.org/abs/2405.15184
 - [2] J. Bhandari et al., "SENTAUR: Security EnhaNced Trojan Assessment Using LLMs Against Undesirable Revisions," arXiv:2407.12352, 2024. https://arxiv.org/pdf/2407.12352
 - [3] 0ena, "RISC-V Hardware Trojans," GitHub, 2020. https://github.com/0ena/riscv-hw-trojans
-- [4] Trust-Hub, "Hardware Trojan Benchmarks," https://trust-hub.org
+- [4] [Authors], "Hardware Trojans in RISC-V SoCs," IEEE, 2023. https://ieeexplore.ieee.org/abstract/document/10321883
+- [5] Trust-Hub, "Hardware Trojan Benchmarks," https://trust-hub.org
 
 ---
 
@@ -360,7 +361,7 @@ This work builds upon:
 
 Key papers that informed our work:
 - Bailey (2017) - RISC-V privilege escalation exploits
-- Boraten & Kodi (2016) - Performance degradation attacks
+- Boraten & Kodi (2016) - Performance degradation attacks (NoC-based)
 - Lin et al. (2009) - Trojan side-channel engineering
 
 See [docs/TRUST_HUB_PATTERNS.md](docs/TRUST_HUB_PATTERNS.md) for complete references.
