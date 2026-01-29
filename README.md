@@ -197,8 +197,8 @@ python -m pytest tests/ -v
 **References:**
 - [1] K. Hui et al., "TrojanForge: Generating Adversarial Hardware Trojan Examples Using Reinforcement Learning," arXiv:2405.15184, 2024. https://arxiv.org/abs/2405.15184
 - [2] J. Bhandari et al., "SENTAUR: Security EnhaNced Trojan Assessment Using LLMs Against Undesirable Revisions," arXiv:2407.12352, 2024. https://arxiv.org/pdf/2407.12352
-- [3] 0ena, "RISC-V Hardware Trojans," GitHub, 2020. https://github.com/0ena/riscv-hw-trojans
-- [4] [Authors], "Hardware Trojans in RISC-V SoCs," IEEE, 2023. https://ieeexplore.ieee.org/abstract/document/10321883
+- [3] A. Moschos, "Towards Practical Fabrication Stage Attacks Using Interrupt-Resilient Hardware Trojans," GitHub, 2020. https://github.com/0ena/riscv-hw-trojans
+- [4] S. Deb, "A RISC-V SoC with Hardware Trojans: Case Study on Trojan-ing the On-Chip Protocol Conversion," IEEE, 2023. https://ieeexplore.ieee.org/abstract/document/10321883
 - [5] Trust-Hub, "Hardware Trojan Benchmarks," https://trust-hub.org
 
 ---
