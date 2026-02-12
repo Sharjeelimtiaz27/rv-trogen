@@ -11,40 +11,40 @@
 
 ### T1: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (4):**
+**Trigger Signals (3):**
+- amo_op_i
 - amo_operand_a_i
 - amo_operand_b_i
-- operand_b
-- adder_operand_a
 
-**Payload Signals (1):**
+**Payload Signals (2):**
+- amo_result_o
 - amo_result_o
 
 **Generated File:** T1_amo_alu_Integrity.sv
 
 ---
 
-### T2: Availability - Performance Degradation
+### T2: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.40
-**Description:** Degrades performance through artificial delays
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (4):**
+**Trigger Signals (2):**
 - amo_operand_a_i
 - amo_operand_b_i
-- operand_b
-- adder_operand_a
 
-**Payload Signals (0):**
+**Payload Signals (2):**
+- amo_result_o
+- amo_result_o
 
-**Generated File:** T2_amo_alu_Availability.sv
+**Generated File:** T2_amo_alu_Covert.sv
 
 ---
 

@@ -9,36 +9,47 @@
 
 ## Generated Trojans
 
-### T1: Availability - Performance Degradation
+### T1: Integrity - Integrity Violation
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
 **Confidence:** 1.00
-**Description:** Degrades performance through artificial delays
+**Description:** Corrupts computation results or data
 
-**Trigger Signals (1):**
+**Trigger Signals (5):**
 - OpOperandType
+- opType
+- DataPath
+- DataPath
+- DataPath
 
-**Payload Signals (1):**
-- stall
+**Payload Signals (3):**
+- DataPath
+- DataPath
+- DataPath
 
-**Generated File:** T1_IntegerRegisterReadStage_Availability.sv
+**Generated File:** T1_IntegerRegisterReadStage_Integrity.sv
 
 ---
 
-### T2: Integrity - Integrity Violation
+### T2: Covert - Covert Channel
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
 **Severity:** High
-**Confidence:** 0.60
-**Description:** Corrupts computation results or data
+**Confidence:** 1.00
+**Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (1):**
-- OpOperandType
+**Trigger Signals (3):**
+- DataPath
+- DataPath
+- DataPath
 
-**Payload Signals (0):**
+**Payload Signals (3):**
+- DataPath
+- DataPath
+- DataPath
 
-**Generated File:** T2_IntegerRegisterReadStage_Integrity.sv
+**Generated File:** T2_IntegerRegisterReadStage_Covert.sv
 
 ---
 

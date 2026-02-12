@@ -11,26 +11,26 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (29):**
-- stall_st_pending_i
+**Trigger Signals (48):**
 - amo_valid_commit_i
+- lsu_ready_o
 - lsu_valid_i
-- enable_translation_i
-- enable_g_translation_i
-- ... and 24 more
+- load_valid_o
+- store_valid_o
+- ... and 43 more
 
-**Payload Signals (29):**
-- stall_st_pending_i
+**Payload Signals (48):**
 - amo_valid_commit_i
+- lsu_ready_o
 - lsu_valid_i
-- enable_translation_i
-- enable_g_translation_i
-- ... and 24 more
+- load_valid_o
+- store_valid_o
+- ... and 43 more
 
 **Generated File:** T1_load_store_unit_DoS.sv
 
@@ -38,103 +38,130 @@
 
 ### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** RSA-T600
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** Critical
 **Confidence:** 1.00
 **Description:** Leaks sensitive data to attacker-accessible location
 
-**Trigger Signals (1):**
-- lsu_ctrl_t
-
-**Payload Signals (3):**
-- fu_data_t
+**Trigger Signals (2):**
 - csr_hs_ld_st_inst_o
-- data_misaligned
+- csr_hs_ld_st_inst_o
+
+**Payload Signals (25):**
+- fu_data_t
+- fu_data_i
+- load_result_o
+- store_result_o
+- csr_hs_ld_st_inst_o
+- ... and 20 more
 
 **Generated File:** T2_load_store_unit_Leak.sv
 
 ---
 
-### T3: Integrity - Integrity Violation
+### T3: Privilege - Privilege Escalation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Not applicable (processor-specific)
+**Severity:** Critical
+**Confidence:** 1.00
+**Description:** Escalates privilege level to machine mode
+
+**Trigger Signals (14):**
+- csr_hs_ld_st_inst_o
+- vaddr_to_be_flushed_i
+- gpaddr_to_be_flushed_i
+- pmpaddr_i
+- rvfi_mem_paddr_o
+- ... and 9 more
+
+**Payload Signals (8):**
+- riscv::priv_lvl_t
+- priv_lvl_i
+- riscv::priv_lvl_t
+- ld_st_priv_lvl_i
+- riscv::priv_lvl_t
+- ... and 3 more
+
+**Generated File:** T3_load_store_unit_Privilege.sv
+
+---
+
+### T4: Integrity - Integrity Violation
+
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (4):**
+**Trigger Signals (19):**
 - fu_data_t
-- data_misaligned
-- pop_st
-- pop_ld
+- fu_data_i
+- vaddr_to_be_flushed_i
+- gpaddr_to_be_flushed_i
+- pmpaddr_i
+- ... and 14 more
 
-**Payload Signals (4):**
+**Payload Signals (17):**
 - fu_data_t
-- store_valid_o
-- data_misaligned
-- store_buffer_empty
+- fu_data_i
+- load_result_o
+- store_trans_id_o
+- store_result_o
+- ... and 12 more
 
-**Generated File:** T3_load_store_unit_Integrity.sv
+**Generated File:** T4_load_store_unit_Integrity.sv
 
 ---
 
-### T4: Availability - Performance Degradation
+### T5: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (25):**
+**Trigger Signals (56):**
 - amo_valid_commit_i
-- fu_data_t
+- lsu_ready_o
 - lsu_valid_i
-- acc_mmu_req_t
-- request
-- ... and 20 more
+- load_trans_id_o
+- load_result_o
+- ... and 51 more
 
-**Payload Signals (14):**
+**Payload Signals (18):**
 - stall_st_pending_i
 - amo_valid_commit_i
-- lsu_valid_i
 - lsu_ready_o
+- lsu_valid_i
 - load_valid_o
-- ... and 9 more
+- ... and 13 more
 
-**Generated File:** T4_load_store_unit_Availability.sv
-
----
-
-### T5: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (2):**
-- csr_hs_ld_st_inst_o
-- lsu_ctrl_t
-
-**Payload Signals (0):**
-
-**Generated File:** T5_load_store_unit_Privilege.sv
+**Generated File:** T5_load_store_unit_Availability.sv
 
 ---
 
 ### T6: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (3):**
+**Trigger Signals (13):**
 - fu_data_t
+- fu_data_i
+- load_trans_id_o
+- load_result_o
 - load_valid_o
-- data_misaligned
+- ... and 8 more
 
-**Payload Signals (0):**
+**Payload Signals (28):**
+- amo_valid_commit_i
+- fu_data_t
+- fu_data_i
+- lsu_ready_o
+- lsu_valid_i
+- ... and 23 more
 
 **Generated File:** T6_load_store_unit_Covert.sv
 

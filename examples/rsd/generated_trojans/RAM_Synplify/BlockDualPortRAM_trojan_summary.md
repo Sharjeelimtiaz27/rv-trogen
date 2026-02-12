@@ -3,30 +3,74 @@
 **Module:** BlockDualPortRAM
 **File:** RAM_Synplify.sv
 **Type:** Sequential
-**Total Candidates:** 1
+**Total Candidates:** 3
 
 ---
 
 ## Generated Trojans
 
-### T1: Privilege - Privilege Escalation
+### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** Custom RISC-V
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Disables functionality by forcing control signals to 0
+
+**Trigger Signals (5):**
+- we
+- we
+- we
+- we
+- we
+
+**Payload Signals (5):**
+- we
+- we
+- we
+- we
+- we
+
+**Generated File:** T1_BlockDualPortRAM_DoS.sv
+
+---
+
+### T2: Leak - Information Leakage
+
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
+**Confidence:** 1.00
+**Description:** Leaks sensitive data to attacker-accessible location
 
-**Trigger Signals (12):**
+**Trigger Signals (6):**
 - we
 - we
 - we
 - we
 - we
-- ... and 7 more
+- ... and 1 more
 
-**Payload Signals (0):**
+**Payload Signals (1):**
+- Address
 
-**Generated File:** T1_BlockDualPortRAM_Privilege.sv
+**Generated File:** T2_BlockDualPortRAM_Leak.sv
+
+---
+
+### T3: Integrity - Integrity Violation
+
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Corrupts computation results or data
+
+**Trigger Signals (2):**
+- Address
+- Select
+
+**Payload Signals (1):**
+- WRITE_NUM
+
+**Generated File:** T3_BlockDualPortRAM_Integrity.sv
 
 ---
 

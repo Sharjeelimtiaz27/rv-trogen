@@ -3,7 +3,7 @@
 **Module:** is
 **File:** cva6_shared_tlb.sv
 **Type:** Sequential
-**Total Candidates:** 4
+**Total Candidates:** 5
 
 ---
 
@@ -11,83 +11,128 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (8):**
-- s_st_enbl_i
-- g_st_enbl_i
-- s_ld_st_enbl_i
-- g_ld_st_enbl_i
+**Trigger Signals (9):**
 - itlb_req_o
-- ... and 3 more
+- itlb_req_o
+- shared_tag_valid
+- tag_req
+- tag_we
+- ... and 4 more
 
-**Payload Signals (8):**
-- s_st_enbl_i
-- g_st_enbl_i
-- s_ld_st_enbl_i
-- g_ld_st_enbl_i
+**Payload Signals (9):**
 - itlb_req_o
-- ... and 3 more
+- itlb_req_o
+- shared_tag_valid
+- tag_req
+- tag_we
+- ... and 4 more
 
 **Generated File:** T1_is_DoS.sv
 
 ---
 
-### T2: Availability - Performance Degradation
+### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** Critical
 **Confidence:** 1.00
-**Description:** Degrades performance through artificial delays
+**Description:** Leaks sensitive data to attacker-accessible location
 
-**Trigger Signals (4):**
-- itlb_req_o
-- itlb_req_d
-- dtlb_req_d
-- all_ways_valid
+**Trigger Signals (2):**
+- tag_we
+- pte_we
 
-**Payload Signals (1):**
-- all_ways_valid
+**Payload Signals (15):**
+- itlb_vaddr_i
+- dtlb_vaddr_i
+- shared_tlb_vaddr_o
+- shared_tlb_vaddr_o
+- out
+- ... and 10 more
 
-**Generated File:** T2_is_Availability.sv
+**Generated File:** T2_is_Leak.sv
 
 ---
 
 ### T3: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
-**Confidence:** 0.60
+**Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (0):**
+**Trigger Signals (14):**
+- itlb_vaddr_i
+- dtlb_vaddr_i
+- shared_tlb_vaddr_o
+- shared_tlb_vaddr_o
+- tag_wr_addr
+- ... and 9 more
 
-**Payload Signals (1):**
-- output
+**Payload Signals (5):**
+- out
+- tag_wr_data
+- tag_rd_data
+- pte_wr_data
+- pte_rd_data
 
 **Generated File:** T3_is_Integrity.sv
 
 ---
 
-### T4: Covert - Covert Channel
+### T4: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
-**Confidence:** 0.60
+**Confidence:** 1.00
+**Description:** Degrades performance through artificial delays
+
+**Trigger Signals (7):**
+- itlb_req_o
+- itlb_req_o
+- shared_tag_valid
+- tag_req
+- pte_req
+- ... and 2 more
+
+**Payload Signals (3):**
+- shared_tag_valid
+- way_valid
+- all_ways_valid
+
+**Generated File:** T4_is_Availability.sv
+
+---
+
+### T5: Covert - Covert Channel
+
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (4):**
+**Trigger Signals (8):**
 - itlb_access_i
 - dtlb_access_i
 - shared_tlb_access_o
-- shared_tlb_access_q
+- shared_tlb_access_o
+- tag_wr_data
+- ... and 3 more
 
-**Payload Signals (0):**
+**Payload Signals (8):**
+- out
+- shared_tag_valid
+- tag_wr_data
+- tag_rd_data
+- pte_wr_data
+- ... and 3 more
 
-**Generated File:** T4_is_Covert.sv
+**Generated File:** T5_is_Covert.sv
 
 ---
 

@@ -3,7 +3,7 @@
 **Module:** TestDCacheFillerTop
 **File:** TestDCacheFillerTop.sv
 **Type:** Sequential
-**Total Candidates:** 4
+**Total Candidates:** 3
 
 ---
 
@@ -11,68 +11,82 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (1):**
+**Trigger Signals (6):**
 - dcFillReq
+- MemAccessReq
+- dcMemAccessReq
+- dcFillReq
+- MemAccessReq
+- ... and 1 more
 
-**Payload Signals (1):**
+**Payload Signals (6):**
 - dcFillReq
+- MemAccessReq
+- dcMemAccessReq
+- dcFillReq
+- MemAccessReq
+- ... and 1 more
 
 **Generated File:** T1_TestDCacheFillerTop_DoS.sv
 
 ---
 
-### T2: Availability - Performance Degradation
+### T2: Integrity - Integrity Violation
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 1.00
-**Description:** Degrades performance through artificial delays
-
-**Trigger Signals (1):**
-- dcFillReq
-
-**Payload Signals (2):**
-- dcFillAck
-- dcFillerBusy
-
-**Generated File:** T2_TestDCacheFillerTop_Availability.sv
-
----
-
-### T3: Integrity - Integrity Violation
-
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
-**Confidence:** 0.60
+**Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (0):**
+**Trigger Signals (20):**
+- AddrPath
+- dcMissAddr
+- AddrPath
+- dcReplaceAddr
+- LineDataPath
+- ... and 15 more
 
-**Payload Signals (1):**
+**Payload Signals (14):**
 - rstOut
+- MemAccessResult
+- dcMemAccessResult
+- LineDataPath
+- dcReplaceData
+- ... and 9 more
 
-**Generated File:** T3_TestDCacheFillerTop_Integrity.sv
+**Generated File:** T2_TestDCacheFillerTop_Integrity.sv
 
 ---
 
-### T4: Covert - Covert Channel
+### T3: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (0):**
+**Trigger Signals (16):**
+- MemAccessResult
+- dcMemAccessResult
+- LineDataPath
+- dcReplaceData
+- LineDataPath
+- ... and 11 more
 
-**Payload Signals (1):**
-- dcFillerBusy
+**Payload Signals (14):**
+- rstOut
+- MemAccessResult
+- dcMemAccessResult
+- LineDataPath
+- dcReplaceData
+- ... and 9 more
 
-**Generated File:** T4_TestDCacheFillerTop_Covert.sv
+**Generated File:** T3_TestDCacheFillerTop_Covert.sv
 
 ---
 

@@ -39,7 +39,7 @@ def read_trojan_code(trojan_file: Path) -> dict:
             - payload_instructions: How to modify signals
             - trojan_type: DoS, Leak, etc.
     """
-    content = trojan_file.read_text()
+    content = trojan_file.read_text(encoding='utf-8')
     
     result = {
         'trigger_code': '',

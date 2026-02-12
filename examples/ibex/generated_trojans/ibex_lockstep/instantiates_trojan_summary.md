@@ -3,7 +3,7 @@
 **Module:** instantiates
 **File:** ibex_lockstep.sv
 **Type:** Sequential
-**Total Candidates:** 6
+**Total Candidates:** 5
 
 ---
 
@@ -11,26 +11,26 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (20):**
+**Trigger Signals (26):**
 - instr_req_i
 - instr_rvalid_i
 - data_req_i
 - data_rvalid_i
-- ic_scr_key_valid_i
-- ... and 15 more
+- data_we_i
+- ... and 21 more
 
-**Payload Signals (20):**
+**Payload Signals (26):**
 - instr_req_i
 - instr_rvalid_i
 - data_req_i
 - data_rvalid_i
-- ic_scr_key_valid_i
-- ... and 15 more
+- data_we_i
+- ... and 21 more
 
 **Generated File:** T1_instantiates_DoS.sv
 
@@ -38,26 +38,26 @@
 
 ### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** RSA-T600
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** Critical
 **Confidence:** 1.00
 **Description:** Leaks sensitive data to attacker-accessible location
 
-**Trigger Signals (6):**
-- irq_external_i
+**Trigger Signals (11):**
+- data_we_i
+- rf_we_wb_i
+- ic_tag_write_i
+- ic_data_write_i
 - debug_req_i
-- test_en_i
-- scan_rst_ni
-- irq_external
-- ... and 1 more
+- ... and 6 more
 
-**Payload Signals (32):**
+**Payload Signals (52):**
 - boot_addr_i
 - instr_addr_i
+- instr_rdata_i
 - data_req_i
 - data_gnt_i
-- data_rvalid_i
-- ... and 27 more
+- ... and 47 more
 
 **Generated File:** T2_instantiates_Leak.sv
 
@@ -65,26 +65,26 @@
 
 ### T3: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (25):**
+**Trigger Signals (51):**
 - boot_addr_i
 - instr_addr_i
+- instr_rdata_i
 - data_req_i
 - data_gnt_i
-- data_rvalid_i
-- ... and 20 more
+- ... and 46 more
 
-**Payload Signals (19):**
+**Payload Signals (43):**
+- instr_rdata_i
 - data_req_i
 - data_gnt_i
 - data_rvalid_i
 - data_we_i
-- data_be_i
-- ... and 14 more
+- ... and 38 more
 
 **Generated File:** T3_instantiates_Integrity.sv
 
@@ -92,26 +92,26 @@
 
 ### T4: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (26):**
+**Trigger Signals (18):**
 - instr_req_i
 - instr_rvalid_i
 - data_req_i
+- data_rvalid_i
+- ic_tag_req_i
+- ... and 13 more
+
+**Payload Signals (10):**
+- instr_gnt_i
+- instr_rvalid_i
 - data_gnt_i
 - data_rvalid_i
-- ... and 21 more
-
-**Payload Signals (6):**
-- instr_rvalid_i
-- data_rvalid_i
 - ic_scr_key_valid_i
-- instr_rvalid
-- data_rvalid
-- ... and 1 more
+- ... and 5 more
 
 **Generated File:** T4_instantiates_Availability.sv
 
@@ -119,46 +119,28 @@
 
 ### T5: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
 **Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (20):**
+**Trigger Signals (43):**
+- instr_rdata_i
 - data_req_i
 - data_gnt_i
 - data_rvalid_i
 - data_we_i
-- data_be_i
-- ... and 15 more
+- ... and 38 more
 
-**Payload Signals (3):**
-- debug_req_i
-- test_en_i
-- debug_req
+**Payload Signals (47):**
+- instr_rvalid_i
+- instr_rdata_i
+- data_req_i
+- data_gnt_i
+- data_rvalid_i
+- ... and 42 more
 
 **Generated File:** T5_instantiates_Covert.sv
-
----
-
-### T6: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (21):**
-- boot_addr_i
-- instr_addr_i
-- data_we_i
-- data_addr_i
-- rf_raddr_a_i
-- ... and 16 more
-
-**Payload Signals (0):**
-
-**Generated File:** T6_instantiates_Privilege.sv
 
 ---
 

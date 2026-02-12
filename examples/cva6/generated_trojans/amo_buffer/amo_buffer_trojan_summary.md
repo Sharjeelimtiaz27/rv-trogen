@@ -3,7 +3,7 @@
 **Module:** amo_buffer
 **File:** amo_buffer.sv
 **Type:** Sequential
-**Total Candidates:** 5
+**Total Candidates:** 4
 
 ---
 
@@ -11,24 +11,26 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (5):**
+**Trigger Signals (10):**
 - valid_i
-- amo_valid_commit_i
-- no_st_pending_i
 - ready_o
-- amo_valid
+- ariane_pkg::amo_req_t
+- amo_req_o
+- amo_valid_commit_i
+- ... and 5 more
 
-**Payload Signals (5):**
+**Payload Signals (10):**
 - valid_i
-- amo_valid_commit_i
-- no_st_pending_i
 - ready_o
-- amo_valid
+- ariane_pkg::amo_req_t
+- amo_req_o
+- amo_valid_commit_i
+- ... and 5 more
 
 **Generated File:** T1_amo_buffer_DoS.sv
 
@@ -36,16 +38,25 @@
 
 ### T2: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (1):**
+**Trigger Signals (10):**
+- amo_op_i
+- paddr_i
+- data_i
 - data_size_i
+- amo_op_i
+- ... and 5 more
 
-**Payload Signals (1):**
+**Payload Signals (5):**
+- data_i
 - data_size_i
+- data_i
+- data_size_i
+- data
 
 **Generated File:** T2_amo_buffer_Integrity.sv
 
@@ -53,56 +64,54 @@
 
 ### T3: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (4):**
+**Trigger Signals (10):**
 - valid_i
-- data_size_i
+- amo_op_i
+- ariane_pkg::amo_req_t
+- amo_req_o
 - amo_valid_commit_i
-- amo_valid
+- ... and 5 more
 
-**Payload Signals (4):**
+**Payload Signals (6):**
 - valid_i
+- ready_o
 - amo_valid_commit_i
 - ready_o
-- amo_valid
+- amo_valid_commit_i
+- ... and 1 more
 
 **Generated File:** T3_amo_buffer_Availability.sv
 
 ---
 
-### T4: Leak - Information Leakage
+### T4: Covert - Covert Channel
 
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (0):**
-
-**Payload Signals (1):**
-- data_size_i
-
-**Generated File:** T4_amo_buffer_Leak.sv
-
----
-
-### T5: Covert - Covert Channel
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (1):**
+**Trigger Signals (5):**
+- data_i
 - data_size_i
+- data_i
+- data_size_i
+- data
 
-**Payload Signals (0):**
+**Payload Signals (11):**
+- valid_i
+- ready_o
+- data_i
+- data_size_i
+- amo_valid_commit_i
+- ... and 6 more
 
-**Generated File:** T5_amo_buffer_Covert.sv
+**Generated File:** T4_amo_buffer_Covert.sv
 
 ---
 

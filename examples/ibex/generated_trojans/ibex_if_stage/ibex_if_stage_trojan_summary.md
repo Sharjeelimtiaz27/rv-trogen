@@ -11,26 +11,26 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (27):**
+**Trigger Signals (30):**
 - req_i
+- instr_req_o
 - instr_rvalid_i
-- ic_scr_key_valid_i
-- instr_valid_clear_i
-- dummy_instr_en_i
-- ... and 22 more
+- ic_tag_req_o
+- ic_data_req_o
+- ... and 25 more
 
-**Payload Signals (27):**
+**Payload Signals (30):**
 - req_i
+- instr_req_o
 - instr_rvalid_i
-- ic_scr_key_valid_i
-- instr_valid_clear_i
-- dummy_instr_en_i
-- ... and 22 more
+- ic_tag_req_o
+- ic_data_req_o
+- ... and 25 more
 
 **Generated File:** T1_ibex_if_stage_DoS.sv
 
@@ -38,125 +38,136 @@
 
 ### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** RSA-T600
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** Critical
 **Confidence:** 1.00
 **Description:** Leaks sensitive data to attacker-accessible location
 
-**Trigger Signals (1):**
-- next_pc
-
-**Payload Signals (27):**
-- boot_addr_i
-- ic_scr_key_valid_i
-- nt_branch_addr_i
+**Trigger Signals (13):**
+- ic_tag_write_o
+- ic_data_write_o
 - csr_mepc_i
 - csr_depc_i
-- ... and 22 more
+- csr_mtvec_i
+- ... and 8 more
+
+**Payload Signals (56):**
+- boot_addr_i
+- instr_addr_o
+- instr_rdata_i
+- ic_tag_addr_o
+- ic_tag_wdata_o
+- ... and 51 more
 
 **Generated File:** T2_ibex_if_stage_Leak.sv
 
 ---
 
-### T3: Integrity - Integrity Violation
+### T3: Privilege - Privilege Escalation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Not applicable (processor-specific)
+**Severity:** Critical
+**Confidence:** 1.00
+**Description:** Escalates privilege level to machine mode
+
+**Trigger Signals (29):**
+- boot_addr_i
+- instr_addr_o
+- ic_tag_write_o
+- ic_tag_addr_o
+- ic_data_write_o
+- ... and 24 more
+
+**Payload Signals (6):**
+- csr_mepc_i
+- csr_mtvec_i
+- csr_mtvec_init_o
+- csr_mepc_i
+- csr_mtvec_i
+- ... and 1 more
+
+**Generated File:** T3_ibex_if_stage_Privilege.sv
+
+---
+
+### T4: Integrity - Integrity Violation
+
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (21):**
+**Trigger Signals (48):**
 - boot_addr_i
-- pc_sel_e
-- nt_branch_addr_i
-- exc_pc_sel_e
 - instr_addr_o
-- ... and 16 more
+- instr_rdata_i
+- ic_tag_addr_o
+- ic_tag_wdata_o
+- ... and 43 more
 
-**Payload Signals (14):**
+**Payload Signals (36):**
+- instr_rdata_i
 - ic_tag_write_o
-- ic_data_write_o
-- instr_rdata_id_o
-- instr_rdata_alu_id_o
-- instr_rdata_c_id_o
-- ... and 9 more
+- ic_tag_wdata_o
+- ic_tag_rdata_i
+- ic_data_req_o
+- ... and 31 more
 
-**Generated File:** T3_ibex_if_stage_Integrity.sv
+**Generated File:** T4_ibex_if_stage_Integrity.sv
 
 ---
 
-### T4: Availability - Performance Degradation
+### T5: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
 **Trigger Signals (21):**
 - req_i
-- instr_rvalid_i
-- ic_scr_key_valid_i
-- instr_valid_clear_i
 - instr_req_o
+- instr_rvalid_i
+- ic_tag_req_o
+- ic_data_req_o
 - ... and 16 more
 
-**Payload Signals (15):**
+**Payload Signals (18):**
+- instr_gnt_i
 - instr_rvalid_i
 - ic_scr_key_valid_i
-- instr_valid_clear_i
-- id_in_ready_i
 - instr_valid_id_o
-- ... and 10 more
+- instr_valid_clear_i
+- ... and 13 more
 
-**Generated File:** T4_ibex_if_stage_Availability.sv
+**Generated File:** T5_ibex_if_stage_Availability.sv
 
 ---
 
-### T5: Covert - Covert Channel
+### T6: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
 **Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (23):**
-- ic_scr_key_valid_i
+**Trigger Signals (38):**
+- instr_rdata_i
+- ic_tag_wdata_o
+- ic_tag_rdata_i
+- ic_data_req_o
 - ic_data_write_o
-- ic_scr_key_req_o
-- instr_rdata_id_o
-- instr_rdata_alu_id_o
-- ... and 18 more
+- ... and 33 more
 
-**Payload Signals (12):**
-- if_busy_o
-- prefetch_busy
-- unused_fetch_addr_n0
-- unused_boot_addr
-- unused_csr_mtvec
-- ... and 7 more
+**Payload Signals (49):**
+- instr_rvalid_i
+- instr_rdata_i
+- ic_tag_wdata_o
+- ic_tag_rdata_i
+- ic_data_req_o
+- ... and 44 more
 
-**Generated File:** T5_ibex_if_stage_Covert.sv
-
----
-
-### T6: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (20):**
-- boot_addr_i
-- nt_branch_addr_i
-- csr_mepc_i
-- csr_depc_i
-- csr_mtvec_i
-- ... and 15 more
-
-**Payload Signals (0):**
-
-**Generated File:** T6_ibex_if_stage_Privilege.sv
+**Generated File:** T6_ibex_if_stage_Covert.sv
 
 ---
 

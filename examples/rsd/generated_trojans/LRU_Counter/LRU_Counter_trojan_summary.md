@@ -3,41 +3,26 @@
 **Module:** LRU_Counter
 **File:** LRU_Counter.sv
 **Type:** Sequential
-**Total Candidates:** 2
+**Total Candidates:** 1
 
 ---
 
 ## Generated Trojans
 
-### T1: Privilege - Privilege Escalation
+### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Disables functionality by forcing control signals to 0
 
 **Trigger Signals (1):**
 - we
 
-**Payload Signals (0):**
+**Payload Signals (1):**
+- we
 
-**Generated File:** T1_LRU_Counter_Privilege.sv
-
----
-
-### T2: Covert - Covert Channel
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Creates hidden communication channel through timing
-
-**Trigger Signals (1):**
-- access
-
-**Payload Signals (0):**
-
-**Generated File:** T2_LRU_Counter_Covert.sv
+**Generated File:** T1_LRU_Counter_DoS.sv
 
 ---
 

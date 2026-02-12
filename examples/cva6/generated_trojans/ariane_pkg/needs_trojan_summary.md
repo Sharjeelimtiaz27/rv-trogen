@@ -11,24 +11,22 @@
 
 ### T1: Leak - Information Leakage
 
-**Trust-Hub Source:** RSA-T600
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** Critical
 **Confidence:** 1.00
 **Description:** Leaks sensitive data to attacker-accessible location
 
-**Trigger Signals (4):**
-- smode_status_read_mask
+**Trigger Signals (2):**
 - SMODE_STATUS_WRITE_MASK
-- sext32to64
-- extract_transfer_size
+- HSTATUS_WRITE_MASK
 
-**Payload Signals (9):**
+**Payload Signals (8):**
 - vaddr
 - DataCount
 - DataAddr
 - dataaccess
 - datasize
-- ... and 4 more
+- ... and 3 more
 
 **Generated File:** T1_needs_Leak.sv
 
@@ -36,18 +34,18 @@
 
 ### T2: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (21):**
+**Trigger Signals (22):**
 - fu_op
+- op)
 - fu_op
+- op)
 - fu_op
-- fu_op
-- fu_op
-- ... and 16 more
+- ... and 17 more
 
 **Payload Signals (8):**
 - DataCount
@@ -61,87 +59,11 @@
 
 ---
 
-### T3: DoS - Denial of Service
+### T3: Covert - Covert Channel
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
 **Severity:** High
-**Confidence:** 0.80
-**Description:** Disables functionality by forcing control signals to 0
-
-**Trigger Signals (15):**
-- s_st_enbl
-- g_st_enbl
-- s_st_enbl
-- g_st_enbl
-- s_st_enbl
-- ... and 10 more
-
-**Payload Signals (14):**
-- s_st_enbl
-- g_st_enbl
-- s_st_enbl
-- g_st_enbl
-- s_st_enbl
-- ... and 9 more
-
-**Generated File:** T3_needs_DoS.sv
-
----
-
-### T4: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.80
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (9):**
-- vaddr
-- DataAddr
-- dataaddr
-- smode_status_read_mask
-- SMODE_STATUS_WRITE_MASK
-- ... and 4 more
-
-**Payload Signals (4):**
-- smode_status_read_mask
-- SMODE_STATUS_WRITE_MASK
-- HSTATUS_WRITE_MASK
-- fd_changes_rd_state
-
-**Generated File:** T4_needs_Privilege.sv
-
----
-
-### T5: Availability - Performance Degradation
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.80
-**Description:** Degrades performance through artificial delays
-
-**Trigger Signals (22):**
-- fu_op
-- fu_op
-- fu_op
-- fu_op
-- fu_op
-- ... and 17 more
-
-**Payload Signals (3):**
-- INVALIDATE_ON_FLUSH
-- valid
-- ack
-
-**Generated File:** T5_needs_Availability.sv
-
----
-
-### T6: Covert - Covert Channel
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
+**Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
 **Trigger Signals (5):**
@@ -151,9 +73,83 @@
 - datasize
 - dataaddr
 
-**Payload Signals (0):**
+**Payload Signals (8):**
+- DataCount
+- DataAddr
+- dataaccess
+- datasize
+- dataaddr
+- ... and 3 more
 
-**Generated File:** T6_needs_Covert.sv
+**Generated File:** T3_needs_Covert.sv
+
+---
+
+### T4: DoS - Denial of Service
+
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
+**Confidence:** 0.80
+**Description:** Disables functionality by forcing control signals to 0
+
+**Trigger Signals (4):**
+- CauseRequest
+- INVALIDATE_ON_FLUSH
+- valid
+- req
+
+**Payload Signals (4):**
+- CauseRequest
+- INVALIDATE_ON_FLUSH
+- valid
+- req
+
+**Generated File:** T4_needs_DoS.sv
+
+---
+
+### T5: Privilege - Privilege Escalation
+
+**Trust-Hub Status:** Not applicable (processor-specific)
+**Severity:** Critical
+**Confidence:** 0.80
+**Description:** Escalates privilege level to machine mode
+
+**Trigger Signals (6):**
+- vaddr
+- DataAddr
+- dataaddr
+- SMODE_STATUS_WRITE_MASK
+- HSTATUS_WRITE_MASK
+- ... and 1 more
+
+**Payload Signals (1):**
+- SMODE_STATUS_WRITE_MASK
+
+**Generated File:** T5_needs_Privilege.sv
+
+---
+
+### T6: Availability - Performance Degradation
+
+**Trust-Hub Status:** Category exists (gate-level only)
+**Severity:** Medium
+**Confidence:** 0.80
+**Description:** Degrades performance through artificial delays
+
+**Trigger Signals (19):**
+- fu_op
+- op)
+- fu_op
+- op)
+- fu_op
+- ... and 14 more
+
+**Payload Signals (2):**
+- INVALIDATE_ON_FLUSH
+- valid
+
+**Generated File:** T6_needs_Availability.sv
 
 ---
 

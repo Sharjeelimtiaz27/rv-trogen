@@ -11,26 +11,26 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (70):**
+**Trigger Signals (57):**
 - debug_req_i
 - cvxif_req_t
+- cvxif_req_o
 - noc_req_t
-- valid
-- fetch_valid
-- ... and 65 more
+- noc_req_o
+- ... and 52 more
 
-**Payload Signals (68):**
+**Payload Signals (57):**
 - debug_req_i
 - cvxif_req_t
+- cvxif_req_o
 - noc_req_t
-- valid
-- fetch_valid
-- ... and 63 more
+- noc_req_o
+- ... and 52 more
 
 **Generated File:** T1_cva6_DoS.sv
 
@@ -38,26 +38,26 @@
 
 ### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** RSA-T600
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** Critical
 **Confidence:** 1.00
 **Description:** Leaks sensitive data to attacker-accessible location
 
-**Trigger Signals (26):**
+**Trigger Signals (15):**
 - debug_req_i
 - mode
-- halt_acc_ctrl
-- debug_mode
-- debug_from_trigger
-- ... and 21 more
-
-**Payload Signals (37):**
-- data_req
 - data_we
-- data_size
-- data_gnt
-- data_rvalid
-- ... and 32 more
+- csr_valid_id_ex
+- x_we_ex_id
+- ... and 10 more
+
+**Payload Signals (51):**
+- boot_addr_i
+- predict_address
+- fetch_paddr
+- fetch_vaddr
+- vaddr
+- ... and 46 more
 
 **Generated File:** T2_cva6_Leak.sv
 
@@ -65,23 +65,21 @@
 
 ### T3: Privilege - Privilege Escalation
 
-**Trust-Hub Source:** Custom RISC-V
+**Trust-Hub Status:** Not applicable (processor-specific)
 **Severity:** Critical
 **Confidence:** 1.00
 **Description:** Escalates privilege level to machine mode
 
-**Trigger Signals (53):**
-- mode
-- data_we
-- halt_acc_ctrl
-- csr_hs_ld_st_inst_ex
-- x_we_ex_id
-- ... and 48 more
+**Trigger Signals (31):**
+- boot_addr_i
+- predict_address
+- fetch_paddr
+- fetch_vaddr
+- vaddr
+- ... and 26 more
 
-**Payload Signals (4):**
+**Payload Signals (2):**
 - mode
-- dirty_fp_state
-- dirty_v_state
 - debug_mode
 
 **Generated File:** T3_cva6_Privilege.sv
@@ -90,26 +88,26 @@
 
 ### T4: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (8):**
-- data_req
-- data_we
-- data_size
-- data_gnt
-- data_rvalid
-- ... and 3 more
+**Trigger Signals (39):**
+- boot_addr_i
+- predict_address
+- fetch_paddr
+- fetch_vaddr
+- vaddr
+- ... and 34 more
 
-**Payload Signals (9):**
+**Payload Signals (29):**
+- data
+- result
+- data_wdata
+- data_wuser
 - data_req
-- data_we
-- data_size
-- data_gnt
-- data_rvalid
-- ... and 4 more
+- ... and 24 more
 
 **Generated File:** T4_cva6_Integrity.sv
 
@@ -117,26 +115,26 @@
 
 ### T5: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (38):**
+**Trigger Signals (54):**
 - debug_req_i
 - cvxif_req_t
+- cvxif_req_o
 - noc_req_t
-- valid
-- fetch_valid
-- ... and 33 more
+- noc_req_o
+- ... and 49 more
 
-**Payload Signals (46):**
+**Payload Signals (42):**
 - valid
 - fetch_valid
-- ready
 - ex_valid
 - tag_valid
-- ... and 41 more
+- data_rvalid
+- ... and 37 more
 
 **Generated File:** T5_cva6_Availability.sv
 
@@ -144,24 +142,26 @@
 
 ### T6: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
 **Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (8):**
-- fetch_valid
-- fetch_req
+**Trigger Signals (20):**
+- data
+- data_wdata
+- data_wuser
 - data_req
 - data_we
-- data_size
-- ... and 3 more
+- ... and 15 more
 
-**Payload Signals (4):**
-- debug_req_i
-- debug_mode
-- debug_from_trigger
-- set_debug_pc
+**Payload Signals (65):**
+- valid
+- fetch_valid
+- data
+- result
+- ex_valid
+- ... and 60 more
 
 **Generated File:** T6_cva6_Covert.sv
 

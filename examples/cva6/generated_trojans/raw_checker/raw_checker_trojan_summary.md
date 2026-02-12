@@ -11,15 +11,17 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (1):**
+**Trigger Signals (2):**
+- valid_o
 - valid_o
 
-**Payload Signals (1):**
+**Payload Signals (2):**
+- valid_o
 - valid_o
 
 **Generated File:** T1_raw_checker_DoS.sv
@@ -28,15 +30,17 @@
 
 ### T2: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (1):**
+**Trigger Signals (2):**
+- valid_o
 - valid_o
 
-**Payload Signals (1):**
+**Payload Signals (2):**
+- valid_o
 - valid_o
 
 **Generated File:** T2_raw_checker_Availability.sv

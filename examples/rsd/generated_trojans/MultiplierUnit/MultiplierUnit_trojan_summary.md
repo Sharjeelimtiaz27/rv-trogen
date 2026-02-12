@@ -3,91 +3,85 @@
 **Module:** MultiplierUnit
 **File:** MultiplierUnit.sv
 **Type:** Sequential
-**Total Candidates:** 4
+**Total Candidates:** 3
 
 ---
 
 ## Generated Trojans
 
-### T1: Leak - Information Leakage
+### T1: Integrity - Integrity Violation
 
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 1.00
-**Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (3):**
-- DataPath
-- DataPath
-- DataPath
-
-**Payload Signals (3):**
-- DataPath
-- DataPath
-- DataPath
-
-**Generated File:** T1_MultiplierUnit_Leak.sv
-
----
-
-### T2: Integrity - Integrity Violation
-
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (5):**
+**Trigger Signals (22):**
 - DataPath
+- fuOpA_In
 - DataPath
+- fuOpB_In
 - DataPath
-- fuOpA_sign
-- fuOpB_sign
+- ... and 17 more
 
-**Payload Signals (3):**
+**Payload Signals (15):**
 - DataPath
 - DataPath
 - DataPath
+- dataOut
+- DataPath
+- ... and 10 more
 
-**Generated File:** T2_MultiplierUnit_Integrity.sv
+**Generated File:** T1_MultiplierUnit_Integrity.sv
 
 ---
 
-### T3: Availability - Performance Degradation
+### T2: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
-**Confidence:** 0.60
+**Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (5):**
-- DataPath
-- DataPath
-- DataPath
+**Trigger Signals (8):**
+- fuOpA_In
+- fuOpB_In
+- fuOpA_In
+- fuOpB_In
 - fuOpA_sign
-- fuOpB_sign
+- ... and 3 more
 
-**Payload Signals (0):**
+**Payload Signals (1):**
+- stall
 
-**Generated File:** T3_MultiplierUnit_Availability.sv
+**Generated File:** T2_MultiplierUnit_Availability.sv
 
 ---
 
-### T4: Covert - Covert Channel
+### T3: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (3):**
+**Trigger Signals (14):**
 - DataPath
 - DataPath
 - DataPath
+- dataOut
+- DataPath
+- ... and 9 more
 
-**Payload Signals (0):**
+**Payload Signals (15):**
+- DataPath
+- DataPath
+- DataPath
+- dataOut
+- DataPath
+- ... and 10 more
 
-**Generated File:** T4_MultiplierUnit_Covert.sv
+**Generated File:** T3_MultiplierUnit_Covert.sv
 
 ---
 

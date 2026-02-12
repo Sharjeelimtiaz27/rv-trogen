@@ -11,18 +11,16 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (2):**
+**Trigger Signals (1):**
 - branch_valid_i
-- jump_taken
 
-**Payload Signals (2):**
+**Payload Signals (1):**
 - branch_valid_i
-- jump_taken
 
 **Generated File:** T1_branch_unit_DoS.sv
 
@@ -30,7 +28,7 @@
 
 ### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** RSA-T600
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** Critical
 **Confidence:** 1.00
 **Description:** Leaks sensitive data to attacker-accessible location
@@ -38,8 +36,12 @@
 **Trigger Signals (1):**
 - debug_mode_i
 
-**Payload Signals (1):**
+**Payload Signals (5):**
 - fu_data_t
+- fu_data_i
+- branch_result_o
+- branch_result_o
+- target_address
 
 **Generated File:** T2_branch_unit_Leak.sv
 
@@ -47,13 +49,14 @@
 
 ### T3: Privilege - Privilege Escalation
 
-**Trust-Hub Source:** Custom RISC-V
+**Trust-Hub Status:** Not applicable (processor-specific)
 **Severity:** Critical
 **Confidence:** 1.00
 **Description:** Escalates privilege level to machine mode
 
-**Trigger Signals (1):**
+**Trigger Signals (2):**
 - debug_mode_i
+- target_address
 
 **Payload Signals (1):**
 - debug_mode_i
@@ -64,16 +67,21 @@
 
 ### T4: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (1):**
+**Trigger Signals (3):**
 - fu_data_t
+- fu_data_i
+- target_address
 
-**Payload Signals (1):**
+**Payload Signals (4):**
 - fu_data_t
+- fu_data_i
+- branch_result_o
+- branch_result_o
 
 **Generated File:** T4_branch_unit_Integrity.sv
 
@@ -81,13 +89,12 @@
 
 ### T5: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (2):**
-- fu_data_t
+**Trigger Signals (1):**
 - branch_valid_i
 
 **Payload Signals (1):**
@@ -99,16 +106,21 @@
 
 ### T6: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
 **Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (1):**
+**Trigger Signals (2):**
 - fu_data_t
+- fu_data_i
 
-**Payload Signals (1):**
-- debug_mode_i
+**Payload Signals (5):**
+- fu_data_t
+- fu_data_i
+- branch_valid_i
+- branch_result_o
+- branch_result_o
 
 **Generated File:** T6_branch_unit_Covert.sv
 

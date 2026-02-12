@@ -3,75 +3,63 @@
 **Module:** FreeList
 **File:** FreeList.sv
 **Type:** Sequential
-**Total Candidates:** 4
+**Total Candidates:** 2
 
 ---
 
 ## Generated Trojans
 
-### T1: DoS - Denial of Service
+### T1: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
-**Description:** Disables functionality by forcing control signals to 0
-
-**Trigger Signals (1):**
-- rstStart
-
-**Payload Signals (1):**
-- rstStart
-
-**Generated File:** T1_FreeList_DoS.sv
-
----
-
-### T2: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (1):**
-- we
-
-**Payload Signals (0):**
-
-**Generated File:** T2_FreeList_Privilege.sv
-
----
-
-### T3: Integrity - Integrity Violation
-
-**Trust-Hub Source:** AES-T800
-**Severity:** High
-**Confidence:** 0.60
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (1):**
+**Trigger Signals (12):**
 - pop
+- pushedData
+- headData
+- pop
+- POP_WIDTH
+- ... and 7 more
 
-**Payload Signals (0):**
+**Payload Signals (6):**
+- pushedData
+- headData
+- pushedData
+- poppedData
+- headData
+- ... and 1 more
 
-**Generated File:** T3_FreeList_Integrity.sv
+**Generated File:** T1_FreeList_Integrity.sv
 
 ---
 
-### T4: Availability - Performance Degradation
+### T2: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Degrades performance through artificial delays
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (2):**
-- pop
-- rstStart
+**Trigger Signals (6):**
+- pushedData
+- headData
+- pushedData
+- poppedData
+- headData
+- ... and 1 more
 
-**Payload Signals (0):**
+**Payload Signals (6):**
+- pushedData
+- headData
+- pushedData
+- poppedData
+- headData
+- ... and 1 more
 
-**Generated File:** T4_FreeList_Availability.sv
+**Generated File:** T2_FreeList_Covert.sv
 
 ---
 

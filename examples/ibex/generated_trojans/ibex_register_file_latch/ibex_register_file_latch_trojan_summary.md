@@ -3,7 +3,7 @@
 **Module:** ibex_register_file_latch
 **File:** ibex_register_file_latch.sv
 **Type:** Sequential
-**Total Candidates:** 6
+**Total Candidates:** 4
 
 ---
 
@@ -11,16 +11,22 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (1):**
+**Trigger Signals (4):**
 - test_en_i
+- we_a_i
+- we_a_i
+- we_r0_dummy
 
-**Payload Signals (1):**
+**Payload Signals (4):**
 - test_en_i
+- we_a_i
+- we_a_i
+- we_r0_dummy
 
 **Generated File:** T1_ibex_register_file_latch_DoS.sv
 
@@ -28,20 +34,24 @@
 
 ### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** RSA-T600
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** Critical
 **Confidence:** 1.00
 **Description:** Leaks sensitive data to attacker-accessible location
 
-**Trigger Signals (1):**
+**Trigger Signals (4):**
 - test_en_i
+- we_a_i
+- we_a_i
+- we_r0_dummy
 
-**Payload Signals (5):**
+**Payload Signals (14):**
 - raddr_a_i
+- rdata_a_o
 - raddr_b_i
+- rdata_b_o
 - waddr_a_i
-- data
-- oh_raddr_a_err
+- ... and 9 more
 
 **Generated File:** T2_ibex_register_file_latch_Leak.sv
 
@@ -49,20 +59,26 @@
 
 ### T3: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (5):**
+**Trigger Signals (14):**
 - raddr_a_i
+- rdata_a_o
 - raddr_b_i
+- rdata_b_o
 - waddr_a_i
-- data
-- oh_raddr_a_err
+- ... and 9 more
 
-**Payload Signals (1):**
-- data
+**Payload Signals (7):**
+- rdata_a_o
+- rdata_b_o
+- wdata_a_i
+- rdata_a_o
+- rdata_b_o
+- ... and 2 more
 
 **Generated File:** T3_ibex_register_file_latch_Integrity.sv
 
@@ -70,57 +86,28 @@
 
 ### T4: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
 **Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (1):**
-- data
+**Trigger Signals (7):**
+- rdata_a_o
+- rdata_b_o
+- wdata_a_i
+- rdata_a_o
+- rdata_b_o
+- ... and 2 more
 
-**Payload Signals (3):**
-- test_en_i
-- unused_strobe
-- unused_dummy_instr
+**Payload Signals (7):**
+- rdata_a_o
+- rdata_b_o
+- wdata_a_i
+- rdata_a_o
+- rdata_b_o
+- ... and 2 more
 
 **Generated File:** T4_ibex_register_file_latch_Covert.sv
-
----
-
-### T5: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (6):**
-- raddr_a_i
-- raddr_b_i
-- waddr_a_i
-- we_a_i
-- oh_raddr_a_err
-- ... and 1 more
-
-**Payload Signals (0):**
-
-**Generated File:** T5_ibex_register_file_latch_Privilege.sv
-
----
-
-### T6: Availability - Performance Degradation
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Degrades performance through artificial delays
-
-**Trigger Signals (1):**
-- data
-
-**Payload Signals (0):**
-
-**Generated File:** T6_ibex_register_file_latch_Availability.sv
 
 ---
 

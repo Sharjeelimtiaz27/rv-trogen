@@ -1,0 +1,847 @@
+================================================================================
+RSD SIGNAL CLASSIFICATION SUMMARY
+================================================================================
+
+Total Modules: 149
+
+
+ActiveList:
+------------------------------------------------------------
+
+Axi4LiteDualPortBlockRAM:
+------------------------------------------------------------
+
+Axi4LitePlToPsControlRegister:
+------------------------------------------------------------
+  Availability    - Triggers:  0, Payloads:  1
+    Payloads: done
+  Covert          - Triggers:  1, Payloads:  1
+    Triggers: memory_data
+    Payloads: memory_data
+  DoS             - Triggers:  2, Payloads:  3
+    Triggers: memory_we, we
+    Payloads: done, memory_we, we
+  Integrity       - Triggers:  2, Payloads:  1
+    Triggers: memory_addr, memory_data
+    Payloads: memory_data
+  Leak            - Triggers:  2, Payloads:  2
+    Triggers: memory_we, we
+    Payloads: memory_addr, memory_data
+  Privilege       - Triggers:  3, Payloads:  0
+    Triggers: memory_addr, memory_we, we
+
+Axi4Memory:
+------------------------------------------------------------
+
+BTB:
+------------------------------------------------------------
+
+Bimodal:
+------------------------------------------------------------
+
+BitCounter:
+------------------------------------------------------------
+  Availability    - Triggers:  0, Payloads:  1
+    Payloads: stall
+  Covert          - Triggers:  1, Payloads:  1
+    Triggers: dataOut
+    Payloads: dataOut
+  Integrity       - Triggers:  1, Payloads:  1
+    Triggers: dataOut
+    Payloads: dataOut
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: dataOut
+
+BlockDualPortRAM:
+------------------------------------------------------------
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: we
+    Payloads: we
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: WRITE_NUM
+  Leak            - Triggers:  2, Payloads:  0
+    Triggers: WRITE_NUM, we
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: WRITE_NUM, we
+
+BranchPredictor:
+------------------------------------------------------------
+
+BypassCtrlStage:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: LOAD_ISSUE_WIDTH
+  Covert          - Triggers:  1, Payloads:  1
+    Triggers: LOAD_ISSUE_WIDTH
+    Payloads: out
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: out
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: out
+
+BypassStage:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: LOAD_ISSUE_WIDTH
+  Covert          - Triggers:  1, Payloads:  1
+    Triggers: LOAD_ISSUE_WIDTH
+    Payloads: out
+  Integrity       - Triggers:  1, Payloads:  1
+    Triggers: sel
+    Payloads: out
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: out
+
+CSR_Unit:
+------------------------------------------------------------
+
+CacheFlushManager:
+------------------------------------------------------------
+
+CommitStage:
+------------------------------------------------------------
+
+ComplexIntegerExecutionStage:
+------------------------------------------------------------
+
+ComplexIntegerIssueStage:
+------------------------------------------------------------
+
+ComplexIntegerRegisterReadStage:
+------------------------------------------------------------
+
+ComplexIntegerRegisterWriteStage:
+------------------------------------------------------------
+
+ControlQueue:
+------------------------------------------------------------
+  Covert          - Triggers:  1, Payloads:  1
+    Triggers: `PS_PL_CTRL_QUEUE_DATA_BIT_SIZE-1:0
+    Payloads: `PS_PL_CTRL_QUEUE_DATA_BIT_SIZE-1:0
+  Integrity       - Triggers:  1, Payloads:  1
+    Triggers: `PS_PL_CTRL_QUEUE_DATA_BIT_SIZE-1:0
+    Payloads: `PS_PL_CTRL_QUEUE_DATA_BIT_SIZE-1:0
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: `PS_PL_CTRL_QUEUE_DATA_BIT_SIZE-1:0
+
+Controller:
+------------------------------------------------------------
+
+Core:
+------------------------------------------------------------
+
+DCacheController:
+------------------------------------------------------------
+
+Debug:
+------------------------------------------------------------
+
+DecodedBranchResolver:
+------------------------------------------------------------
+  Availability    - Triggers:  0, Payloads:  1
+    Payloads: stall
+
+Decoder:
+------------------------------------------------------------
+  Availability    - Triggers:  3, Payloads:  0
+    Triggers: OpInfo, op, opInfo
+  Integrity       - Triggers:  3, Payloads:  0
+    Triggers: OpInfo, op, opInfo
+
+DestinationRAM:
+------------------------------------------------------------
+
+DispatchStage:
+------------------------------------------------------------
+
+Divider:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: req
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: req
+    Payloads: req
+
+DividerUnit:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  1
+    Triggers: req
+    Payloads: stall
+  Covert          - Triggers:  1, Payloads:  1
+    Triggers: dataOut
+    Payloads: dataOut
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: req
+    Payloads: req
+  Integrity       - Triggers:  1, Payloads:  1
+    Triggers: dataOut
+    Payloads: dataOut
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: dataOut
+
+FP32DivSqrter:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: req
+  Covert          - Triggers:  0, Payloads:  1
+    Payloads: result
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: req
+    Payloads: req
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: result
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: result
+
+FP32PipelinedAdder:
+------------------------------------------------------------
+  Covert          - Triggers:  0, Payloads:  1
+    Payloads: result
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: result
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: result
+
+FP32PipelinedFMA:
+------------------------------------------------------------
+  Covert          - Triggers:  0, Payloads:  2
+    Payloads: fma_result, result
+  Integrity       - Triggers:  0, Payloads:  2
+    Payloads: fma_result, result
+  Leak            - Triggers:  0, Payloads:  2
+    Payloads: fma_result, result
+
+FP32PipelinedMultiplier:
+------------------------------------------------------------
+  Covert          - Triggers:  0, Payloads:  1
+    Payloads: result
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: result
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: result
+
+FP32PipelinedOther:
+------------------------------------------------------------
+  Covert          - Triggers:  0, Payloads:  1
+    Payloads: result
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: result
+  Leak            - Triggers:  1, Payloads:  1
+    Triggers: Rounding_Mode
+    Payloads: result
+  Privilege       - Triggers:  1, Payloads:  1
+    Triggers: Rounding_Mode
+    Payloads: Rounding_Mode
+
+FPDivSqrtUnit:
+------------------------------------------------------------
+
+FPExecutionStage:
+------------------------------------------------------------
+
+FPIssueStage:
+------------------------------------------------------------
+
+FPRegisterReadStage:
+------------------------------------------------------------
+
+FPRegisterWriteStage:
+------------------------------------------------------------
+
+FetchStage:
+------------------------------------------------------------
+
+FlipFlop:
+------------------------------------------------------------
+  Covert          - Triggers:  0, Payloads:  1
+    Payloads: out
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: we
+    Payloads: we
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: out
+  Leak            - Triggers:  1, Payloads:  1
+    Triggers: we
+    Payloads: out
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: we
+
+FreeList:
+------------------------------------------------------------
+
+Gshare:
+------------------------------------------------------------
+
+ICacheArray:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  1
+    Triggers: valid
+    Payloads: valid
+  Covert          - Triggers:  1, Payloads:  1
+    Triggers: FETCH_WIDTH
+    Payloads: valid
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: valid, we
+    Payloads: valid, we
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: writeIndex
+  Leak            - Triggers:  2, Payloads:  0
+    Triggers: we, writeIndex
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: we, writeIndex
+
+IO_Unit:
+------------------------------------------------------------
+
+IntAdder:
+------------------------------------------------------------
+
+IntegerExecutionStage:
+------------------------------------------------------------
+
+IntegerIssueStage:
+------------------------------------------------------------
+
+IntegerRegisterReadStage:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: OpOperandType
+  Integrity       - Triggers:  1, Payloads:  0
+    Triggers: OpOperandType
+
+IntegerRegisterWriteStage:
+------------------------------------------------------------
+
+InterruptController:
+------------------------------------------------------------
+
+IssueQueue:
+------------------------------------------------------------
+
+LRU_Counter:
+------------------------------------------------------------
+  Covert          - Triggers:  1, Payloads:  0
+    Triggers: access
+
+LoadQueue:
+------------------------------------------------------------
+
+LoadStoreUnit:
+------------------------------------------------------------
+
+Main:
+------------------------------------------------------------
+  Leak            - Triggers:  1, Payloads:  1
+    Triggers: RSD_DISABLE_DEBUG_REGISTER
+    Payloads: RSD_DISABLE_DEBUG_REGISTER
+
+Main_Zynq:
+------------------------------------------------------------
+  Leak            - Triggers:  1, Payloads:  1
+    Triggers: RSD_DISABLE_DEBUG_REGISTER
+    Payloads: RSD_DISABLE_DEBUG_REGISTER
+
+Memory:
+------------------------------------------------------------
+
+MemoryAccessController:
+------------------------------------------------------------
+
+MemoryAccessStage:
+------------------------------------------------------------
+
+MemoryDependencyPredictor:
+------------------------------------------------------------
+
+MemoryExecutionStage:
+------------------------------------------------------------
+
+MemoryIssueStage:
+------------------------------------------------------------
+
+MemoryLatencySimulator:
+------------------------------------------------------------
+
+MemoryReadReqQueue:
+------------------------------------------------------------
+
+MemoryRegisterReadStage:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: OpOperandType
+  Integrity       - Triggers:  1, Payloads:  0
+    Triggers: OpOperandType
+
+MemoryRegisterWriteStage:
+------------------------------------------------------------
+
+MemoryTagAccessStage:
+------------------------------------------------------------
+
+MemoryWriteDataQueue:
+------------------------------------------------------------
+
+MicroOpPicker:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: req
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: req
+    Payloads: req
+
+MulDivUnit:
+------------------------------------------------------------
+
+Multiplier:
+------------------------------------------------------------
+  Availability    - Triggers:  0, Payloads:  1
+    Payloads: stall
+  Covert          - Triggers:  0, Payloads:  1
+    Payloads: out
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: out
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: out
+
+MultiplierUnit:
+------------------------------------------------------------
+  Availability    - Triggers:  0, Payloads:  1
+    Payloads: stall
+  Covert          - Triggers:  1, Payloads:  1
+    Triggers: dataOut
+    Payloads: dataOut
+  Integrity       - Triggers:  1, Payloads:  1
+    Triggers: dataOut
+    Payloads: dataOut
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: dataOut
+
+NextPCStage:
+------------------------------------------------------------
+
+OrgShifter:
+------------------------------------------------------------
+  Covert          - Triggers:  2, Payloads:  2
+    Triggers: dataIn, dataOut
+    Payloads: dataIn, dataOut
+  Integrity       - Triggers:  2, Payloads:  2
+    Triggers: dataIn, dataOut
+    Payloads: dataIn, dataOut
+  Leak            - Triggers:  0, Payloads:  2
+    Payloads: dataIn, dataOut
+
+PC:
+------------------------------------------------------------
+
+PerformanceCounter:
+------------------------------------------------------------
+
+Picker:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  1
+    Triggers: req, request
+    Payloads: grant
+  DoS             - Triggers:  2, Payloads:  1
+    Triggers: req, request
+    Payloads: req
+
+PipelinedRefDivider:
+------------------------------------------------------------
+  Availability    - Triggers:  0, Payloads:  1
+    Payloads: stall
+
+PreDecodeStage:
+------------------------------------------------------------
+
+ProducerMatrix:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: STORE_ISSUE_WIDTH
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: STORE_ISSUE_WIDTH
+  Leak            - Triggers:  0, Payloads:  2
+    Payloads: ISSUE_QUEUE_SRC_REG_NUM, ISSUE_QUEUE_SRC_REG_NUM-1:0
+
+QueuePointer:
+------------------------------------------------------------
+
+RMT:
+------------------------------------------------------------
+
+ReadyBitTable:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: SRC_OP_NUM
+  Integrity       - Triggers:  1, Payloads:  0
+    Triggers: SRC_OP_NUM
+
+RecoveryManager:
+------------------------------------------------------------
+
+RefDivider:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: req
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: req
+    Payloads: req
+
+RegisterFile:
+------------------------------------------------------------
+
+RenameLogic:
+------------------------------------------------------------
+
+RenameLogicCommitter:
+------------------------------------------------------------
+
+RenameStageSerializer:
+------------------------------------------------------------
+  Availability    - Triggers:  4, Payloads:  2
+    Triggers: OpInfo, opInfo, storeQueueEmpty
+              ... and 1 more
+    Payloads: stall, valid
+  Covert          - Triggers:  0, Payloads:  1
+    Payloads: valid
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: valid
+    Payloads: valid
+  Integrity       - Triggers:  2, Payloads:  1
+    Triggers: OpInfo, opInfo
+    Payloads: storeQueueEmpty
+
+ReplayQueue:
+------------------------------------------------------------
+
+ResetController:
+------------------------------------------------------------
+
+RetirementRMT:
+------------------------------------------------------------
+
+ScheduleStage:
+------------------------------------------------------------
+
+Scheduler:
+------------------------------------------------------------
+
+SelectLogic:
+------------------------------------------------------------
+
+StoreCommitter:
+------------------------------------------------------------
+
+StoreQueue:
+------------------------------------------------------------
+  Covert          - Triggers:  2, Payloads:  2
+    Triggers: dataIn, dataOut
+    Payloads: dataIn, dataOut
+  Integrity       - Triggers:  3, Payloads:  2
+    Triggers: addr, dataIn, dataOut
+    Payloads: dataIn, dataOut
+  Leak            - Triggers:  1, Payloads:  3
+    Triggers: mode
+    Payloads: addr, dataIn, dataOut
+  Privilege       - Triggers:  2, Payloads:  1
+    Triggers: addr, mode
+    Payloads: mode
+
+TestBenchClockGenerator:
+------------------------------------------------------------
+
+TestBlockDualPortRAM:
+------------------------------------------------------------
+
+TestBlockDualPortRAM_Top:
+------------------------------------------------------------
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: we
+    Payloads: we
+  Leak            - Triggers:  1, Payloads:  0
+    Triggers: we
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: we
+
+TestBlockMultiPortRAM:
+------------------------------------------------------------
+
+TestBlockMultiPortRAM_Top:
+------------------------------------------------------------
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: we
+    Payloads: we
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: WRITE_NUM
+  Leak            - Triggers:  2, Payloads:  0
+    Triggers: WRITE_NUM, we
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: WRITE_NUM, we
+
+TestBlockTrueDualPortRAM_Top:
+------------------------------------------------------------
+
+TestCacheSystem:
+------------------------------------------------------------
+
+TestCacheSystemTop:
+------------------------------------------------------------
+  Covert          - Triggers:  1, Payloads:  0
+    Triggers: FETCH_WIDTH-1:0
+
+TestDCache:
+------------------------------------------------------------
+
+TestDCacheFiller:
+------------------------------------------------------------
+
+TestDCacheFillerTop:
+------------------------------------------------------------
+
+TestDCacheTop:
+------------------------------------------------------------
+
+TestDRAM_Controller:
+------------------------------------------------------------
+
+TestDRAM_ControllerTop:
+------------------------------------------------------------
+
+TestDistributedDualPortRAM:
+------------------------------------------------------------
+
+TestDistributedDualPortRAM_Top:
+------------------------------------------------------------
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: we
+    Payloads: we
+  Leak            - Triggers:  1, Payloads:  0
+    Triggers: we
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: we
+
+TestDistributedMultiBankRAM_Top:
+------------------------------------------------------------
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: we
+    Payloads: we
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: WRITE_NUM
+  Leak            - Triggers:  2, Payloads:  0
+    Triggers: WRITE_NUM, we
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: WRITE_NUM, we
+
+TestDistributedMultiPortRAM:
+------------------------------------------------------------
+
+TestDistributedMultiPortRAM_Top:
+------------------------------------------------------------
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: we
+    Payloads: we
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: WRITE_NUM
+  Leak            - Triggers:  2, Payloads:  0
+    Triggers: WRITE_NUM, we
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: WRITE_NUM, we
+
+TestDistributedSharedMultiPortRAM_Top:
+------------------------------------------------------------
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: we
+    Payloads: we
+  Leak            - Triggers:  1, Payloads:  0
+    Triggers: we
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: we
+
+TestDistributedSinglePortRAM_Top:
+------------------------------------------------------------
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: we
+    Payloads: we
+  Leak            - Triggers:  1, Payloads:  0
+    Triggers: we
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: we
+
+TestDivider:
+------------------------------------------------------------
+
+TestICache:
+------------------------------------------------------------
+
+TestICacheFiller:
+------------------------------------------------------------
+
+TestICacheFillerTop:
+------------------------------------------------------------
+
+TestICacheSystem:
+------------------------------------------------------------
+
+TestICacheSystemTop:
+------------------------------------------------------------
+  Covert          - Triggers:  1, Payloads:  0
+    Triggers: FETCH_WIDTH-1:0
+
+TestICacheTop:
+------------------------------------------------------------
+  Covert          - Triggers:  1, Payloads:  0
+    Triggers: FETCH_WIDTH-1:0
+
+TestInitializedBlockRAM_Top:
+------------------------------------------------------------
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: we
+    Payloads: we
+  Leak            - Triggers:  1, Payloads:  0
+    Triggers: we
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: we
+
+TestIntALU:
+------------------------------------------------------------
+
+TestLRU_Counter:
+------------------------------------------------------------
+
+TestLRU_CounterTop:
+------------------------------------------------------------
+  Covert          - Triggers:  1, Payloads:  0
+    Triggers: access
+
+TestMain:
+------------------------------------------------------------
+
+TestMemory:
+------------------------------------------------------------
+
+TestMemoryTop:
+------------------------------------------------------------
+
+TestMultiWidthFreeList:
+------------------------------------------------------------
+
+TestMultiWidthFreeListTop:
+------------------------------------------------------------
+
+TestMultiWidthQueuePointer:
+------------------------------------------------------------
+
+TestMultiWidthQueuePointerTop:
+------------------------------------------------------------
+
+TestRefDividerTop:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: req
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: req
+    Payloads: req
+
+TestRegisterFile:
+------------------------------------------------------------
+
+TestRegisterFileTop:
+------------------------------------------------------------
+
+TestRegisterMultiPortRAM_Top:
+------------------------------------------------------------
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: we
+    Payloads: we
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: WRITE_NUM
+  Leak            - Triggers:  2, Payloads:  0
+    Triggers: WRITE_NUM, we
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: WRITE_NUM, we
+
+TestSourceCAM:
+------------------------------------------------------------
+
+TestSourceCAM_Top:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: SRC_OP_NUM-1:0
+  Integrity       - Triggers:  1, Payloads:  0
+    Triggers: SRC_OP_NUM-1:0
+
+Top:
+------------------------------------------------------------
+  Leak            - Triggers:  1, Payloads:  1
+    Triggers: RSD_DISABLE_DEBUG_REGISTER
+    Payloads: RSD_DISABLE_DEBUG_REGISTER
+
+WakeupLogic:
+------------------------------------------------------------
+
+WakeupPipelineRegister:
+------------------------------------------------------------
+
+for:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: SRC_OP_NUM
+  Integrity       - Triggers:  1, Payloads:  0
+    Triggers: SRC_OP_NUM
+
+is:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  1
+    Triggers: loadIssueReq, storeIssueReq
+    Payloads: stall
+  Covert          - Triggers:  1, Payloads:  0
+    Triggers: loadIssueReq
+  Integrity       - Triggers:  0, Payloads:  2
+    Payloads: storeIssueReq, write
+  Leak            - Triggers:  1, Payloads:  0
+    Triggers: write
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: write
+
+logic:
+------------------------------------------------------------
+  Availability    - Triggers:  4, Payloads:  0
+    Triggers: loadQueueHeadPtr, loadQueueRecoveryTailPtr, storeQueueHeadPtr
+              ... and 1 more
+  Covert          - Triggers:  2, Payloads:  0
+    Triggers: loadQueueHeadPtr, loadQueueRecoveryTailPtr
+  Integrity       - Triggers:  0, Payloads:  2
+    Payloads: storeQueueHeadPtr, storeQueueRecoveryTailPtr
+
+================================================================================
+OVERALL STATISTICS
+================================================================================
+
+Availability:
+  Applicable modules: 26
+  Total trigger signals: 30
+  Total payload signals: 12
+
+Covert:
+  Applicable modules: 25
+  Total trigger signals: 20
+  Total payload signals: 21
+
+DoS:
+  Applicable modules: 21
+  Total trigger signals: 24
+  Total payload signals: 24
+
+Integrity:
+  Applicable modules: 32
+  Total trigger signals: 22
+  Total payload signals: 31
+
+Leak:
+  Applicable modules: 32
+  Total trigger signals: 26
+  Total payload signals: 26
+
+Privilege:
+  Applicable modules: 16
+  Total trigger signals: 25
+  Total payload signals: 2

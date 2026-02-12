@@ -3,86 +3,63 @@
 **Module:** OrgShifter
 **File:** Shifter.sv
 **Type:** Combinational
-**Total Candidates:** 4
+**Total Candidates:** 2
 
 ---
 
 ## Generated Trojans
 
-### T1: Leak - Information Leakage
+### T1: Integrity - Integrity Violation
 
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 1.00
-**Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (2):**
-- DataPath
-- DataPath
-
-**Payload Signals (2):**
-- DataPath
-- DataPath
-
-**Generated File:** T1_OrgShifter_Leak.sv
-
----
-
-### T2: Integrity - Integrity Violation
-
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (4):**
+**Trigger Signals (18):**
 - ShiftOperandType
-- ShiftOperandType
+- shiftOperandType
 - DataPath
+- dataIn
 - DataPath
+- ... and 13 more
 
-**Payload Signals (3):**
+**Payload Signals (19):**
 - DataPath
+- dataIn
 - DataPath
+- dataOut
 - carryOut
+- ... and 14 more
 
-**Generated File:** T2_OrgShifter_Integrity.sv
+**Generated File:** T1_OrgShifter_Integrity.sv
 
 ---
 
-### T3: Covert - Covert Channel
+### T2: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (2):**
+**Trigger Signals (14):**
 - DataPath
+- dataIn
 - DataPath
-
-**Payload Signals (0):**
-
-**Generated File:** T3_OrgShifter_Covert.sv
-
----
-
-### T4: Availability - Performance Degradation
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.40
-**Description:** Degrades performance through artificial delays
-
-**Trigger Signals (4):**
-- ShiftOperandType
-- ShiftOperandType
+- dataOut
 - DataPath
+- ... and 9 more
+
+**Payload Signals (19):**
 - DataPath
+- dataIn
+- DataPath
+- dataOut
+- carryOut
+- ... and 14 more
 
-**Payload Signals (0):**
-
-**Generated File:** T4_OrgShifter_Availability.sv
+**Generated File:** T2_OrgShifter_Covert.sv
 
 ---
 

@@ -3,7 +3,7 @@
 **Module:** TestDivider
 **File:** TestDivider.sv
 **Type:** Sequential
-**Total Candidates:** 2
+**Total Candidates:** 1
 
 ---
 
@@ -11,7 +11,7 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
@@ -23,22 +23,6 @@
 - req
 
 **Generated File:** T1_TestDivider_DoS.sv
-
----
-
-### T2: Availability - Performance Degradation
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Degrades performance through artificial delays
-
-**Trigger Signals (1):**
-- req
-
-**Payload Signals (0):**
-
-**Generated File:** T2_TestDivider_Availability.sv
 
 ---
 

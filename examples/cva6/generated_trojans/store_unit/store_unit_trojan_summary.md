@@ -3,7 +3,7 @@
 **Module:** store_unit
 **File:** store_unit.sv
 **Type:** Sequential
-**Total Candidates:** 6
+**Total Candidates:** 4
 
 ---
 
@@ -11,136 +11,104 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (16):**
-- stall_st_pending_i
+**Trigger Signals (24):**
 - valid_i
+- commit_ready_o
 - amo_valid_commit_i
-- dcache_req_o_t
-- no_st_pending_o
-- ... and 11 more
+- valid_o
+- translation_req_o
+- ... and 19 more
 
-**Payload Signals (16):**
-- stall_st_pending_i
+**Payload Signals (24):**
 - valid_i
+- commit_ready_o
 - amo_valid_commit_i
-- dcache_req_o_t
-- no_st_pending_o
-- ... and 11 more
+- valid_o
+- translation_req_o
+- ... and 19 more
 
 **Generated File:** T1_store_unit_DoS.sv
 
 ---
 
-### T2: Leak - Information Leakage
+### T2: Integrity - Integrity Violation
 
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 1.00
-**Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (1):**
-- lsu_ctrl_t
-
-**Payload Signals (4):**
-- addr
-- data
-- data_tmp
-- st_data_size_n
-
-**Generated File:** T2_store_unit_Leak.sv
-
----
-
-### T3: Integrity - Integrity Violation
-
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (5):**
+**Trigger Signals (9):**
 - pop_st_o
-- addr
-- data
-- data_tmp
-- st_data_size_n
+- vaddr_o
+- rvfi_mem_paddr_o
+- paddr_i
+- pop_st_o
+- ... and 4 more
 
-**Payload Signals (7):**
+**Payload Signals (6):**
 - store_buffer_empty_o
-- data
+- result_o
+- store_buffer_empty_o
+- result_o
 - data_tmp
-- st_valid_without_flush
-- st_data_size_n
-- ... and 2 more
+- ... and 1 more
 
-**Generated File:** T3_store_unit_Integrity.sv
+**Generated File:** T2_store_unit_Integrity.sv
 
 ---
 
-### T4: Availability - Performance Degradation
+### T3: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (14):**
+**Trigger Signals (30):**
+- store_buffer_empty_o
 - valid_i
-- amo_valid_commit_i
-- dcache_req_o_t
+- lsu_ctrl_t
+- lsu_ctrl_i
 - pop_st_o
-- valid_o
-- ... and 9 more
+- ... and 25 more
 
-**Payload Signals (10):**
+**Payload Signals (11):**
 - stall_st_pending_i
 - valid_i
-- amo_valid_commit_i
 - commit_ready_o
+- amo_valid_commit_i
 - valid_o
-- ... and 5 more
+- ... and 6 more
 
-**Generated File:** T4_store_unit_Availability.sv
-
----
-
-### T5: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (2):**
-- lsu_ctrl_t
-- addr
-
-**Payload Signals (0):**
-
-**Generated File:** T5_store_unit_Privilege.sv
+**Generated File:** T3_store_unit_Availability.sv
 
 ---
 
-### T6: Covert - Covert Channel
+### T4: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (3):**
-- data
+**Trigger Signals (1):**
 - data_tmp
-- st_data_size_n
 
-**Payload Signals (0):**
+**Payload Signals (13):**
+- valid_i
+- commit_ready_o
+- amo_valid_commit_i
+- valid_o
+- result_o
+- ... and 8 more
 
-**Generated File:** T6_store_unit_Covert.sv
+**Generated File:** T4_store_unit_Covert.sv
 
 ---
 

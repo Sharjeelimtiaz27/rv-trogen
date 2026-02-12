@@ -3,43 +3,30 @@
 **Module:** ibex_counter
 **File:** ibex_counter.sv
 **Type:** Sequential
-**Total Candidates:** 2
+**Total Candidates:** 1
 
 ---
 
 ## Generated Trojans
 
-### T1: Privilege - Privilege Escalation
+### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Disables functionality by forcing control signals to 0
 
 **Trigger Signals (3):**
 - counterh_we_i
 - counter_we_i
 - we
 
-**Payload Signals (0):**
+**Payload Signals (3):**
+- counterh_we_i
+- counter_we_i
+- we
 
-**Generated File:** T1_ibex_counter_Privilege.sv
-
----
-
-### T2: Covert - Covert Channel
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Creates hidden communication channel through timing
-
-**Trigger Signals (1):**
-- counter_load
-
-**Payload Signals (0):**
-
-**Generated File:** T2_ibex_counter_Covert.sv
+**Generated File:** T1_ibex_counter_DoS.sv
 
 ---
 

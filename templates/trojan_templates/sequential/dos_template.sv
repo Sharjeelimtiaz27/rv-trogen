@@ -1,25 +1,29 @@
 /**
- * Sequential Leak Trojan - Code Snippet
+ * Sequential DoS Trojan - Code Snippet
  * 
- * Trust-Hub Category: Leak Information ✓ (Verified)
- * Trust-Hub Benchmarks: AES-T600, AES-T1400, AES-T800
+ * Trust-Hub Category: Denial of Service ✓ (Verified)
+ * Trust-Hub Benchmarks: AES-T1800, AES-T1900, AES-T500, BasicRSA-T200
  * 
  * Description:
- *   Leaks sensitive data to observable outputs
+ *   Disables operations by blocking {{PAYLOAD_SIGNAL}} control signal
  *   
  * Trigger: Counter on {{TRIGGER_SIGNAL}}
- * Payload: Route {{PAYLOAD_SIGNAL}} to leak port
+ * Payload: Block {{PAYLOAD_SIGNAL}} when trojan activates
+ * 
+ * NOTE: This template generates BASIC trigger logic only.
+ *       The prepare_multi_trojan_simulation.py script will REPLACE
+ *       this with varied trigger types (Type 1, 2, 3, 4) based on trojan index.
  * 
  * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
 // ============================================================
-// TROJAN TRIGGER LOGIC (Counter-based)
+// TROJAN TRIGGER LOGIC (Will be replaced with varied types)
 // ============================================================
 
 localparam int TRIGGER_THRESHOLD = 1000;
-logic [31:0] trojan_counter;
+logic [15:0] trojan_counter;
 logic trojan_active;
 
 always_ff @(posedge {{CLOCK_SIGNAL}} or negedge {{RESET_SIGNAL}}) begin
@@ -27,10 +31,12 @@ always_ff @(posedge {{CLOCK_SIGNAL}} or negedge {{RESET_SIGNAL}}) begin
         trojan_counter <= '0;
         trojan_active  <= 1'b0;
     end else begin
+        // Count trigger signal activations
         if ({{TRIGGER_SIGNAL}}) begin
             trojan_counter <= trojan_counter + 1;
         end
         
+        // Activate when threshold reached
         if (trojan_counter >= TRIGGER_THRESHOLD) begin
             trojan_active <= 1'b1;
         end
@@ -38,33 +44,21 @@ always_ff @(posedge {{CLOCK_SIGNAL}} or negedge {{RESET_SIGNAL}}) begin
 end
 
 // ============================================================
-// PAYLOAD: Data Leakage
-// ============================================================
-// Create leak register to hold secret data
-logic [31:0] trojan_leak_data;
-
-always_ff @(posedge {{CLOCK_SIGNAL}} or negedge {{RESET_SIGNAL}}) begin
-    if (!{{RESET_SIGNAL}}) begin
-        trojan_leak_data <= '0;
-    end else if (trojan_active) begin
-        // Capture secret data when trojan is active
-        trojan_leak_data <= {{PAYLOAD_SIGNAL}};
-    end
-end
-
-// ============================================================
 // PAYLOAD MODIFICATION INSTRUCTIONS
 // ============================================================
-// Information Leak: Route {{PAYLOAD_SIGNAL}} to unused output
+// DoS Attack: Block {{PAYLOAD_SIGNAL}} when trojan is active
+//
+// IMPORTANT: {{PAYLOAD_SIGNAL}} is an INPUT signal - we CANNOT assign to it!
+// Instead, we modify WHERE IT'S USED in conditional statements.
 //
 // Integration Script Must:
-// 1. Find an unused output signal or create one
-// 2. Modify that output to leak data when trojan_active
+//   Find all occurrences of:
+//     if ({{PAYLOAD_SIGNAL}}) begin
+//   
+//   Replace with:
+//     if ({{PAYLOAD_SIGNAL}} && !trojan_active) begin
 //
-// Example:
-//   Find: assign unused_output = 1'b0;
-//   Replace: assign unused_output = trojan_active ? trojan_leak_data[0] : 1'b0;
-//
-// OR if no unused output, modify existing output:
-//   Find: assign output_signal = normal_value;
-//   Replace: assign output_signal = trojan_active ? {{PAYLOAD_SIGNAL}} : normal_value;
+// Effect: When trojan_active = 1:
+//   Condition becomes: {{PAYLOAD_SIGNAL}} && 0 = 0 (always false)
+//   All operations controlled by {{PAYLOAD_SIGNAL}} are blocked
+//   Result: Denial of Service!

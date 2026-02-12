@@ -3,7 +3,7 @@
 **Module:** store_buffer
 **File:** store_buffer.sv
 **Type:** Sequential
-**Total Candidates:** 5
+**Total Candidates:** 4
 
 ---
 
@@ -11,26 +11,26 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (9):**
-- stall_st_pending_i
+**Trigger Signals (17):**
+- commit_ready_o
+- ready_o
 - valid_i
 - valid_without_flush_i
 - dcache_req_o_t
-- no_st_pending_o
-- ... and 4 more
+- ... and 12 more
 
-**Payload Signals (9):**
-- stall_st_pending_i
+**Payload Signals (17):**
+- commit_ready_o
+- ready_o
 - valid_i
 - valid_without_flush_i
 - dcache_req_o_t
-- no_st_pending_o
-- ... and 4 more
+- ... and 12 more
 
 **Generated File:** T1_store_buffer_DoS.sv
 
@@ -38,22 +38,26 @@
 
 ### T2: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (3):**
+**Trigger Signals (11):**
+- paddr_i
+- rvfi_mem_paddr_o
+- data_i
 - data_size_i
-- data
-- data_size
+- paddr_i
+- ... and 6 more
 
-**Payload Signals (5):**
-- valid_without_flush_i
-- data_size_i
-- data
+**Payload Signals (10):**
 - store_buffer_empty_o
-- data_size
+- valid_without_flush_i
+- data_i
+- data_size_i
+- store_buffer_empty_o
+- ... and 5 more
 
 **Generated File:** T2_store_buffer_Integrity.sv
 
@@ -61,64 +65,55 @@
 
 ### T3: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (8):**
+**Trigger Signals (15):**
+- store_buffer_empty_o
 - valid_i
 - valid_without_flush_i
-- data_size_i
 - dcache_req_o_t
-- data
-- ... and 3 more
+- req_port_i
+- ... and 10 more
 
-**Payload Signals (6):**
+**Payload Signals (10):**
 - stall_st_pending_i
-- valid_i
-- valid_without_flush_i
 - commit_ready_o
 - ready_o
-- ... and 1 more
+- valid_i
+- valid_without_flush_i
+- ... and 5 more
 
 **Generated File:** T3_store_buffer_Availability.sv
 
 ---
 
-### T4: Leak - Information Leakage
+### T4: Covert - Covert Channel
 
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (0):**
-
-**Payload Signals (3):**
-- data_size_i
-- data
-- data_size
-
-**Generated File:** T4_store_buffer_Leak.sv
-
----
-
-### T5: Covert - Covert Channel
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (3):**
+**Trigger Signals (6):**
+- data_i
+- data_size_i
+- data_i
 - data_size_i
 - data
-- data_size
+- ... and 1 more
 
-**Payload Signals (0):**
+**Payload Signals (15):**
+- commit_ready_o
+- ready_o
+- valid_i
+- valid_without_flush_i
+- data_i
+- ... and 10 more
 
-**Generated File:** T5_store_buffer_Covert.sv
+**Generated File:** T4_store_buffer_Covert.sv
 
 ---
 

@@ -1,0 +1,636 @@
+================================================================================
+IBEX SIGNAL CLASSIFICATION SUMMARY
+================================================================================
+
+Total Modules: 25
+
+
+ibex_alu:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: ibex_pkg::alu_op_e
+  Covert          - Triggers:  4, Payloads:  5
+    Triggers: multdiv_operand_a_i, multdiv_operand_b_i, operand_a_i
+              ... and 1 more
+    Payloads: adder_result_ext_o, adder_result_o, comparison_result_o
+              ... and 2 more
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: imd_val_we_o
+    Payloads: imd_val_we_o
+  Integrity       - Triggers:  3, Payloads:  5
+    Triggers: ibex_pkg::alu_op_e, multdiv_sel_i, operator_i
+    Payloads: adder_result_ext_o, adder_result_o, comparison_result_o
+              ... and 2 more
+  Leak            - Triggers:  1, Payloads:  9
+    Triggers: imd_val_we_o
+    Payloads: adder_result_ext_o, adder_result_o, comparison_result_o
+              ... and 6 more
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: imd_val_we_o
+
+ibex_branch_predict:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  1
+    Triggers: fetch_valid_i
+    Payloads: fetch_valid_i
+  Covert          - Triggers:  3, Payloads:  1
+    Triggers: fetch_pc_i, fetch_rdata_i, fetch_valid_i
+    Payloads: fetch_valid_i
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: fetch_valid_i
+    Payloads: fetch_valid_i
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: fetch_rdata_i
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: fetch_rdata_i
+
+ibex_controller:
+------------------------------------------------------------
+  Availability    - Triggers:  8, Payloads:  7
+    Triggers: debug_req_i, instr_req_o, instr_valid_clear_o
+              ... and 5 more
+    Payloads: ctrl_busy_o, id_in_ready_o, instr_valid_clear_o
+              ... and 4 more
+  Covert          - Triggers:  3, Payloads:  5
+    Triggers: instr_fetch_err_i, instr_fetch_err_plus2_i, load_err_i
+    Payloads: ctrl_busy_o, id_in_ready_o, instr_valid_clear_o
+              ... and 2 more
+  DoS             - Triggers:  7, Payloads:  6
+    Triggers: debug_req_i, id_in_ready_o, instr_req_o
+              ... and 4 more
+    Payloads: debug_req_i, id_in_ready_o, instr_req_o
+              ... and 3 more
+  Integrity       - Triggers:  3, Payloads:  1
+    Triggers: ibex_pkg::exc_pc_sel_e, ibex_pkg::pc_sel_e, lsu_addr_last_i
+    Payloads: store_err_i
+  Leak            - Triggers: 19, Payloads: 11
+    Triggers: csr_mstatus_mie_i, csr_mtval_o, csr_pipe_flush_i
+              ... and 16 more
+    Payloads: csr_mstatus_mie_i, csr_mtval_o, csr_pipe_flush_i
+              ... and 8 more
+  Privilege       - Triggers: 15, Payloads:  6
+    Triggers: csr_mstatus_mie_i, csr_mtval_o, csr_pipe_flush_i
+              ... and 12 more
+    Payloads: csr_mstatus_mie_i, debug_mode_entering_o, debug_mode_o
+              ... and 3 more
+
+ibex_counter:
+------------------------------------------------------------
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: counter_we_i, counterh_we_i
+    Payloads: counter_we_i, counterh_we_i
+  Leak            - Triggers:  2, Payloads:  0
+    Triggers: counter_we_i, counterh_we_i
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: counter_we_i, counterh_we_i
+
+ibex_cs_registers:
+------------------------------------------------------------
+  Availability    - Triggers:  8, Payloads:  5
+    Triggers: csr_op_en_i, csr_op_i, ibex_pkg::csr_op_e
+              ... and 5 more
+    Payloads: div_wait_i, dside_wait_i, ic_scr_key_valid_i
+              ... and 2 more
+  Covert          - Triggers:  4, Payloads:  6
+    Triggers: csr_access_i, data_ind_timing_o, ic_scr_key_valid_i
+              ... and 1 more
+    Payloads: data_ind_timing_o, div_wait_i, dside_wait_i
+              ... and 3 more
+  DoS             - Triggers:  6, Payloads:  5
+    Triggers: csr_op_en_i, dummy_instr_en_o, dummy_instr_seed_en_o
+              ... and 3 more
+    Payloads: csr_op_en_i, dummy_instr_en_o, dummy_instr_seed_en_o
+              ... and 2 more
+  Integrity       - Triggers:  7, Payloads:  4
+    Triggers: boot_addr_i, csr_addr_i, csr_op_en_i
+              ... and 4 more
+    Payloads: csr_rdata_o, csr_wdata_i, data_ind_timing_o
+              ... and 1 more
+  Leak            - Triggers: 36, Payloads: 29
+    Triggers: csr_access_i, csr_addr_i, csr_depc_o
+              ... and 33 more
+    Payloads: boot_addr_i, csr_access_i, csr_addr_i
+              ... and 26 more
+  Privilege       - Triggers: 33, Payloads: 11
+    Triggers: boot_addr_i, csr_access_i, csr_addr_i
+              ... and 30 more
+    Payloads: csr_mepc_o, csr_mstatus_mie_o, csr_mstatus_tw_o
+              ... and 8 more
+
+ibex_csr:
+------------------------------------------------------------
+  Covert          - Triggers:  2, Payloads:  2
+    Triggers: rd_data_o, wr_data_i
+    Payloads: rd_data_o, wr_data_i
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: wr_en_i
+    Payloads: wr_en_i
+  Integrity       - Triggers:  2, Payloads:  2
+    Triggers: rd_data_o, wr_data_i
+    Payloads: rd_data_o, wr_data_i
+  Leak            - Triggers:  0, Payloads:  2
+    Payloads: rd_data_o, wr_data_i
+
+ibex_dummy_instr:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  2
+    Triggers: fetch_valid_i
+    Payloads: fetch_valid_i, id_in_ready_i
+  Covert          - Triggers:  2, Payloads:  3
+    Triggers: dummy_instr_data_o, fetch_valid_i
+    Payloads: dummy_instr_data_o, fetch_valid_i, id_in_ready_i
+  DoS             - Triggers:  4, Payloads:  4
+    Triggers: dummy_instr_en_i, dummy_instr_seed_en_i, fetch_valid_i
+              ... and 1 more
+    Payloads: dummy_instr_en_i, dummy_instr_seed_en_i, fetch_valid_i
+              ... and 1 more
+  Integrity       - Triggers:  1, Payloads:  1
+    Triggers: dummy_instr_data_o
+    Payloads: dummy_instr_data_o
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: dummy_instr_data_o
+
+ibex_ex_block:
+------------------------------------------------------------
+  Availability    - Triggers:  3, Payloads:  2
+    Triggers: ex_valid_o, ibex_pkg::alu_op_e, ibex_pkg::md_op_e
+    Payloads: ex_valid_o, multdiv_ready_id_i
+  Covert          - Triggers:  7, Payloads:  5
+    Triggers: alu_operand_a_i, alu_operand_b_i, bt_a_operand_i
+              ... and 4 more
+    Payloads: alu_adder_result_ex_o, data_ind_timing_i, ex_valid_o
+              ... and 2 more
+  DoS             - Triggers:  5, Payloads:  5
+    Triggers: div_en_i, ex_valid_o, imd_val_we_o
+              ... and 2 more
+    Payloads: div_en_i, ex_valid_o, imd_val_we_o
+              ... and 2 more
+  Integrity       - Triggers:  7, Payloads:  3
+    Triggers: alu_operator_i, data_ind_timing_i, div_sel_i
+              ... and 4 more
+    Payloads: alu_adder_result_ex_o, data_ind_timing_i, result_ex_o
+  Leak            - Triggers:  2, Payloads:  9
+    Triggers: imd_val_we_o, multdiv_signed_mode_i
+    Payloads: alu_adder_result_ex_o, alu_operand_a_i, alu_operand_b_i
+              ... and 6 more
+  Privilege       - Triggers:  2, Payloads:  1
+    Triggers: imd_val_we_o, multdiv_signed_mode_i
+    Payloads: multdiv_signed_mode_i
+
+ibex_fetch_fifo:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  4
+    Triggers: in_valid_i, out_valid_o
+    Payloads: busy_o, in_valid_i, out_ready_i
+              ... and 1 more
+  Covert          - Triggers:  0, Payloads:  8
+    Payloads: busy_o, in_valid_i, out_addr_o
+              ... and 5 more
+  DoS             - Triggers:  3, Payloads:  3
+    Triggers: in_valid_i, out_ready_i, out_valid_o
+    Payloads: in_valid_i, out_ready_i, out_valid_o
+  Integrity       - Triggers:  2, Payloads:  7
+    Triggers: in_addr_i, out_addr_o
+    Payloads: in_rdata_i, out_addr_o, out_err_o
+              ... and 4 more
+  Leak            - Triggers:  0, Payloads:  8
+    Payloads: in_addr_i, in_rdata_i, out_addr_o
+              ... and 5 more
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: in_addr_i, out_addr_o
+
+ibex_icache:
+------------------------------------------------------------
+  Availability    - Triggers:  7, Payloads:  5
+    Triggers: ic_data_req_o, ic_scr_key_req_o, ic_scr_key_valid_i
+              ... and 4 more
+    Payloads: busy_o, ic_scr_key_valid_i, instr_gnt_i
+              ... and 2 more
+  Covert          - Triggers:  7, Payloads:  9
+    Triggers: ic_data_addr_o, ic_data_rdata_i, ic_data_req_o
+              ... and 4 more
+    Payloads: busy_o, ic_data_addr_o, ic_data_rdata_i
+              ... and 6 more
+  DoS             - Triggers:  9, Payloads:  9
+    Triggers: ic_data_req_o, ic_scr_key_req_o, ic_scr_key_valid_i
+              ... and 6 more
+    Payloads: ic_data_req_o, ic_scr_key_req_o, ic_scr_key_valid_i
+              ... and 6 more
+  Integrity       - Triggers:  9, Payloads: 10
+    Triggers: addr_i, addr_o, ic_data_addr_o
+              ... and 6 more
+    Payloads: ic_data_addr_o, ic_data_rdata_i, ic_data_req_o
+              ... and 7 more
+  Leak            - Triggers:  2, Payloads: 13
+    Triggers: ic_data_write_o, ic_tag_write_o
+    Payloads: addr_i, addr_o, ic_data_addr_o
+              ... and 10 more
+  Privilege       - Triggers:  7, Payloads:  0
+    Triggers: addr_i, addr_o, ic_data_addr_o
+              ... and 4 more
+
+ibex_id_stage:
+------------------------------------------------------------
+  Availability    - Triggers: 28, Payloads: 13
+    Triggers: csr_op_en_o, csr_op_o, debug_req_i
+              ... and 25 more
+    Payloads: ctrl_busy_o, ex_valid_i, id_in_ready_o
+              ... and 10 more
+  Covert          - Triggers: 14, Payloads: 13
+    Triggers: alu_operand_a_ex_o, alu_operand_b_ex_o, bt_a_operand_o
+              ... and 11 more
+    Payloads: ctrl_busy_o, data_ind_timing_i, ex_valid_i
+              ... and 10 more
+  DoS             - Triggers: 20, Payloads: 20
+    Triggers: csr_op_en_o, debug_req_i, div_en_ex_o
+              ... and 17 more
+    Payloads: csr_op_en_o, debug_req_i, div_en_ex_o
+              ... and 17 more
+  Integrity       - Triggers: 16, Payloads: 16
+    Triggers: alu_operator_ex_o, csr_addr_o, csr_op_en_o
+              ... and 13 more
+    Payloads: csr_rdata_i, data_ind_timing_i, expecting_store_resp_o
+              ... and 13 more
+  Leak            - Triggers: 30, Payloads: 35
+    Triggers: csr_access_o, csr_addr_o, csr_mstatus_mie_i
+              ... and 27 more
+    Payloads: alu_operand_a_ex_o, alu_operand_b_ex_o, bt_a_operand_o
+              ... and 32 more
+  Privilege       - Triggers: 28, Payloads:  8
+    Triggers: csr_access_o, csr_addr_o, csr_mstatus_mie_i
+              ... and 25 more
+    Payloads: csr_mstatus_mie_i, csr_mstatus_tw_i, debug_mode_entering_o
+              ... and 5 more
+
+ibex_if_stage:
+------------------------------------------------------------
+  Availability    - Triggers:  8, Payloads:  6
+    Triggers: ic_data_req_o, ic_scr_key_req_o, ic_scr_key_valid_i
+              ... and 5 more
+    Payloads: ic_scr_key_valid_i, id_in_ready_i, if_busy_o
+              ... and 3 more
+  Covert          - Triggers:  9, Payloads: 10
+    Triggers: ic_data_addr_o, ic_data_rdata_i, ic_data_req_o
+              ... and 6 more
+    Payloads: ic_data_addr_o, ic_data_rdata_i, ic_data_req_o
+              ... and 7 more
+  DoS             - Triggers: 12, Payloads: 12
+    Triggers: dummy_instr_en_i, dummy_instr_seed_en_i, ic_data_req_o
+              ... and 9 more
+    Payloads: dummy_instr_en_i, dummy_instr_seed_en_i, ic_data_req_o
+              ... and 9 more
+  Integrity       - Triggers: 11, Payloads: 12
+    Triggers: boot_addr_i, exc_pc_sel_e, ic_data_addr_o
+              ... and 8 more
+    Payloads: ic_data_addr_o, ic_data_rdata_i, ic_data_req_o
+              ... and 9 more
+  Leak            - Triggers:  6, Payloads: 19
+    Triggers: csr_depc_i, csr_mepc_i, csr_mtvec_i
+              ... and 3 more
+    Payloads: boot_addr_i, csr_depc_i, csr_mepc_i
+              ... and 16 more
+  Privilege       - Triggers: 11, Payloads:  3
+    Triggers: boot_addr_i, csr_depc_i, csr_mepc_i
+              ... and 8 more
+    Payloads: csr_mepc_i, csr_mtvec_i, csr_mtvec_init_o
+
+ibex_load_store_unit:
+------------------------------------------------------------
+  Availability    - Triggers: 17, Payloads:  5
+    Triggers: addr_incr_req_o, data_req_o, load_err_o
+              ... and 14 more
+    Payloads: busy_o, data_gnt_i, lsu_rdata_valid_o
+              ... and 2 more
+  Covert          - Triggers: 13, Payloads: 14
+    Triggers: data_addr_o, data_be_o, data_bus_err_i
+              ... and 10 more
+    Payloads: adder_result_ex_i, busy_o, data_addr_o
+              ... and 11 more
+  DoS             - Triggers:  8, Payloads:  8
+    Triggers: addr_incr_req_o, data_req_o, data_we_o
+              ... and 5 more
+    Payloads: addr_incr_req_o, data_req_o, data_we_o
+              ... and 5 more
+  Integrity       - Triggers: 12, Payloads: 17
+    Triggers: addr_incr_req_o, addr_last_o, data_addr_o
+              ... and 9 more
+    Payloads: adder_result_ex_i, data_addr_o, data_be_o
+              ... and 14 more
+  Leak            - Triggers:  2, Payloads: 16
+    Triggers: data_we_o, lsu_we_i
+    Payloads: adder_result_ex_i, addr_incr_req_o, addr_last_o
+              ... and 13 more
+  Privilege       - Triggers:  5, Payloads:  0
+    Triggers: addr_incr_req_o, addr_last_o, data_addr_o
+              ... and 2 more
+
+ibex_multdiv_fast:
+------------------------------------------------------------
+  Availability    - Triggers:  4, Payloads:  2
+    Triggers: ibex_pkg::md_op_e, op_a_i, op_b_i
+              ... and 1 more
+    Payloads: multdiv_ready_id_i, valid_o
+  Covert          - Triggers:  3, Payloads:  4
+    Triggers: alu_operand_a_o, alu_operand_b_o, data_ind_timing_i
+    Payloads: data_ind_timing_i, multdiv_ready_id_i, multdiv_result_o
+              ... and 1 more
+  DoS             - Triggers:  5, Payloads:  5
+    Triggers: div_en_i, imd_val_we_o, mult_en_i
+              ... and 2 more
+    Payloads: div_en_i, imd_val_we_o, mult_en_i
+              ... and 2 more
+  Integrity       - Triggers:  7, Payloads:  2
+    Triggers: data_ind_timing_i, div_sel_i, ibex_pkg::md_op_e
+              ... and 4 more
+    Payloads: data_ind_timing_i, multdiv_result_o
+  Leak            - Triggers:  2, Payloads:  4
+    Triggers: imd_val_we_o, signed_mode_i
+    Payloads: alu_operand_a_o, alu_operand_b_o, data_ind_timing_i
+              ... and 1 more
+  Privilege       - Triggers:  2, Payloads:  1
+    Triggers: imd_val_we_o, signed_mode_i
+    Payloads: signed_mode_i
+
+ibex_multdiv_slow:
+------------------------------------------------------------
+  Availability    - Triggers:  4, Payloads:  2
+    Triggers: ibex_pkg::md_op_e, op_a_i, op_b_i
+              ... and 1 more
+    Payloads: multdiv_ready_id_i, valid_o
+  Covert          - Triggers:  3, Payloads:  4
+    Triggers: alu_operand_a_o, alu_operand_b_o, data_ind_timing_i
+    Payloads: data_ind_timing_i, multdiv_ready_id_i, multdiv_result_o
+              ... and 1 more
+  DoS             - Triggers:  5, Payloads:  5
+    Triggers: div_en_i, imd_val_we_o, mult_en_i
+              ... and 2 more
+    Payloads: div_en_i, imd_val_we_o, mult_en_i
+              ... and 2 more
+  Integrity       - Triggers:  7, Payloads:  2
+    Triggers: data_ind_timing_i, div_sel_i, ibex_pkg::md_op_e
+              ... and 4 more
+    Payloads: data_ind_timing_i, multdiv_result_o
+  Leak            - Triggers:  2, Payloads:  4
+    Triggers: imd_val_we_o, signed_mode_i
+    Payloads: alu_operand_a_o, alu_operand_b_o, data_ind_timing_i
+              ... and 1 more
+  Privilege       - Triggers:  2, Payloads:  1
+    Triggers: imd_val_we_o, signed_mode_i
+    Payloads: signed_mode_i
+
+ibex_pmp:
+------------------------------------------------------------
+  Availability    - Triggers:  4, Payloads:  0
+    Triggers: ibex_pkg::pmp_req_e, pmp_req_addr_i, pmp_req_err_o
+              ... and 1 more
+  DoS             - Triggers:  4, Payloads:  4
+    Triggers: ibex_pkg::pmp_req_e, pmp_req_addr_i, pmp_req_err_o
+              ... and 1 more
+    Payloads: ibex_pkg::pmp_req_e, pmp_req_addr_i, pmp_req_err_o
+              ... and 1 more
+  Integrity       - Triggers:  2, Payloads:  0
+    Triggers: csr_pmp_addr_i, pmp_req_addr_i
+  Leak            - Triggers:  5, Payloads:  4
+    Triggers: csr_pmp_addr_i, csr_pmp_cfg_i, csr_pmp_mseccfg_i
+              ... and 2 more
+    Payloads: csr_pmp_addr_i, csr_pmp_cfg_i, csr_pmp_mseccfg_i
+              ... and 1 more
+  Privilege       - Triggers:  6, Payloads:  3
+    Triggers: csr_pmp_addr_i, csr_pmp_cfg_i, csr_pmp_mseccfg_i
+              ... and 3 more
+    Payloads: debug_mode_i, ibex_pkg::priv_lvl_e, priv_mode_i
+
+ibex_prefetch_buffer:
+------------------------------------------------------------
+  Availability    - Triggers:  3, Payloads:  4
+    Triggers: instr_req_o, req_i, valid_o
+    Payloads: busy_o, instr_gnt_i, ready_i
+              ... and 1 more
+  Covert          - Triggers:  0, Payloads:  3
+    Payloads: busy_o, ready_i, valid_o
+  DoS             - Triggers:  4, Payloads:  4
+    Triggers: instr_req_o, ready_i, req_i
+              ... and 1 more
+    Payloads: instr_req_o, ready_i, req_i
+              ... and 1 more
+  Integrity       - Triggers:  3, Payloads:  2
+    Triggers: addr_i, addr_o, instr_addr_o
+    Payloads: instr_rdata_i, rdata_o
+  Leak            - Triggers:  0, Payloads:  5
+    Payloads: addr_i, addr_o, instr_addr_o
+              ... and 2 more
+  Privilege       - Triggers:  3, Payloads:  0
+    Triggers: addr_i, addr_o, instr_addr_o
+
+ibex_register_file_ff:
+------------------------------------------------------------
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: test_en_i, we_a_i
+    Payloads: test_en_i, we_a_i
+  Integrity       - Triggers:  0, Payloads:  3
+    Payloads: rdata_a_o, rdata_b_o, wdata_a_i
+  Leak            - Triggers:  2, Payloads:  3
+    Triggers: test_en_i, we_a_i
+    Payloads: rdata_a_o, rdata_b_o, wdata_a_i
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: we_a_i
+
+ibex_register_file_fpga:
+------------------------------------------------------------
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: test_en_i, we_a_i
+    Payloads: test_en_i, we_a_i
+  Integrity       - Triggers:  0, Payloads:  3
+    Payloads: rdata_a_o, rdata_b_o, wdata_a_i
+  Leak            - Triggers:  2, Payloads:  3
+    Triggers: test_en_i, we_a_i
+    Payloads: rdata_a_o, rdata_b_o, wdata_a_i
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: we_a_i
+
+ibex_register_file_latch:
+------------------------------------------------------------
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: test_en_i, we_a_i
+    Payloads: test_en_i, we_a_i
+  Integrity       - Triggers:  0, Payloads:  3
+    Payloads: rdata_a_o, rdata_b_o, wdata_a_i
+  Leak            - Triggers:  2, Payloads:  3
+    Triggers: test_en_i, we_a_i
+    Payloads: rdata_a_o, rdata_b_o, wdata_a_i
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: we_a_i
+
+ibex_tracer:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  2
+    Triggers: rvfi_ext_expanded_insn_valid, rvfi_valid
+    Payloads: rvfi_ext_expanded_insn_valid, rvfi_valid
+  Covert          - Triggers:  0, Payloads:  2
+    Payloads: rvfi_ext_expanded_insn_valid, rvfi_valid
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: rvfi_ext_expanded_insn_valid, rvfi_valid
+    Payloads: rvfi_ext_expanded_insn_valid, rvfi_valid
+  Integrity       - Triggers:  5, Payloads:  8
+    Triggers: rvfi_mem_addr, rvfi_rd_addr, rvfi_rs1_addr
+              ... and 2 more
+    Payloads: rvfi_mem_rdata, rvfi_mem_wdata, rvfi_pc_rdata
+              ... and 5 more
+  Leak            - Triggers:  2, Payloads: 14
+    Triggers: csr_addr), rvfi_mode
+    Payloads: csr_addr), rvfi_mem_addr, rvfi_mem_rdata
+              ... and 11 more
+  Privilege       - Triggers:  7, Payloads:  1
+    Triggers: csr_addr), rvfi_mem_addr, rvfi_mode
+              ... and 4 more
+    Payloads: rvfi_mode
+
+ibex_wb_stage:
+------------------------------------------------------------
+  Availability    - Triggers:  6, Payloads:  3
+    Triggers: lsu_resp_err_i, lsu_resp_valid_i, outstanding_load_wb_o
+              ... and 3 more
+    Payloads: instr_done_wb_o, lsu_resp_valid_i, ready_wb_o
+  Covert          - Triggers:  1, Payloads:  2
+    Triggers: outstanding_load_wb_o
+    Payloads: lsu_resp_valid_i, ready_wb_o
+  DoS             - Triggers:  6, Payloads:  7
+    Triggers: en_wb_i, lsu_resp_valid_i, ready_wb_o
+              ... and 3 more
+    Payloads: en_wb_i, instr_done_wb_o, lsu_resp_valid_i
+              ... and 4 more
+  Integrity       - Triggers:  0, Payloads:  6
+    Payloads: outstanding_store_wb_o, rf_wdata_fwd_wb_o, rf_wdata_id_i
+              ... and 3 more
+  Leak            - Triggers:  4, Payloads:  4
+    Triggers: rf_we_id_i, rf_we_lsu_i, rf_we_wb_o
+              ... and 1 more
+    Payloads: rf_wdata_fwd_wb_o, rf_wdata_id_i, rf_wdata_lsu_i
+              ... and 1 more
+  Privilege       - Triggers:  4, Payloads:  0
+    Triggers: rf_we_id_i, rf_we_lsu_i, rf_we_wb_o
+              ... and 1 more
+
+instantiates:
+------------------------------------------------------------
+  Availability    - Triggers:  7, Payloads:  4
+    Triggers: data_req_i, debug_req_i, ic_data_req_i
+              ... and 4 more
+    Payloads: core_busy_i, data_gnt_i, ic_scr_key_valid_i
+              ... and 1 more
+  Covert          - Triggers: 17, Payloads: 16
+    Triggers: data_addr_i, data_be_i, data_err_i
+              ... and 14 more
+    Payloads: core_busy_i, data_addr_i, data_be_i
+              ... and 13 more
+  DoS             - Triggers: 11, Payloads: 11
+    Triggers: data_req_i, data_we_i, debug_req_i
+              ... and 8 more
+    Payloads: data_req_i, data_we_i, debug_req_i
+              ... and 8 more
+  Integrity       - Triggers: 17, Payloads: 21
+    Triggers: boot_addr_i, data_addr_i, data_be_i
+              ... and 14 more
+    Payloads: data_addr_i, data_be_i, data_err_i
+              ... and 18 more
+  Leak            - Triggers:  6, Payloads: 23
+    Triggers: data_we_i, debug_req_i, ic_data_write_i
+              ... and 3 more
+    Payloads: boot_addr_i, data_addr_i, data_be_i
+              ... and 20 more
+  Privilege       - Triggers:  9, Payloads:  0
+    Triggers: boot_addr_i, data_addr_i, data_we_i
+              ... and 6 more
+
+is:
+------------------------------------------------------------
+  Availability    - Triggers:  7, Payloads:  0
+    Triggers: alu_op_a_mux_sel_o, alu_op_b_mux_sel_o, csr_op_o
+              ... and 4 more
+  Covert          - Triggers:  5, Payloads:  4
+    Triggers: csr_access_o, data_req_o, data_sign_extension_o
+              ... and 2 more
+    Payloads: data_req_o, data_sign_extension_o, data_type_o
+              ... and 1 more
+  DoS             - Triggers:  5, Payloads:  5
+    Triggers: data_req_o, data_we_o, div_en_o
+              ... and 2 more
+    Payloads: data_req_o, data_we_o, div_en_o
+              ... and 2 more
+  Integrity       - Triggers: 25, Payloads:  7
+    Triggers: alu_op_a_mux_sel_o, alu_op_b_mux_sel_o, alu_operator_o
+              ... and 22 more
+    Payloads: data_req_o, data_sign_extension_o, data_type_o
+              ... and 4 more
+  Leak            - Triggers:  6, Payloads: 10
+    Triggers: csr_access_o, csr_addr_o, csr_op_o
+              ... and 3 more
+    Payloads: csr_access_o, csr_addr_o, csr_op_o
+              ... and 7 more
+  Privilege       - Triggers:  6, Payloads:  1
+    Triggers: csr_access_o, csr_addr_o, csr_op_o
+              ... and 3 more
+    Payloads: multdiv_signed_mode_o
+
+of:
+------------------------------------------------------------
+  Availability    - Triggers:  5, Payloads:  3
+    Triggers: data_req_o, debug_req_i, instr_req_o
+              ... and 2 more
+    Payloads: data_gnt_i, instr_gnt_i, scramble_key_valid_i
+  Covert          - Triggers: 16, Payloads: 14
+    Triggers: data_addr_o, data_be_o, data_err_i
+              ... and 13 more
+    Payloads: data_addr_o, data_be_o, data_err_i
+              ... and 11 more
+  DoS             - Triggers:  8, Payloads:  8
+    Triggers: data_req_o, data_we_o, debug_req_i
+              ... and 5 more
+    Payloads: data_req_o, data_we_o, debug_req_i
+              ... and 5 more
+  Integrity       - Triggers: 15, Payloads: 15
+    Triggers: boot_addr_i, data_addr_o, data_be_o
+              ... and 12 more
+    Payloads: data_addr_o, data_be_o, data_err_i
+              ... and 12 more
+  Leak            - Triggers:  3, Payloads: 17
+    Triggers: data_we_o, debug_req_i, test_en_i
+    Payloads: boot_addr_i, data_addr_o, data_be_o
+              ... and 14 more
+  Privilege       - Triggers:  4, Payloads:  0
+    Triggers: boot_addr_i, data_addr_o, data_we_o
+              ... and 1 more
+
+================================================================================
+OVERALL STATISTICS
+================================================================================
+
+Availability:
+  Applicable modules: 20
+  Total trigger signals: 126
+  Total payload signals: 70
+
+Covert:
+  Applicable modules: 20
+  Total trigger signals: 113
+  Total payload signals: 130
+
+DoS:
+  Applicable modules: 25
+  Total trigger signals: 135
+  Total payload signals: 134
+
+Integrity:
+  Applicable modules: 24
+  Total trigger signals: 154
+  Total payload signals: 151
+
+Leak:
+  Applicable modules: 25
+  Total trigger signals: 136
+  Total payload signals: 247
+
+Privilege:
+  Applicable modules: 22
+  Total trigger signals: 152
+  Total payload signals: 36

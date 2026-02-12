@@ -3,7 +3,7 @@
 **Module:** cache_ctrl
 **File:** cache_ctrl.sv
 **Type:** Sequential
-**Total Candidates:** 6
+**Total Candidates:** 5
 
 ---
 
@@ -11,125 +11,133 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (7):**
+**Trigger Signals (23):**
 - dcache_req_i_t
-- active_serving_i
-- critical_word_valid_i
-- bypass_valid_i
+- req_port_i
 - dcache_req_o_t
-- ... and 2 more
+- req_port_o
+- req_o
+- ... and 18 more
 
-**Payload Signals (7):**
+**Payload Signals (23):**
 - dcache_req_i_t
-- active_serving_i
-- critical_word_valid_i
-- bypass_valid_i
+- req_port_i
 - dcache_req_o_t
-- ... and 2 more
+- req_port_o
+- req_o
+- ... and 18 more
 
 **Generated File:** T1_cache_ctrl_DoS.sv
 
 ---
 
-### T2: Integrity - Integrity Violation
+### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** Critical
+**Confidence:** 1.00
+**Description:** Leaks sensitive data to attacker-accessible location
+
+**Trigger Signals (3):**
+- we_o
+- we_o
+- we
+
+**Payload Signals (13):**
+- addr_o
+- data_o
+- data_i
+- bypass_data_i
+- mshr_addr_o
+- ... and 8 more
+
+**Generated File:** T2_cache_ctrl_Leak.sv
+
+---
+
+### T3: Integrity - Integrity Violation
+
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (3):**
+**Trigger Signals (13):**
+- addr_o
+- data_o
+- data_i
 - bypass_data_i
-- mshr_addr_matches_i
 - mshr_addr_o
+- ... and 8 more
 
-**Payload Signals (1):**
+**Payload Signals (7):**
+- data_o
+- data_i
 - bypass_data_i
+- data_o
+- data_i
+- ... and 2 more
 
-**Generated File:** T2_cache_ctrl_Integrity.sv
+**Generated File:** T3_cache_ctrl_Integrity.sv
 
 ---
 
-### T3: Availability - Performance Degradation
+### T4: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (6):**
+**Trigger Signals (18):**
 - dcache_req_i_t
-- critical_word_valid_i
-- bypass_valid_i
-- bypass_data_i
+- req_port_i
 - dcache_req_o_t
-- ... and 1 more
+- req_port_o
+- req_o
+- ... and 13 more
 
-**Payload Signals (3):**
-- critical_word_valid_i
-- bypass_valid_i
+**Payload Signals (12):**
 - busy_o
+- gnt_i
+- miss_gnt_i
+- critical_word_valid_i
+- bypass_gnt_i
+- ... and 7 more
 
-**Generated File:** T3_cache_ctrl_Availability.sv
+**Generated File:** T4_cache_ctrl_Availability.sv
 
 ---
 
-### T4: Covert - Covert Channel
+### T5: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
 **Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (1):**
+**Trigger Signals (7):**
+- data_o
+- data_i
 - bypass_data_i
+- data_o
+- data_i
+- ... and 2 more
 
-**Payload Signals (1):**
+**Payload Signals (13):**
 - busy_o
+- data_o
+- data_i
+- critical_word_valid_i
+- bypass_valid_i
+- ... and 8 more
 
-**Generated File:** T4_cache_ctrl_Covert.sv
-
----
-
-### T5: Leak - Information Leakage
-
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (0):**
-
-**Payload Signals (3):**
-- bypass_data_i
-- mshr_addr_matches_i
-- mshr_addr_o
-
-**Generated File:** T5_cache_ctrl_Leak.sv
-
----
-
-### T6: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (4):**
-- mshr_addr_matches_i
-- we_o
-- mshr_addr_o
-- we
-
-**Payload Signals (0):**
-
-**Generated File:** T6_cache_ctrl_Privilege.sv
+**Generated File:** T5_cache_ctrl_Covert.sv
 
 ---
 

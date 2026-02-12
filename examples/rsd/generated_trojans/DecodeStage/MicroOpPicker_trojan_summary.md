@@ -3,7 +3,7 @@
 **Module:** MicroOpPicker
 **File:** DecodeStage.sv
 **Type:** Sequential
-**Total Candidates:** 3
+**Total Candidates:** 2
 
 ---
 
@@ -11,69 +11,40 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (5):**
-- sent
-- insnValidIn
-- insnValidOut
-- insnFlushTriggering
-- flushTriggered
+**Trigger Signals (1):**
+- req
 
-**Payload Signals (4):**
-- sent
-- complete
-- insnValidIn
-- insnValidOut
+**Payload Signals (1):**
+- req
 
 **Generated File:** T1_MicroOpPicker_DoS.sv
 
 ---
 
-### T2: Integrity - Integrity Violation
+### T2: Availability - Performance Degradation
 
-**Trust-Hub Source:** AES-T800
-**Severity:** High
-**Confidence:** 1.00
-**Description:** Corrupts computation results or data
-
-**Trigger Signals (2):**
-- AllDecodedMicroOpPath
-- mopPicked
-
-**Payload Signals (1):**
-- insnValidOut
-
-**Generated File:** T2_MicroOpPicker_Integrity.sv
-
----
-
-### T3: Availability - Performance Degradation
-
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (6):**
+**Trigger Signals (7):**
 - AllDecodedMicroOpPath
-- insnValidIn
-- insnValidOut
-- insnFlushTriggering
-- flushTriggered
-- ... and 1 more
+- req
+- AllDecodedMicroOpPath
+- AllDecodedMicroOpIndex
+- AllDecodedMicroOpPath
+- ... and 2 more
 
-**Payload Signals (5):**
-- stall
-- complete
+**Payload Signals (1):**
 - stallBranchResolver
-- insnValidIn
-- insnValidOut
 
-**Generated File:** T3_MicroOpPicker_Availability.sv
+**Generated File:** T2_MicroOpPicker_Availability.sv
 
 ---
 

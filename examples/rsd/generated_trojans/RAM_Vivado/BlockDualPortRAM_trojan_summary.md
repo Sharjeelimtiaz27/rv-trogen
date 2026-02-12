@@ -9,54 +9,69 @@
 
 ## Generated Trojans
 
-### T1: Leak - Information Leakage
+### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Leaks sensitive data to attacker-accessible location
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (0):**
+**Trigger Signals (8):**
+- we
+- we
+- we
+- we
+- we
+- ... and 3 more
 
-**Payload Signals (1):**
-- addrwidth
+**Payload Signals (8):**
+- we
+- we
+- we
+- we
+- we
+- ... and 3 more
 
-**Generated File:** T1_BlockDualPortRAM_Leak.sv
+**Generated File:** T1_BlockDualPortRAM_DoS.sv
 
 ---
 
-### T2: Privilege - Privilege Escalation
+### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** Custom RISC-V
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
+**Confidence:** 1.00
+**Description:** Leaks sensitive data to attacker-accessible location
 
-**Trigger Signals (20):**
+**Trigger Signals (10):**
 - we
 - we
 - we
-- addrwidth
 - we
-- ... and 15 more
+- we
+- ... and 5 more
 
-**Payload Signals (0):**
+**Payload Signals (1):**
+- Address
 
-**Generated File:** T2_BlockDualPortRAM_Privilege.sv
+**Generated File:** T2_BlockDualPortRAM_Leak.sv
 
 ---
 
 ### T3: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
-**Confidence:** 0.60
+**Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (1):**
-- addrwidth
+**Trigger Signals (2):**
+- Address
+- Select
 
-**Payload Signals (0):**
+**Payload Signals (2):**
+- WRITE_NUM
+- WRITE_NUM
 
 **Generated File:** T3_BlockDualPortRAM_Integrity.sv
 

@@ -3,7 +3,7 @@
 **Module:** IntegerExecutionStage
 **File:** IntegerExecutionStage.sv
 **Type:** Sequential
-**Total Candidates:** 4
+**Total Candidates:** 2
 
 ---
 
@@ -11,21 +11,15 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (4):**
-- IsConditionEnabledInt
-- isCondEnabled
-- brTaken
+**Trigger Signals (1):**
 - regValid
 
-**Payload Signals (4):**
-- IsConditionEnabledInt
-- isCondEnabled
-- brTaken
+**Payload Signals (1):**
 - regValid
 
 **Generated File:** T1_IntegerExecutionStage_DoS.sv
@@ -34,7 +28,7 @@
 
 ### T2: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
@@ -42,43 +36,10 @@
 **Trigger Signals (1):**
 - regValid
 
-**Payload Signals (2):**
-- stall
+**Payload Signals (1):**
 - regValid
 
 **Generated File:** T2_IntegerExecutionStage_Availability.sv
-
----
-
-### T3: Leak - Information Leakage
-
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (0):**
-
-**Payload Signals (1):**
-- regValid
-
-**Generated File:** T3_IntegerExecutionStage_Leak.sv
-
----
-
-### T4: Integrity - Integrity Violation
-
-**Trust-Hub Source:** AES-T800
-**Severity:** High
-**Confidence:** 0.60
-**Description:** Corrupts computation results or data
-
-**Trigger Signals (0):**
-
-**Payload Signals (1):**
-- shiftCarryOut
-
-**Generated File:** T4_IntegerExecutionStage_Integrity.sv
 
 ---
 

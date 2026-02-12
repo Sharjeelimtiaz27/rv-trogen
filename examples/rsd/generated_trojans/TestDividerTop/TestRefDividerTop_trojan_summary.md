@@ -3,7 +3,7 @@
 **Module:** TestRefDividerTop
 **File:** TestDividerTop.sv
 **Type:** Sequential
-**Total Candidates:** 2
+**Total Candidates:** 3
 
 ---
 
@@ -11,7 +11,7 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
@@ -26,19 +26,57 @@
 
 ---
 
-### T2: Availability - Performance Degradation
+### T2: Integrity - Integrity Violation
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Degrades performance through artificial delays
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Corrupts computation results or data
 
-**Trigger Signals (1):**
-- req
+**Trigger Signals (10):**
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- ... and 5 more
 
-**Payload Signals (0):**
+**Payload Signals (10):**
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- ... and 5 more
 
-**Generated File:** T2_TestRefDividerTop_Availability.sv
+**Generated File:** T2_TestRefDividerTop_Integrity.sv
+
+---
+
+### T3: Covert - Covert Channel
+
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Creates hidden communication channel through timing
+
+**Trigger Signals (10):**
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- ... and 5 more
+
+**Payload Signals (10):**
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- ... and 5 more
+
+**Generated File:** T3_TestRefDividerTop_Covert.sv
 
 ---
 

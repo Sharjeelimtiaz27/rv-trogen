@@ -3,44 +3,28 @@
 **Module:** RegisterFile
 **File:** RegisterFile.sv
 **Type:** Sequential
-**Total Candidates:** 2
+**Total Candidates:** 1
 
 ---
 
 ## Generated Trojans
 
-### T1: Leak - Information Leakage
+### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (0):**
-
-**Payload Signals (3):**
-- regWE
-- fpRegWE
-- PRegNumPath
-
-**Generated File:** T1_RegisterFile_Leak.sv
-
----
-
-### T2: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Disables functionality by forcing control signals to 0
 
 **Trigger Signals (2):**
 - regWE
 - fpRegWE
 
-**Payload Signals (0):**
+**Payload Signals (2):**
+- regWE
+- fpRegWE
 
-**Generated File:** T2_RegisterFile_Privilege.sv
+**Generated File:** T1_RegisterFile_DoS.sv
 
 ---
 

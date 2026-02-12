@@ -3,7 +3,7 @@
 **Module:** std_nbdcache
 **File:** std_nbdcache.sv
 **Type:** Sequential
-**Total Candidates:** 3
+**Total Candidates:** 5
 
 ---
 
@@ -11,68 +11,131 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (8):**
+**Trigger Signals (25):**
 - enable_i
 - amo_req_t
+- amo_req_i
 - dcache_req_i_t
-- dcache_req_o_t
-- axi_req_t
-- ... and 3 more
+- req_ports_i
+- ... and 20 more
 
-**Payload Signals (8):**
+**Payload Signals (25):**
 - enable_i
 - amo_req_t
+- amo_req_i
 - dcache_req_i_t
-- dcache_req_o_t
-- axi_req_t
-- ... and 3 more
+- req_ports_i
+- ... and 20 more
 
 **Generated File:** T1_std_nbdcache_DoS.sv
 
 ---
 
-### T2: Availability - Performance Degradation
+### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** Critical
+**Confidence:** 1.00
+**Description:** Leaks sensitive data to attacker-accessible location
+
+**Trigger Signals (2):**
+- we
+- we_ram
+
+**Payload Signals (10):**
+- axi_data_o
+- axi_data_i
+- axi_data_o
+- axi_data_i
+- data
+- ... and 5 more
+
+**Generated File:** T2_std_nbdcache_Leak.sv
+
+---
+
+### T3: Integrity - Integrity Violation
+
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Corrupts computation results or data
+
+**Trigger Signals (10):**
+- axi_data_o
+- axi_data_i
+- axi_data_o
+- axi_data_i
+- data
+- ... and 5 more
+
+**Payload Signals (6):**
+- axi_data_o
+- axi_data_i
+- axi_data_o
+- axi_data_i
+- data
+- ... and 1 more
+
+**Generated File:** T3_std_nbdcache_Integrity.sv
+
+---
+
+### T4: Availability - Performance Degradation
+
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (7):**
+**Trigger Signals (22):**
 - amo_req_t
+- amo_req_i
 - dcache_req_i_t
+- req_ports_i
 - dcache_req_o_t
-- axi_req_t
-- axi_req_t
-- ... and 2 more
+- ... and 17 more
 
-**Payload Signals (3):**
+**Payload Signals (5):**
+- flush_ack_o
 - flush_ack_o
 - valid
 - critical_word_valid
+- bypass_valid
 
-**Generated File:** T2_std_nbdcache_Availability.sv
+**Generated File:** T4_std_nbdcache_Availability.sv
 
 ---
 
-### T3: Privilege - Privilege Escalation
+### T5: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (1):**
-- we_ram
+**Trigger Signals (6):**
+- axi_data_o
+- axi_data_i
+- axi_data_o
+- axi_data_i
+- data
+- ... and 1 more
 
-**Payload Signals (0):**
+**Payload Signals (9):**
+- axi_data_o
+- axi_data_i
+- axi_data_o
+- axi_data_i
+- data
+- ... and 4 more
 
-**Generated File:** T3_std_nbdcache_Privilege.sv
+**Generated File:** T5_std_nbdcache_Covert.sv
 
 ---
 

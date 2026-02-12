@@ -1,0 +1,749 @@
+# Copy this into classify_signals.py PROCESSOR_SIGNALS dict
+
+'RSD': {
+    'ActiveList': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'Axi4LiteDualPortBlockRAM': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'Axi4LitePlToPsControlRegister': {
+        'inputs': ['we', 'SerialDataPath', 'wv', 'PC_Path', 'lastCommittedPC', ')'],
+        'outputs': ['AddrPath', 'memory_addr', 'MemoryEntryDataPath', 'memory_data', 'memory_we', 'done', ')'],
+        'internals': []
+    },
+    'Axi4Memory': {
+        'inputs': ['AddrPath', 'memAccessAddr', 'MemoryEntryDataPath', 'memAccessWriteData', 'memAccessRE', 'memAccessWE', 'memAccessReadBusy', 'memAccessWriteBusy', 'MemAccessSerial', 'nextMemReadSerial', 'MemWriteSerial', 'nextMemWriteSerial', 'memReadDataReady', 'MemoryEntryDataPath', 'memReadData', 'MemAccessSerial', 'memReadSerial', 'MemAccessResponse', 'memAccessResponse', ')', 'bit_depth)'],
+        'outputs': ['memAccessReadBusy', 'memAccessWriteBusy', 'MemAccessSerial', 'nextMemReadSerial', 'MemWriteSerial', 'nextMemWriteSerial', 'memReadDataReady', 'MemoryEntryDataPath', 'memReadData', 'MemAccessSerial', 'memReadSerial', 'MemAccessResponse', 'memAccessResponse', ')'],
+        'internals': []
+    },
+    'BTB': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'Bimodal': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'BitCounter': {
+        'inputs': ['DataPath', 'fuOpA_In', 'DataPath', 'dataOut', ')', 'clk', 'rst', 'stall', 'DataPath', 'fuOpA_In', 'DataPath', 'dataOut', ')'],
+        'outputs': ['DataPath', 'dataOut', ')', 'DataPath', 'dataOut', ')'],
+        'internals': []
+    },
+    'BlockDualPortRAM': {
+        'inputs': ['clk', 'we', 'wa', 'wv', 'ra', 'rv', ')', 'clk', ')', 'clk', ')', 'clk', 'we', 'wa', 'wv', 'ra', 'rv', ')', 'clk', 'we', 'wa', 'wv', 'ra', 'rv', ')', 'clk', 'we', 'wa', 'wv', 'ra', 'rv', ')', 'clk', 'we', 'rwa', 'wv', 'rv', ')', 'clk', 'we', 'wa', 'wv', 'ra', 'rv', ')', 'clk', 'we', 'wa', 'wv', 'ra', 'rv', ')', 'clk', 'we', '0', 'rwa', '0', 'wv', '0', '0', ')', 'clk', 'WRITE_NUM', ')', 'clk', ')', 'clk', 'WRITE_NUM', ')', 'clk', ')', 'clk', ')', 'clk', ')', 'clk', ')', 'clk', ')'],
+        'outputs': ['rv', ')', ')', ')', 'rv', ')', 'rv', ')', 'rv', ')', 'rv', ')', 'rv', ')', 'rv', ')', '0', ')', ')', 'of', 'a', 'port(%x)', 'is', 'incorrect."', 'i)', ')', ')', 'of', 'a', 'port(%x)', 'is', 'incorrect."', 'i)', ')', ')', 'of', 'a', 'port(%x)', 'is', 'incorrect."', 'i)', ')', ')', ')', 'of', 'a', 'port(%x)', 'is', 'incorrect."', 'i)', ')', ')', ')', 'of', 'a', 'port(%x)', 'is', 'incorrect"', 'i)', ')', ')'],
+        'internals': []
+    },
+    'BranchPredictor': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'BypassCtrlStage': {
+        'inputs': ['clk', 'rst', 'PipelineControll', 'ctrl', 'BypassCtrlOperand', 'in', 'BypassCtrlOperand', 'out', ')', 'PRegNumPath', 'read', 'BypassCtrlOperand', 'intEX', 'INT_ISSUE_WIDTH', 'BypassCtrlOperand', 'intWB', 'INT_ISSUE_WIDTH', 'BypassCtrlOperand', 'memMA', 'LOAD_ISSUE_WIDTH', 'BypassCtrlOperand', 'memWB', 'LOAD_ISSUE_WIDTH', ')'],
+        'outputs': ['BypassCtrlOperand', 'out', ')'],
+        'internals': []
+    },
+    'BypassStage': {
+        'inputs': ['clk', 'rst', 'PipelineControll', 'ctrl', 'BypassOperand', 'in', 'BypassOperand', 'out', ')', 'BypassSelect', 'sel', 'BypassOperand', 'intEX', 'INT_ISSUE_WIDTH', 'BypassOperand', 'intWB', 'INT_ISSUE_WIDTH', 'BypassOperand', 'memMA', 'LOAD_ISSUE_WIDTH', 'BypassOperand', 'memWB', 'LOAD_ISSUE_WIDTH', ')'],
+        'outputs': ['BypassOperand', 'out', ')'],
+        'internals': []
+    },
+    'CSR_Unit': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'CacheFlushManager': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'CommitStage': {
+        'inputs': ['CommitLaneCountPath', 'finishedOpNum', 'ExecutionState', ')', 'ActiveListCountPath', 'activeListCount', 'ExecutionState', ')', 'last', ')', 'startCommit', 'ActiveListCountPath', 'activeListCount', 'ExecutionState', 'isBranch', 'isStore', 'unableToStartRecovery', ')'],
+        'outputs': ['CommitLaneCountPath', 'finishedInsnRange', 'CommitLaneCountPath', 'finishedOpNum', 'ExecutionState', ')', 'CommitLaneCountPath', 'finishedOpNum', 'ActiveListCountPath', 'activeListCount', 'ExecutionState', ')', 'CommitLaneIndexPath', 'CommitLaneIndexPath', 'last', ')', 'toRecoveryPhase', 'CommitLaneIndexPath', 'recoveredIndex', 'RefetchType', 'refetchType', 'ExecutionState', 'recoveryCause', 'startCommit', 'ActiveListCountPath', 'activeListCount', 'ExecutionState', 'isBranch', 'isStore', 'unableToStartRecovery', ')'],
+        'internals': []
+    },
+    'ComplexIntegerExecutionStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'ComplexIntegerIssueStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'ComplexIntegerRegisterReadStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'ComplexIntegerRegisterWriteStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'ControlQueue': {
+        'inputs': ['clk', 'rst', 'push', 'pop', '`PS_PL_CTRL_QUEUE_DATA_BIT_SIZE-1:0', 'pushedData', 'full', 'empty', '`PS_PL_CTRL_QUEUE_DATA_BIT_SIZE-1:0', 'headData', ')'],
+        'outputs': ['full', 'empty', '`PS_PL_CTRL_QUEUE_DATA_BIT_SIZE-1:0', 'headData', ')'],
+        'internals': []
+    },
+    'Controller': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'Core': {
+        'inputs': ['clk', 'rst', 'rstStart', 'MemAccessSerial', 'nextMemReadSerial', 'MemWriteSerial', 'nextMemWriteSerial', 'MemoryEntryDataPath', 'memReadData', 'memReadDataReady', 'MemAccessSerial', 'memReadSerial', 'MemAccessResponse', 'memAccessResponse', 'memAccessReadBusy', 'memAccessWriteBusy', 'reqExternalInterrupt', 'ExternalInterruptCodePath', 'externalInterruptCode', 'DebugRegister', 'debugRegister', 'PC_Path', 'lastCommittedPC', 'PhyAddrPath', 'memAccessAddr', 'MemoryEntryDataPath', 'memAccessWriteData', 'memAccessRE', 'memAccessWE', 'serialWE', 'SerialDataPath', 'serialWriteData', ')'],
+        'outputs': ['DebugRegister', 'debugRegister', 'PC_Path', 'lastCommittedPC', 'PhyAddrPath', 'memAccessAddr', 'MemoryEntryDataPath', 'memAccessWriteData', 'memAccessRE', 'memAccessWE', 'serialWE', 'SerialDataPath', 'serialWriteData', ')'],
+        'internals': []
+    },
+    'DCacheController': {
+        'inputs': ['DCacheLinePath', 'fetchedLine', 'DCacheLinePath', 'storedLine', 'storedDirty', ')', 'PhyAddrPath', 'addr)', 'PhyAddrPath', 'addr)', 'PhyAddrPath', 'addr)', 'PhyAddrPath', 'addr)', 'DCacheIndexPath', 'index', 'DCacheTagPath', 'tag)', 'PhyAddrPath', 'addr)'],
+        'outputs': ['DCacheLinePath', 'dstLine', 'DCacheLinePath', 'fetchedLine', 'DCacheLinePath', 'storedLine', 'storedDirty', ')'],
+        'internals': []
+    },
+    'Debug': {
+        'inputs': [],
+        'outputs': ['PC_Path', 'lastCommittedPC', ')'],
+        'internals': []
+    },
+    'DecodedBranchResolver': {
+        'inputs': ['clk', 'rst', 'stall', 'decodeComplete', 'RISCV_ISF_Common', ':', 'isf', 'BranchPred', ':', 'brPredIn', 'PC_Path', 'InsnInfo', ':', 'insnInfo', 'flushTriggered', 'BranchPred', 'PC_Path', 'recoveredPC', ')'],
+        'outputs': ['flushTriggered', 'BranchPred', 'PC_Path', 'recoveredPC', ')'],
+        'internals': []
+    },
+    'Decoder': {
+        'inputs': ['OpInfo', 'src', 'MicroOpIndex', 'mid', 'split', 'last', ')', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', 'unsupported', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', 'unsupported', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', 'unsupported', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', 'unsupported', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', 'unsupported', ')', 'RISCV_ISF_Common', 'isf', ')', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', 'unsupported', ')', 'RISCV_ISF_Common', 'isf', ')', 'illegalPC', ')', 'RISCV_ISF_Common', 'isf', 'illegalPC', ')', 'InsnPath', 'insn', 'illegalPC', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', ')'],
+        'outputs': ['OpInfo', 'op', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', 'unsupported', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', 'unsupported', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', 'unsupported', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', 'unsupported', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', 'unsupported', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'RISCV_ISF_Common', 'isf', 'LScalarRegNumPath', 'srcRegNumA', 'LScalarRegNumPath', 'srcRegNumB', 'LScalarRegNumPath', 'dstRegNum', 'unsupported', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', ')', 'OpInfo', 'opInfo', 'illegalPC', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', 'RISCV_ISF_Common', 'isf', 'illegalPC', ')', 'OpInfo', 'microOps', 'InsnInfo', 'insnInfo', ')'],
+        'internals': []
+    },
+    'DestinationRAM': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'DispatchStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'Divider': {
+        'inputs': ['clk', 'rst', 'req', 'DataPath', 'dividend', 'DataPath', 'divisor', 'isSigned', 'finished', 'DataPath', 'quotient', 'DataPath', 'remainder', ')', 'clk', 'rst', 'req', 'DataPath', 'dividend', 'DataPath', 'divisor', 'isSigned', 'finished', 'DataPath', 'quotient', 'DataPath', 'remainder', ')', 'DividerPath', 'dividend', ')'],
+        'outputs': ['finished', 'DataPath', 'quotient', 'DataPath', 'remainder', ')', 'finished', 'DataPath', 'quotient', 'DataPath', 'remainder', ')'],
+        'internals': []
+    },
+    'DividerUnit': {
+        'inputs': ['clk', 'rst', 'req', 'DataPath', 'fuOpA_In', 'DataPath', 'fuOpB_In', 'IntDIV_Code', 'divCode', 'finished', 'DataPath', 'dataOut', ')', 'clk', 'stall', 'req', 'DataPath', 'fuOpA_In', 'DataPath', 'fuOpB_In', 'IntDIV_Code', 'divCode', 'finished', 'DataPath', 'dataOut', ')'],
+        'outputs': ['finished', 'DataPath', 'dataOut', ')', 'finished', 'DataPath', 'dataOut', ')'],
+        'internals': []
+    },
+    'FP32DivSqrter': {
+        'inputs': ['clk', 'rst', 'lhs', 'rhs', 'is_divide', 'req', 'finished', 'result', ')'],
+        'outputs': ['finished', 'result', ')'],
+        'internals': []
+    },
+    'FP32PipelinedAdder': {
+        'inputs': ['clk', 'lhs', 'rhs', 'result', ')', 'lhs', 'rhs', 'FAddStage1RegPath', 'stg0Out', ')', 'clk', 'FAddStage1RegPath', 'stg1In', 'FAddStage2RegPath', 'stg1Out', ')', 'x)', 'clk', 'FAddStage2RegPath', 'stg2In', 'result', ')'],
+        'outputs': ['result', ')', 'FAddStage1RegPath', 'stg0Out', ')', 'FAddStage2RegPath', 'stg1Out', ')', 'result', ')'],
+        'internals': []
+    },
+    'FP32PipelinedFMA': {
+        'inputs': ['clk', 'mullhs', 'mulrhs', 'addend', 'result', ')', 'clk', 'FMAStage1RegPath', 'stg0Out', 'mullhs', 'mulrhs', 'addend', 'is_subtract', 'mlhs', 'mrhs', 'maddend', ')', 'clk', 'FMAStage1RegPath', 'stg1In', 'FMAStage2RegPath', 'stg1Out', ')', 'clk', 'FMAStage2RegPath', 'stg2In', 'FMAStage3RegPath', 'stg2Out', 'fma_result', ')', 'clk', 'FMAStage3RegPath', 'stg3In', 'FMAStage4RegPath', 'stg3Out', ')', 'clk', 'FMAStage4RegPath', 'stg4In', 'result', ')'],
+        'outputs': ['result', ')', 'FMAStage1RegPath', 'stg0Out', 'mullhs', 'mulrhs', 'addend', 'is_subtract', 'mlhs', 'mrhs', 'maddend', ')', 'FMAStage2RegPath', 'stg1Out', ')', 'FMAStage3RegPath', 'stg2Out', 'fma_result', ')', 'FMAStage4RegPath', 'stg3Out', ')', 'result', ')'],
+        'internals': []
+    },
+    'FP32PipelinedMultiplier': {
+        'inputs': ['clk', 'lhs', 'rhs', 'result', ')', 'lhs', 'rhs', 'FMulStage1RegPath', 'stg0Out', ')', 'clk', 'FMulStage1RegPath', 'stg1In', 'FMulStage2RegPath', 'stg1Out', ')', 'clk', 'FMulStage2RegPath', 'stg2In', 'result', ')'],
+        'outputs': ['result', ')', 'FMulStage1RegPath', 'stg0Out', ')', 'FMulStage2RegPath', 'stg1Out', ')', 'result', ')'],
+        'internals': []
+    },
+    'FP32PipelinedOther': {
+        'inputs': ['x', ')', 'lhs', 'fmt_unsigned', 'Rounding_Mode', 'rm', 'result', 'FFlags_Path', 'fflags', ')', 'lhs', 'fmt_unsigned', 'Rounding_Mode', 'rm', 'result', 'FFlags_Path', 'fflags', ')', 'clk', 'lhs', 'rhs', 'FPU_Code', 'fpuCode', 'Rounding_Mode', 'rm', 'result', 'FFlags_Path', 'fflags', ')'],
+        'outputs': ['result', 'FFlags_Path', 'fflags', ')', 'result', 'FFlags_Path', 'fflags', ')', 'result', 'FFlags_Path', 'fflags', ')'],
+        'internals': []
+    },
+    'FPDivSqrtUnit': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'FPExecutionStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'FPIssueStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'FPRegisterReadStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'FPRegisterWriteStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'FetchStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'FlipFlop': {
+        'inputs': ['in', 'clk', 'rst', ')', 'in', 'we', 'clk', 'rst', ')'],
+        'outputs': ['out', 'in', 'clk', 'rst', ')', 'out', 'in', 'we', 'clk', 'rst', ')'],
+        'internals': []
+    },
+    'FreeList': {
+        'inputs': ['clk', 'rst', 'push', 'pop', 'ENTRY_WIDTH-1:0', 'pushedData', 'full', 'empty', 'ENTRY_WIDTH-1:0', 'headData', ')', 'clk', 'rst', 'rstStart', 'push', 'PUSH_WIDTH', 'pop', 'POP_WIDTH', 'ENTRY_BIT_SIZE-1:0', 'pushedData', 'PUSH_WIDTH', '$clog2(SIZE):0', 'count', 'ENTRY_BIT_SIZE-1:0', 'poppedData', 'POP_WIDTH', ')'],
+        'outputs': ['full', 'empty', 'ENTRY_WIDTH-1:0', 'headData', ')', '$clog2(SIZE):0', 'count', 'ENTRY_BIT_SIZE-1:0', 'poppedData', 'POP_WIDTH', ')'],
+        'internals': []
+    },
+    'Gshare': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'ICacheArray': {
+        'inputs': ['clk', 'rst', 'rstStart', 'we', 'ICacheIndexPath', 'writeIndex', 'ICacheTagPath', 'writeTag', 'ICacheLinePath', 'writeLineData', 'ICacheIndexPath', 'readIndex', 'ICacheTagPath', 'readTag', 'ICacheLinePath', 'readLineData', 'hit', 'valid', ')', 'clk', 'rst', 'rstStart', 'ICacheIndexPath', 'writeIndex', 'ICacheWayPath', 'writeWay', 'writeHit', 'NRUAccessStatePath', 'writeNRUState', 'ICacheIndexPath', 'readIndex', 'NRUAccessStatePath', 'readNRUState', 'ICacheIndexPath', 'rstIndex', ')', 'hitIn', 'ICacheLineInsnIndexPath', 'headWordPtr', 'hitOut', 'FETCH_WIDTH', ')'],
+        'outputs': ['ICacheLinePath', 'readLineData', 'hit', 'valid', ')', 'NRUAccessStatePath', 'readNRUState', 'ICacheIndexPath', 'rstIndex', ')', 'hitOut', 'FETCH_WIDTH', ')'],
+        'internals': []
+    },
+    'IO_Unit': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'IntAdder': {
+        'inputs': ['DataPath', 'srcA', 'invA', 'DataPath', 'srcB', 'invB', 'carryIn', ')', 'DataPath', 'src', 'inv', ')', 'IntALU_Code', 'aluCode', 'DataPath', 'fuOpA_In', 'DataPath', 'fuOpB_In', ')'],
+        'outputs': ['IntAdderResult', 'dst', 'overflowOut', 'DataPath', 'srcA', 'invA', 'DataPath', 'srcB', 'invB', 'carryIn', ')', 'DataPath', 'aluDataOut', 'IntALU_Code', 'aluCode', 'DataPath', 'fuOpA_In', 'DataPath', 'fuOpB_In', ')'],
+        'internals': []
+    },
+    'IntegerExecutionStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'IntegerIssueStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'IntegerRegisterReadStage': {
+        'inputs': ['OpOperandType', 'opType', 'DataPath', 'DataPath', 'immV', 'DataPath', 'pcV', ')'],
+        'outputs': [],
+        'internals': []
+    },
+    'IntegerRegisterWriteStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'InterruptController': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'IssueQueue': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'LRU_Counter': {
+        'inputs': ['clk', 'rst', 'INDEX_BIT_WIDTH-1:0', 'index', 'PORT_WIDTH', 'access', 'PORT_WIDTH', '$clog2(WAY_NUM)-1:0', 'accessWay', 'PORT_WIDTH', '$clog2(WAY_NUM)-1:0', 'leastRecentlyAccessedWay', 'PORT_WIDTH', ')'],
+        'outputs': ['$clog2(WAY_NUM)-1:0', 'leastRecentlyAccessedWay', 'PORT_WIDTH', ')'],
+        'internals': []
+    },
+    'LoadQueue': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'LoadStoreUnit': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'Main': {
+        'inputs': ['clk_p', 'clk_n', 'negResetIn', 'rxd', '`ifndef', 'RSD_DISABLE_DEBUG_REGISTER', 'DebugRegister', 'debugRegister', '`endif', '`ifdef', 'RSD_SYNTHESIS_ATLYS', 'DDR2CLK0', 'DDR2CLK1', 'DDR2CKE', 'DDR2RASN', 'DDR2CASN', 'DDR2WEN', 'DDR2RZQ', 'DDR2ZIO', 'DDR2LDM', 'DDR2UDM', 'DDR2ODT', 'DDR2BA', 'DDR2A', 'DDR2DQ', 'DDR2UDQS', 'DDR2UDQSN', 'DDR2LDQS', 'DDR2LDQSN', '`endif', 'serialWE', 'SerialDataPath', 'serialWriteData', 'posResetOut', 'LED_Path', 'ledOut', 'txd', ')'],
+        'outputs': ['DebugRegister', 'debugRegister', '`endif', '`ifdef', 'RSD_SYNTHESIS_ATLYS', 'DDR2CLK0', 'DDR2CLK1', 'DDR2CKE', 'DDR2RASN', 'DDR2CASN', 'DDR2WEN', 'DDR2RZQ', 'DDR2ZIO', 'DDR2LDM', 'DDR2UDM', 'DDR2ODT', 'DDR2BA', 'DDR2A', 'DDR2DQ', 'DDR2UDQS', 'DDR2UDQSN', 'DDR2LDQS', 'DDR2LDQSN', '`endif', 'serialWE', 'SerialDataPath', 'serialWriteData', 'posResetOut', 'LED_Path', 'ledOut', 'txd', ')'],
+        'internals': []
+    },
+    'Main_Zynq': {
+        'inputs': ['clk', 'negResetIn', 'LED_Path', 'ledOut', '`else', 'clk_p', 'clk_n', 'negResetIn', 'rxd', '`endif', '`ifndef', 'RSD_DISABLE_DEBUG_REGISTER', 'DebugRegister', 'debugRegister', '`endif', '`ifdef', 'RSD_USE_EXTERNAL_MEMORY', 'Axi4MemoryIF', 'axi4MemoryIF', '`endif', '`ifdef', 'RSD_SYNTHESIS_ZEDBOARD', 'Axi4LiteControlRegisterIF', 'axi4LitePlToPsControlRegisterIF', 'Axi4LiteControlRegisterIF', 'axi4LitePsToPlControlRegisterIF', '`else', 'serialWE', 'SerialDataPath', 'serialWriteData', 'posResetOut', 'LED_Path', 'ledOut', 'txd', '`endif', ')'],
+        'outputs': ['LED_Path', 'ledOut', '`else', 'clk_p', 'clk_n', 'negResetIn', 'rxd', '`endif', '`ifndef', 'RSD_DISABLE_DEBUG_REGISTER', 'DebugRegister', 'debugRegister', '`endif', '`ifdef', 'RSD_USE_EXTERNAL_MEMORY', 'Axi4MemoryIF', 'axi4MemoryIF', '`endif', '`ifdef', 'RSD_SYNTHESIS_ZEDBOARD', 'Axi4LiteControlRegisterIF', 'axi4LitePlToPsControlRegisterIF', 'Axi4LiteControlRegisterIF', 'axi4LitePsToPlControlRegisterIF', '`else', 'serialWE', 'SerialDataPath', 'serialWriteData', 'posResetOut', 'LED_Path', 'ledOut', 'txd', '`endif', ')'],
+        'internals': []
+    },
+    'Memory': {
+        'inputs': ['clk', 'rst', 'AddrPath', 'memAccessAddr', 'MemoryEntryDataPath', 'memAccessWriteData', 'memAccessRE', 'memAccessWE', 'memAccessBusy', 'MemAccessSerial', 'nextMemReadSerial', 'MemWriteSerial', 'nextMemWriteSerial', 'memReadDataReady', 'MemoryEntryDataPath', 'memReadData', 'MemAccessSerial', 'memReadSerial', 'MemAccessResponse', 'memAccessResponse', ')'],
+        'outputs': ['memAccessBusy', 'MemAccessSerial', 'nextMemReadSerial', 'MemWriteSerial', 'nextMemWriteSerial', 'memReadDataReady', 'MemoryEntryDataPath', 'memReadData', 'MemAccessSerial', 'memReadSerial', 'MemAccessResponse', 'memAccessResponse', ')'],
+        'internals': []
+    },
+    'MemoryAccessController': {
+        'inputs': ['MemAccessSerial', 'nextMemReadSerial', 'MemWriteSerial', 'nextMemWriteSerial', 'MemoryEntryDataPath', 'memReadData', 'memReadDataReady', 'MemAccessSerial', 'memReadSerial', 'MemAccessResponse', 'memAccessResponse', 'memAccessReadBusy', 'memAccessWriteBusy', 'PhyAddrPath', 'memAccessAddr', 'MemoryEntryDataPath', 'memAccessWriteData', 'memAccessRE', 'memAccessWE', ')'],
+        'outputs': ['PhyAddrPath', 'memAccessAddr', 'MemoryEntryDataPath', 'memAccessWriteData', 'memAccessRE', 'memAccessWE', ')'],
+        'internals': []
+    },
+    'MemoryAccessStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'MemoryDependencyPredictor': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'MemoryExecutionStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'MemoryIssueStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'MemoryLatencySimulator': {
+        'inputs': ['clk', 'rst', 'push', 'MemoryLatencySimRequestPath', 'pushedData', 'hasRequest', 'MemoryLatencySimRequestPath', 'requestData', ')'],
+        'outputs': ['hasRequest', 'MemoryLatencySimRequestPath', 'requestData', ')'],
+        'internals': []
+    },
+    'MemoryReadReqQueue': {
+        'inputs': ['clk', 'rst', 'push', 'pop', 'MemoryReadReq', 'pushedData', 'full', 'empty', 'MemoryReadReq', 'headData', ')'],
+        'outputs': ['full', 'empty', 'MemoryReadReq', 'headData', ')'],
+        'internals': []
+    },
+    'MemoryRegisterReadStage': {
+        'inputs': ['OpOperandType', 'opType', 'DataPath', 'DataPath', 'immV', 'DataPath', 'pcV', ')'],
+        'outputs': [],
+        'internals': []
+    },
+    'MemoryRegisterWriteStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'MemoryTagAccessStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'MemoryWriteDataQueue': {
+        'inputs': ['clk', 'rst', 'push', 'pop', 'MemoryEntryDataPath', 'pushedData', 'full', 'empty', 'MemoryEntryDataPath', 'headData', 'headPtr', 'tailPtr', ')'],
+        'outputs': ['full', 'empty', 'MemoryEntryDataPath', 'headData', 'headPtr', 'tailPtr', ')'],
+        'internals': []
+    },
+    'MicroOpPicker': {
+        'inputs': ['AllDecodedMicroOpPath', 'req', 'AllDecodedMicroOpPath', 'serialize', 'AllDecodedMicroOpIndex', 'AllDecodedMicroOpPath', 'next', ')'],
+        'outputs': ['AllDecodedMicroOpIndex', 'AllDecodedMicroOpPath', 'next', ')'],
+        'internals': []
+    },
+    'MulDivUnit': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'Multiplier': {
+        'inputs': ['BIT_WIDTH-1:0', 'srcA', 'BIT_WIDTH-1:0', 'srcB', '2*BIT_WIDTH-1:', 'dst', ')', 'BIT_WIDTH-1:0', 'in', 'sign', 'BIT_WIDTH:0', 'out', ')', 'clk', 'stall', 'BIT_WIDTH-1:0', 'srcA', 'BIT_WIDTH-1:0', 'srcB', 'signA', 'signB', '2*BIT_WIDTH-1:0', 'dst', ')'],
+        'outputs': ['2*BIT_WIDTH-1:', 'dst', ')', 'BIT_WIDTH:0', 'out', ')', '2*BIT_WIDTH-1:0', 'dst', ')'],
+        'internals': []
+    },
+    'MultiplierUnit': {
+        'inputs': ['DataPath', 'fuOpA_In', 'DataPath', 'fuOpB_In', 'getUpper', 'DataPath', 'dataOut', ')', 'clk', 'stall', 'DataPath', 'fuOpA_In', 'DataPath', 'fuOpB_In', 'getUpper', 'IntMUL_Code', 'mulCode', 'DataPath', 'dataOut', ')'],
+        'outputs': ['DataPath', 'dataOut', ')', 'DataPath', 'dataOut', ')'],
+        'internals': []
+    },
+    'NextPCStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'OrgShifter': {
+        'inputs': ['ShiftOperandType', 'shiftOperandType', 'ShiftType', 'shiftType', 'ShiftAmountPath', 'immShiftAmount', 'ShiftAmountPath', 'DataPath', 'dataIn', 'carryIn', 'DataPath', 'dataOut', 'carryOut', ')', 'ShiftType', 'shiftType', 'ShiftAmountPath', 'shiftAmount', 'DataPath', 'dataIn', 'shiftIn', 'carryIn', ')', 'ShiftOperandType', 'shiftOperandType', 'ShiftType', 'shiftType', 'ShiftAmountPath', 'immShiftAmount', 'ShiftAmountPath', 'DataPath', 'dataIn', 'carryIn', 'DataPath', 'dataOut', 'carryOut', ')'],
+        'outputs': ['DataPath', 'dataOut', 'carryOut', ')', 'DataPath', 'dataOut', 'carryOut', ')'],
+        'internals': []
+    },
+    'PC': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'PerformanceCounter': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'Picker': {
+        'inputs': ['req', 'grant', ')', 'req', 'grant', ')', 'headPtr', 'tailPtr', 'request', 'grantPtr', 'picked', ')', 'shiftIn', 'shiftAmount', 'shiftOut', ')', 'shiftIn', 'shiftAmount', 'shiftOut', ')'],
+        'outputs': ['grant', ')', 'grant', ')', 'grantPtr', 'picked', ')', 'shiftOut', ')', 'shiftOut', ')'],
+        'internals': []
+    },
+    'PipelinedRefDivider': {
+        'inputs': ['clk', 'stall', 'DataPath', 'dividend', 'DataPath', 'divisor', 'isSigned', 'DataPath', 'quotient', 'DataPath', 'remainder', ')'],
+        'outputs': ['DataPath', 'quotient', 'DataPath', 'remainder', ')'],
+        'internals': []
+    },
+    'PreDecodeStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'ProducerMatrix': {
+        'inputs': ['clk', 'DISPATCH_WIDTH', 'dispatchedSrcRegReady', 'DISPATCH_WIDTH', 'ISSUE_QUEUE_SRC_REG_NUM', 'IssueQueueIndexPath', 'DISPATCH_WIDTH-1:0', 'ISSUE_QUEUE_SRC_REG_NUM-1:0', 'dispatchedSrcRegPtr', 'dependStoreBitVector', 'IssueQueueIndexPath', 'DISPATCH_WIDTH', 'IssueQueueOneHotPath', 'WAKEUP_WIDTH', '+', 'STORE_ISSUE_WIDTH', 'ISSUE_QUEUE_ENTRY_NUM', ')'],
+        'outputs': ['ISSUE_QUEUE_ENTRY_NUM', ')'],
+        'internals': []
+    },
+    'QueuePointer': {
+        'inputs': ['clk', 'rst', 'push', 'pop', 'full', 'empty', 'headPtr', 'tailPtr', ')', 'clk', 'rst', 'push', 'pop', 'full', 'empty', 'headPtr', 'tailPtr', 'count', ')', 'clk', 'rst', 'push', 'pop', 'pushCount', 'popCount', 'headPtr', 'tailPtr', 'count', ')', 'clk', 'rst', 'push', 'pop', 'pushCount', 'popCount', 'setTail', 'setTailPtr', 'headPtr', 'tailPtr', 'count', ')', 'clk', 'rst', 'pushTail', 'popTail', 'popHead', 'pushTailCount', 'popTailCount', 'popHeadCount', 'headPtr', 'tailPtr', 'count', ')', 'clk', 'rst', 'pushTail', 'popTail', 'popHead', 'pushTailCount', 'popTailCount', 'popHeadCount', 'setTail', 'setTailPtr', 'headPtr', 'tailPtr', 'count', ')'],
+        'outputs': ['full', 'empty', 'headPtr', 'tailPtr', ')', 'full', 'empty', 'headPtr', 'tailPtr', 'count', ')', 'headPtr', 'tailPtr', 'count', ')', 'headPtr', 'tailPtr', 'count', ')', 'headPtr', 'tailPtr', 'count', ')', 'headPtr', 'tailPtr', 'count', ')'],
+        'internals': []
+    },
+    'RMT': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'ReadyBitTable': {
+        'inputs': ['clk', 'rst', 'rstStart', 'WAKEUP_WIDTH', 'wakeupDstValid', 'WAKEUP_WIDTH', 'wakeupDstRegNum', 'WAKEUP_WIDTH', 'DISPATCH_WIDTH', 'dispatchedDstValid', 'DISPATCH_WIDTH', 'dispatchedDstRegNum', 'DISPATCH_WIDTH', 'dispatchedSrcValid', 'DISPATCH_WIDTH', 'SRC_OP_NUM', 'dispatchedSrcRegNum', 'DISPATCH_WIDTH', 'SRC_OP_NUM', 'DISPATCH_WIDTH', 'SRC_OP_NUM', ')'],
+        'outputs': ['DISPATCH_WIDTH', 'SRC_OP_NUM', ')'],
+        'internals': []
+    },
+    'RecoveryManager': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'RefDivider': {
+        'inputs': ['clk', 'rst', 'req', 'DataPath', 'dividend', 'DataPath', 'divisor', 'isSigned', 'finished', 'DataPath', 'quotient', 'DataPath', 'remainder', ')', 'clk', 'rst', 'req', 'DataPath', 'dividend', 'DataPath', 'divisor', 'isSigned', 'finished', 'DataPath', 'quotient', 'DataPath', 'remainder', ')'],
+        'outputs': ['finished', 'DataPath', 'quotient', 'DataPath', 'remainder', ')', 'finished', 'DataPath', 'quotient', 'DataPath', 'remainder', ')'],
+        'internals': []
+    },
+    'RegisterFile': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'RenameLogic': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'RenameLogicCommitter': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'RenameStageSerializer': {
+        'inputs': ['clk', 'rst', 'stall', 'clear', 'activeListEmpty', 'storeQueueEmpty', 'OpInfo', 'opInfo', 'valid', 'serialize', ')'],
+        'outputs': ['serialize', ')'],
+        'internals': []
+    },
+    'ReplayQueue': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'ResetController': {
+        'inputs': ['clk', 'rstTrigger', 'locked', 'rst', 'rstStart', ')'],
+        'outputs': ['rst', 'rstStart', ')'],
+        'internals': []
+    },
+    'RetirementRMT': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'ScheduleStage': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'Scheduler': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'SelectLogic': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'StoreCommitter': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'StoreQueue': {
+        'inputs': ['DataPath', 'dataIn', 'LSQ_BlockDataPath', 'blockDataIn', 'PhyAddrPath', 'addr', 'MemAccessMode', 'mode', ')'],
+        'outputs': ['LSQ_BlockDataPath', 'dataOut', 'DataPath', 'dataIn', 'LSQ_BlockDataPath', 'blockDataIn', 'PhyAddrPath', 'addr', 'MemAccessMode', 'mode', ')'],
+        'internals': []
+    },
+    'TestBenchClockGenerator': {
+        'inputs': ['rstOut', 'clk', 'rst', ')'],
+        'outputs': ['clk', 'rst', ')'],
+        'internals': []
+    },
+    'TestBlockDualPortRAM': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestBlockDualPortRAM_Top': {
+        'inputs': ['clk', 'rst', 'ibit', 'obit', '`else', 'clk_p', 'clk_n', 'we', '$clog2(ENTRY_NUM)-1:0', 'ra', 'wa', 'ENTRY_BIT_SIZE-1:0', 'wv', 'ENTRY_BIT_SIZE-1:0', 'rv', '`endif', ')'],
+        'outputs': ['obit', '`else', 'clk_p', 'clk_n', 'we', '$clog2(ENTRY_NUM)-1:0', 'ra', 'wa', 'ENTRY_BIT_SIZE-1:0', 'wv', 'ENTRY_BIT_SIZE-1:0', 'rv', '`endif', ')'],
+        'internals': []
+    },
+    'TestBlockMultiPortRAM': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestBlockMultiPortRAM_Top': {
+        'inputs': ['clk', 'rst', 'ibit', 'obit', '`else', 'clk_p', 'clk_n', 'we', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'wa', 'WRITE_NUM', 'ENTRY_BIT_SIZE-1:0', 'wv', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'ra', 'READ_NUM', 'ENTRY_BIT_SIZE-1:0', 'rv', 'READ_NUM', '`endif', ')'],
+        'outputs': ['obit', '`else', 'clk_p', 'clk_n', 'we', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'wa', 'WRITE_NUM', 'ENTRY_BIT_SIZE-1:0', 'wv', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'ra', 'READ_NUM', 'ENTRY_BIT_SIZE-1:0', 'rv', 'READ_NUM', '`endif', ')'],
+        'internals': []
+    },
+    'TestBlockTrueDualPortRAM_Top': {
+        'inputs': ['clk', 'rst', 'ibit', 'obit', '`else', 'clk_p', 'clk_n', '$clog2(ENTRY_NUM)-1:0', 'ENTRY_BIT_SIZE-1:0', 'ENTRY_BIT_SIZE-1:0', '`endif', ')'],
+        'outputs': ['obit', '`else', 'clk_p', 'clk_n', '$clog2(ENTRY_NUM)-1:0', 'ENTRY_BIT_SIZE-1:0', 'ENTRY_BIT_SIZE-1:0', '`endif', ')'],
+        'internals': []
+    },
+    'TestCacheSystem': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestCacheSystemTop': {
+        'inputs': ['clk_p', 'clk_n', 'rstTrigger', 'rstOut', 'icRE', 'AddrPath', 'icNextReadAddrIn', 'MEM_ISSUE_WIDTH-1:0', 'dcRE', 'AddrPath', 'MEM_ISSUE_WIDTH-1:0', 'dcReadAddrIn', 'dcWE', 'DataPath', 'dcWriteDataIn', 'AddrPath', 'dcWriteAddrIn', 'MemAccessSizeType', 'dcWriteAccessSize', 'FETCH_WIDTH-1:0', 'icReadHit', 'DataPath', 'FETCH_WIDTH-1:0', 'icReadDataOut', 'MEM_ISSUE_WIDTH-1:0', 'dcReadHit', 'DataPath', 'MEM_ISSUE_WIDTH-1:0', 'dcReadDataOut', 'dcWriteHit', 'MemAccessResult', 'dcMemAccessResult', 'dcFillReq', 'dcFillAck', 'dcMiss', 'dcReplace', 'dcFillerBusy', 'AddrPath', 'dcFillAddr', 'dcMissAddr', 'dcReplaceAddr', 'WayPtr', 'dcFillWayPtr', 'dcVictimWayPtr', 'LineDataPath', 'dcFillData', 'dcReplaceData', ')'],
+        'outputs': ['rstOut', 'icRE', 'AddrPath', 'icNextReadAddrIn', 'MEM_ISSUE_WIDTH-1:0', 'dcRE', 'AddrPath', 'MEM_ISSUE_WIDTH-1:0', 'dcReadAddrIn', 'dcWE', 'DataPath', 'dcWriteDataIn', 'AddrPath', 'dcWriteAddrIn', 'MemAccessSizeType', 'dcWriteAccessSize', 'FETCH_WIDTH-1:0', 'icReadHit', 'DataPath', 'FETCH_WIDTH-1:0', 'icReadDataOut', 'MEM_ISSUE_WIDTH-1:0', 'dcReadHit', 'DataPath', 'MEM_ISSUE_WIDTH-1:0', 'dcReadDataOut', 'dcWriteHit', 'MemAccessResult', 'dcMemAccessResult', 'dcFillReq', 'dcFillAck', 'dcMiss', 'dcReplace', 'dcFillerBusy', 'AddrPath', 'dcFillAddr', 'dcMissAddr', 'dcReplaceAddr', 'WayPtr', 'dcFillWayPtr', 'dcVictimWayPtr', 'LineDataPath', 'dcFillData', 'dcReplaceData', ')'],
+        'internals': []
+    },
+    'TestDCache': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestDCacheFiller': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestDCacheFillerTop': {
+        'inputs': ['clk_p', 'clk_n', 'rstTrigger', 'rstOut', 'dcMiss', 'AddrPath', 'dcMissAddr', 'WayPtr', 'dcVictimWayPtr', 'MemAccessResult', 'dcMemAccessResult', 'dcFillAck', 'dcReplace', 'AddrPath', 'dcReplaceAddr', 'LineDataPath', 'dcReplaceData', 'dcFillReq', 'dcFillerBusy', 'AddrPath', 'dcFillAddr', 'WayPtr', 'dcFillWayPtr', 'LineDataPath', 'dcFillData', 'MemAccessReq', 'dcMemAccessReq', ')'],
+        'outputs': ['rstOut', 'dcMiss', 'AddrPath', 'dcMissAddr', 'WayPtr', 'dcVictimWayPtr', 'MemAccessResult', 'dcMemAccessResult', 'dcFillAck', 'dcReplace', 'AddrPath', 'dcReplaceAddr', 'LineDataPath', 'dcReplaceData', 'dcFillReq', 'dcFillerBusy', 'AddrPath', 'dcFillAddr', 'WayPtr', 'dcFillWayPtr', 'LineDataPath', 'dcFillData', 'MemAccessReq', 'dcMemAccessReq', ')'],
+        'internals': []
+    },
+    'TestDCacheTop': {
+        'inputs': ['clk_p', 'clk_n', 'rstTrigger', 'rstOut', 'MEM_ISSUE_WIDTH-1:0', 'dcRE', 'AddrPath', 'MEM_ISSUE_WIDTH-1:0', 'dcReadAddrIn', 'dcWE', 'DataPath', 'dcWriteDataIn', 'AddrPath', 'dcWriteAddrIn', 'MemAccessSizeType', 'dcWriteAccessSize', 'dcFillReq', 'dcFillerBusy', 'AddrPath', 'dcFillAddr', 'WayPtr', 'dcFillWayPtr', 'LineDataPath', 'dcFillData', 'MEM_ISSUE_WIDTH-1:0', 'dcReadHit', 'DataPath', 'MEM_ISSUE_WIDTH-1:0', 'dcReadDataOut', 'dcWriteHit', 'dcFillAck', 'dcMiss', 'dcReplace', 'AddrPath', 'dcMissAddr', 'dcReplaceAddr', 'WayPtr', 'dcVictimWayPtr', 'LineDataPath', 'dcReplaceData', ')'],
+        'outputs': ['rstOut', 'MEM_ISSUE_WIDTH-1:0', 'dcRE', 'AddrPath', 'MEM_ISSUE_WIDTH-1:0', 'dcReadAddrIn', 'dcWE', 'DataPath', 'dcWriteDataIn', 'AddrPath', 'dcWriteAddrIn', 'MemAccessSizeType', 'dcWriteAccessSize', 'dcFillReq', 'dcFillerBusy', 'AddrPath', 'dcFillAddr', 'WayPtr', 'dcFillWayPtr', 'LineDataPath', 'dcFillData', 'MEM_ISSUE_WIDTH-1:0', 'dcReadHit', 'DataPath', 'MEM_ISSUE_WIDTH-1:0', 'dcReadDataOut', 'dcWriteHit', 'dcFillAck', 'dcMiss', 'dcReplace', 'AddrPath', 'dcMissAddr', 'dcReplaceAddr', 'WayPtr', 'dcVictimWayPtr', 'LineDataPath', 'dcReplaceData', ')'],
+        'internals': []
+    },
+    'TestDRAM_Controller': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestDRAM_ControllerTop': {
+        'inputs': ['clk_p', 'clk_n', 'negResetIn', 'rxd', '`ifdef', 'RSD_SYNTHESIS_ATLYS', 'DDR2CLK0', 'DDR2CLK1', 'DDR2CKE', 'DDR2RASN', 'DDR2CASN', 'DDR2WEN', 'DDR2RZQ', 'DDR2ZIO', 'DDR2LDM', 'DDR2UDM', 'DDR2ODT', 'DDR2BA', 'DDR2A', 'DDR2DQ', 'DDR2UDQS', 'DDR2UDQSN', 'DDR2LDQS', 'DDR2LDQSN', '`endif', 'posResetOut', 'txd', 'ledOut', ')'],
+        'outputs': ['DDR2CLK0', 'DDR2CLK1', 'DDR2CKE', 'DDR2RASN', 'DDR2CASN', 'DDR2WEN', 'DDR2RZQ', 'DDR2ZIO', 'DDR2LDM', 'DDR2UDM', 'DDR2ODT', 'DDR2BA', 'DDR2A', 'DDR2DQ', 'DDR2UDQS', 'DDR2UDQSN', 'DDR2LDQS', 'DDR2LDQSN', '`endif', 'posResetOut', 'txd', 'ledOut', ')'],
+        'internals': []
+    },
+    'TestDistributedDualPortRAM': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestDistributedDualPortRAM_Top': {
+        'inputs': ['clk', 'rst', 'ibit', 'obit', '`else', 'clk_p', 'clk_n', 'we', '$clog2(ENTRY_NUM)-1:0', 'ra', 'wa', 'ENTRY_BIT_SIZE-1:0', 'wv', 'ENTRY_BIT_SIZE-1:0', 'rv', '`endif', ')'],
+        'outputs': ['obit', '`else', 'clk_p', 'clk_n', 'we', '$clog2(ENTRY_NUM)-1:0', 'ra', 'wa', 'ENTRY_BIT_SIZE-1:0', 'wv', 'ENTRY_BIT_SIZE-1:0', 'rv', '`endif', ')'],
+        'internals': []
+    },
+    'TestDistributedMultiBankRAM_Top': {
+        'inputs': ['clk', 'rst', 'ibit', 'obit', '`else', 'clk_p', 'clk_n', 'we', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'wa', 'WRITE_NUM', 'ENTRY_BIT_SIZE-1:0', 'wv', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'ra', 'READ_NUM', 'ENTRY_BIT_SIZE-1:0', 'rv', 'READ_NUM', '`endif', ')'],
+        'outputs': ['obit', '`else', 'clk_p', 'clk_n', 'we', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'wa', 'WRITE_NUM', 'ENTRY_BIT_SIZE-1:0', 'wv', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'ra', 'READ_NUM', 'ENTRY_BIT_SIZE-1:0', 'rv', 'READ_NUM', '`endif', ')'],
+        'internals': []
+    },
+    'TestDistributedMultiPortRAM': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestDistributedMultiPortRAM_Top': {
+        'inputs': ['clk', 'rst', 'ibit', 'obit', '`else', 'clk_p', 'clk_n', 'we', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'wa', 'WRITE_NUM', 'ENTRY_BIT_SIZE-1:0', 'wv', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'ra', 'READ_NUM', 'ENTRY_BIT_SIZE-1:0', 'rv', 'READ_NUM', '`endif', ')'],
+        'outputs': ['obit', '`else', 'clk_p', 'clk_n', 'we', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'wa', 'WRITE_NUM', 'ENTRY_BIT_SIZE-1:0', 'wv', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'ra', 'READ_NUM', 'ENTRY_BIT_SIZE-1:0', 'rv', 'READ_NUM', '`endif', ')'],
+        'internals': []
+    },
+    'TestDistributedSharedMultiPortRAM_Top': {
+        'inputs': ['clk', 'rst', 'ibit', 'obit', '`else', 'clk_p', 'clk_n', 'we', '$clog2(ENTRY_NUM)-1:0', 'rwa', 'ENTRY_BIT_SIZE-1:0', 'wv', '$clog2(ENTRY_NUM)-1:0', 'ra', 'READ_NUM-1', 'ENTRY_BIT_SIZE-1:0', 'rv', 'READ_NUM', '`endif', ')'],
+        'outputs': ['obit', '`else', 'clk_p', 'clk_n', 'we', '$clog2(ENTRY_NUM)-1:0', 'rwa', 'ENTRY_BIT_SIZE-1:0', 'wv', '$clog2(ENTRY_NUM)-1:0', 'ra', 'READ_NUM-1', 'ENTRY_BIT_SIZE-1:0', 'rv', 'READ_NUM', '`endif', ')'],
+        'internals': []
+    },
+    'TestDistributedSinglePortRAM_Top': {
+        'inputs': ['clk', 'rst', 'ibit', 'obit', '`else', 'clk_p', 'clk_n', 'we', '$clog2(ENTRY_NUM)-1:0', 'rwa', 'ENTRY_BIT_SIZE-1:0', 'wv', 'ENTRY_BIT_SIZE-1:0', 'rv', '`endif', ')'],
+        'outputs': ['obit', '`else', 'clk_p', 'clk_n', 'we', '$clog2(ENTRY_NUM)-1:0', 'rwa', 'ENTRY_BIT_SIZE-1:0', 'wv', 'ENTRY_BIT_SIZE-1:0', 'rv', '`endif', ')'],
+        'internals': []
+    },
+    'TestDivider': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestICache': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestICacheFiller': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestICacheFillerTop': {
+        'inputs': ['clk_p', 'clk_n', 'rstTrigger', 'rstOut', 'icMiss', 'AddrPath', 'icMissAddr', 'WayPtr', 'icVictimWayPtr', 'MemAccessResult', 'icMemAccessResult', 'icFill', 'icFillerBusy', 'AddrPath', 'icFillAddr', 'WayPtr', 'icFillWayPtr', 'LineDataPath', 'icFillData', 'MemReadAccessReq', 'icMemAccessReq', ')'],
+        'outputs': ['rstOut', 'icMiss', 'AddrPath', 'icMissAddr', 'WayPtr', 'icVictimWayPtr', 'MemAccessResult', 'icMemAccessResult', 'icFill', 'icFillerBusy', 'AddrPath', 'icFillAddr', 'WayPtr', 'icFillWayPtr', 'LineDataPath', 'icFillData', 'MemReadAccessReq', 'icMemAccessReq', ')'],
+        'internals': []
+    },
+    'TestICacheSystem': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestICacheSystemTop': {
+        'inputs': ['clk_p', 'clk_n', 'rstTrigger', 'rstOut', 'icRE', 'AddrPath', 'icNextReadAddrIn', 'MemAccessReq', 'dcMemAccessReq', 'FETCH_WIDTH-1:0', 'icReadHit', 'DataPath', 'FETCH_WIDTH-1:0', 'icReadDataOut', 'MemAccessResult', 'dcMemAccessResult', ')'],
+        'outputs': ['rstOut', 'icRE', 'AddrPath', 'icNextReadAddrIn', 'MemAccessReq', 'dcMemAccessReq', 'FETCH_WIDTH-1:0', 'icReadHit', 'DataPath', 'FETCH_WIDTH-1:0', 'icReadDataOut', 'MemAccessResult', 'dcMemAccessResult', ')'],
+        'internals': []
+    },
+    'TestICacheTop': {
+        'inputs': ['clk_p', 'clk_n', 'rstTrigger', 'rstOut', 'icRE', 'AddrPath', 'icNextReadAddrIn', 'icFill', 'icFillerBusy', 'AddrPath', 'icFillAddr', 'WayPtr', 'icFillWayPtr', 'LineDataPath', 'icFillData', 'FETCH_WIDTH-1:0', 'icReadHit', 'DataPath', 'FETCH_WIDTH-1:0', 'icReadDataOut', 'icMiss', 'AddrPath', 'icMissAddr', 'WayPtr', 'icVictimWayPtr', ')'],
+        'outputs': ['rstOut', 'icRE', 'AddrPath', 'icNextReadAddrIn', 'icFill', 'icFillerBusy', 'AddrPath', 'icFillAddr', 'WayPtr', 'icFillWayPtr', 'LineDataPath', 'icFillData', 'FETCH_WIDTH-1:0', 'icReadHit', 'DataPath', 'FETCH_WIDTH-1:0', 'icReadDataOut', 'icMiss', 'AddrPath', 'icMissAddr', 'WayPtr', 'icVictimWayPtr', ')'],
+        'internals': []
+    },
+    'TestInitializedBlockRAM_Top': {
+        'inputs': ['clk', 'rst', 'ibit', 'obit', '`else', 'clk_p', 'clk_n', 'we', '$clog2(ENTRY_NUM)-1:0', 'ra', 'wa', 'ENTRY_BIT_SIZE-1:0', 'wv', 'ENTRY_BIT_SIZE-1:0', 'rv', '`endif', ')'],
+        'outputs': ['obit', '`else', 'clk_p', 'clk_n', 'we', '$clog2(ENTRY_NUM)-1:0', 'ra', 'wa', 'ENTRY_BIT_SIZE-1:0', 'wv', 'ENTRY_BIT_SIZE-1:0', 'rv', '`endif', ')'],
+        'internals': []
+    },
+    'TestIntALU': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestLRU_Counter': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestLRU_CounterTop': {
+        'inputs': ['clk_p', 'clk_n', 'rst', 'PORT_WIDTH-1:0', 'INDEX_BIT_WIDTH-1:0', 'index', 'PORT_WIDTH-1:0', 'access', 'PORT_WIDTH-1:0', '$clog2(WAY_NUM)-1:0', 'accessWay', 'PORT_WIDTH-1:0', '$clog2(WAY_NUM)-1:0', 'leastRecentlyAccessedWay', ')'],
+        'outputs': ['PORT_WIDTH-1:0', '$clog2(WAY_NUM)-1:0', 'leastRecentlyAccessedWay', ')'],
+        'internals': []
+    },
+    'TestMain': {
+        'inputs': ['commitNumInThisCycle', 'DataPath', 'LREG_NUM', ')'],
+        'outputs': ['DataPath', 'LREG_NUM', ')'],
+        'internals': []
+    },
+    'TestMemory': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestMemoryTop': {
+        'inputs': ['clk_p', 'clk_n', 'rstTrigger', 'rstOut', 'MemReadAccessReq', 'icMemAccessReq', 'MemAccessReq', 'dcMemAccessReq', 'MemAccessResult', 'icMemAccessResult', 'MemAccessResult', 'dcMemAccessResult', ')'],
+        'outputs': ['rstOut', 'MemReadAccessReq', 'icMemAccessReq', 'MemAccessReq', 'dcMemAccessReq', 'MemAccessResult', 'icMemAccessResult', 'MemAccessResult', 'dcMemAccessResult', ')'],
+        'internals': []
+    },
+    'TestMultiWidthFreeList': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestMultiWidthFreeListTop': {
+        'inputs': ['clk_p', 'clk_n', 'rst', 'PUSH_WIDTH-1:0', 'push', 'POP_WIDTH-1:0', 'pop', 'PUSH_WIDTH-1:0', 'ENTRY_WIDTH-1:0', 'pushedData', 'full', 'empty', 'POP_WIDTH-1:0', 'ENTRY_WIDTH-1:0', 'poppedData', ')'],
+        'outputs': ['full', 'empty', 'POP_WIDTH-1:0', 'ENTRY_WIDTH-1:0', 'poppedData', ')'],
+        'internals': []
+    },
+    'TestMultiWidthQueuePointer': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestMultiWidthQueuePointerTop': {
+        'inputs': ['clk_p', 'clk_n', 'rst', 'push', 'pop', '$clog2(PUSH_WIDTH):0', 'pushCount', '$clog2(POP_WIDTH):0', 'popCount', 'full', 'empty', '$clog2(SIZE)-1:0', 'headPtr', '$clog2(SIZE)-1:0', 'tailPtr', '$clog2(SIZE):0', 'count', ')'],
+        'outputs': ['full', 'empty', '$clog2(SIZE)-1:0', 'headPtr', '$clog2(SIZE)-1:0', 'tailPtr', '$clog2(SIZE):0', 'count', ')'],
+        'internals': []
+    },
+    'TestRefDividerTop': {
+        'inputs': ['clk_p', 'clk_n', 'rst', 'req', 'DataPath', 'dividend', 'DataPath', 'divisor', 'isSigned', 'finished', 'DataPath', 'quotient', 'DataPath', 'remainder', 'refFinished', 'DataPath', 'refQuotient', 'DataPath', 'refRemainder', ')'],
+        'outputs': ['finished', 'DataPath', 'quotient', 'DataPath', 'remainder', 'refFinished', 'DataPath', 'refQuotient', 'DataPath', 'refRemainder', ')'],
+        'internals': []
+    },
+    'TestRegisterFile': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestRegisterFileTop': {
+        'inputs': ['clk_p', 'clk_n', 'rst', 'PRegNumPath', 'INT_ISSUE_WIDTH-1:0', 'intSrcRegNumA', 'PRegNumPath', 'INT_ISSUE_WIDTH-1:0', 'intSrcRegNumB', 'PRegNumPath', 'INT_ISSUE_WIDTH-1:0', 'intSrcFlagNum', 'INT_ISSUE_WIDTH-1:0', 'intDstRegWE', 'INT_ISSUE_WIDTH-1:0', 'intDstFlagWE', 'PRegNumPath', 'INT_ISSUE_WIDTH-1:0', 'intDstRegNum', 'PRegNumPath', 'INT_ISSUE_WIDTH-1:0', 'intDstFlagNum', 'DataPath', 'INT_ISSUE_WIDTH-1:0', 'intDstRegData', 'FlagPath', 'INT_ISSUE_WIDTH-1:0', 'intDstFlagData', 'PRegNumPath', 'MEM_ISSUE_WIDTH-1:0', 'memSrcRegNumA', 'PRegNumPath', 'MEM_ISSUE_WIDTH-1:0', 'memSrcRegNumB', 'PRegNumPath', 'MEM_ISSUE_WIDTH-1:0', 'memSrcFlagNum', 'MEM_ISSUE_WIDTH-1:0', 'memDstRegWE', 'MEM_ISSUE_WIDTH-1:0', 'memDstFlagWE', 'PRegNumPath', 'MEM_ISSUE_WIDTH-1:0', 'memDstRegNum', 'PRegNumPath', 'MEM_ISSUE_WIDTH-1:0', 'memDstFlagNum', 'DataPath', 'MEM_ISSUE_WIDTH-1:0', 'memDstRegData', 'FlagPath', 'MEM_ISSUE_WIDTH-1:0', 'memDstFlagData', 'DataPath', 'INT_ISSUE_WIDTH-1:0', 'intSrcRegDataA', 'DataPath', 'INT_ISSUE_WIDTH-1:0', 'intSrcRegDataB', 'FlagPath', 'INT_ISSUE_WIDTH-1:0', 'intSrcFlagData', 'DataPath', 'MEM_ISSUE_WIDTH-1:0', 'memSrcRegDataA', 'DataPath', 'MEM_ISSUE_WIDTH-1:0', 'memSrcRegDataB', 'FlagPath', 'MEM_ISSUE_WIDTH-1:0', 'memSrcFlagData', ')'],
+        'outputs': ['DataPath', 'INT_ISSUE_WIDTH-1:0', 'intSrcRegDataA', 'DataPath', 'INT_ISSUE_WIDTH-1:0', 'intSrcRegDataB', 'FlagPath', 'INT_ISSUE_WIDTH-1:0', 'intSrcFlagData', 'DataPath', 'MEM_ISSUE_WIDTH-1:0', 'memSrcRegDataA', 'DataPath', 'MEM_ISSUE_WIDTH-1:0', 'memSrcRegDataB', 'FlagPath', 'MEM_ISSUE_WIDTH-1:0', 'memSrcFlagData', ')'],
+        'internals': []
+    },
+    'TestRegisterMultiPortRAM_Top': {
+        'inputs': ['clk', 'rst', 'ibit', 'obit', '`else', 'clk_p', 'clk_n', 'we', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'wa', 'WRITE_NUM', 'ENTRY_BIT_SIZE-1:0', 'wv', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'ra', 'READ_NUM', 'ENTRY_BIT_SIZE-1:0', 'rv', 'READ_NUM', '`endif', ')'],
+        'outputs': ['obit', '`else', 'clk_p', 'clk_n', 'we', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'wa', 'WRITE_NUM', 'ENTRY_BIT_SIZE-1:0', 'wv', 'WRITE_NUM', '$clog2(ENTRY_NUM)-1:0', 'ra', 'READ_NUM', 'ENTRY_BIT_SIZE-1:0', 'rv', 'READ_NUM', '`endif', ')'],
+        'internals': []
+    },
+    'TestSourceCAM': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'TestSourceCAM_Top': {
+        'inputs': ['clk_p', 'clk_n', 'rstTrigger', 'rstOut', 'DISPATCH_WIDTH-1:0', 'dispatch', 'IssueQueueIndexPath', 'DISPATCH_WIDTH-1:0', 'dispatchPtr', 'PRegNumPath', 'DISPATCH_WIDTH-1:0', 'SRC_OP_NUM-1:0', 'dispatchedSrcRegNum', 'DISPATCH_WIDTH-1:0', 'SRC_OP_NUM-1:0', 'dispatchedSrcReady', 'WAKEUP_WIDTH-1:0', 'wakeup', 'SchedulerRegTag', 'WAKEUP_WIDTH-1:0', 'wakeupDstTag', 'IssueQueueOneHotPath', 'opReady', ')'],
+        'outputs': ['rstOut', 'DISPATCH_WIDTH-1:0', 'dispatch', 'IssueQueueIndexPath', 'DISPATCH_WIDTH-1:0', 'dispatchPtr', 'PRegNumPath', 'DISPATCH_WIDTH-1:0', 'SRC_OP_NUM-1:0', 'dispatchedSrcRegNum', 'DISPATCH_WIDTH-1:0', 'SRC_OP_NUM-1:0', 'dispatchedSrcReady', 'WAKEUP_WIDTH-1:0', 'wakeup', 'SchedulerRegTag', 'WAKEUP_WIDTH-1:0', 'wakeupDstTag', 'IssueQueueOneHotPath', 'opReady', ')'],
+        'internals': []
+    },
+    'Top': {
+        'inputs': ['clk_p', 'clk_n', 'negResetIn', 'rxd', '`elsif', 'RSD_SYNTHESIS_ATLYS', 'clk_p', 'clk_n', 'negResetIn', 'rxd', '`elsif', 'RSD_SYNTHESIS_ZEDBOARD', 'clk', 'negResetIn', '`else', '"Error!"', '`endif', '`ifndef', 'RSD_DISABLE_DEBUG_REGISTER', 'DebugRegister', 'debugRegister', '`endif', '`ifdef', 'RSD_SYNTHESIS_ATLYS', 'DDR2CLK0', 'DDR2CLK1', 'DDR2CKE', 'DDR2RASN', 'DDR2CASN', 'DDR2WEN', 'DDR2RZQ', 'DDR2ZIO', 'DDR2LDM', 'DDR2UDM', 'DDR2ODT', 'DDR2BA', 'DDR2A', 'DDR2DQ', 'DDR2UDQS', 'DDR2UDQSN', 'DDR2LDQS', 'DDR2LDQSN', '`endif', '`ifndef', 'RSD_SYNTHESIS', 'serialWE', 'SerialDataPath', 'serialWriteData', 'posResetOut', 'LED_Path', 'ledOut', 'txd', '`elsif', 'RSD_SYNTHESIS_ATLYS', 'serialWE', 'SerialDataPath', 'serialWriteData', 'posResetOut', 'LED_Path', 'ledOut', 'txd', '`elsif', 'RSD_SYNTHESIS_ZEDBOARD', 'LED_Path', 'ledOut', 'Axi4LiteControlRegisterIF.Axi4LiteRead', 'axi4LitePlToPsControlRegisterIF', 'Axi4LiteControlRegisterIF.Axi4Lite', 'axi4LitePsToPlControlRegisterIF', '`else', '"Error!"', '`endif', ')'],
+        'outputs': ['DebugRegister', 'debugRegister', '`endif', '`ifdef', 'RSD_SYNTHESIS_ATLYS', 'DDR2CLK0', 'DDR2CLK1', 'DDR2CKE', 'DDR2RASN', 'DDR2CASN', 'DDR2WEN', 'DDR2RZQ', 'DDR2ZIO', 'DDR2LDM', 'DDR2UDM', 'DDR2ODT', 'DDR2BA', 'DDR2A', 'DDR2DQ', 'DDR2UDQS', 'DDR2UDQSN', 'DDR2LDQS', 'DDR2LDQSN', '`endif', '`ifndef', 'RSD_SYNTHESIS', 'serialWE', 'SerialDataPath', 'serialWriteData', 'posResetOut', 'LED_Path', 'ledOut', 'txd', '`elsif', 'RSD_SYNTHESIS_ATLYS', 'serialWE', 'SerialDataPath', 'serialWriteData', 'posResetOut', 'LED_Path', 'ledOut', 'txd', '`elsif', 'RSD_SYNTHESIS_ZEDBOARD', 'LED_Path', 'ledOut', 'Axi4LiteControlRegisterIF.Axi4LiteRead', 'axi4LitePlToPsControlRegisterIF', 'Axi4LiteControlRegisterIF.Axi4Lite', 'axi4LitePsToPlControlRegisterIF', '`else', '"Error!"', '`endif', ')'],
+        'internals': []
+    },
+    'WakeupLogic': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'WakeupPipelineRegister': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'for': {
+        'inputs': ['clk', 'rst', 'dispatch', 'DISPATCH_WIDTH', 'IssueQueueIndexPath', 'dispatchPtr', 'DISPATCH_WIDTH', 'dispatchedSrcRegNum', 'DISPATCH_WIDTH', 'SRC_OP_NUM', 'dispatchedSrcReady', 'DISPATCH_WIDTH', 'SRC_OP_NUM', 'wakeup', 'WAKEUP_WIDTH', 'wakeupDstValid', 'WAKEUP_WIDTH', 'wakeupDstRegNum', 'WAKEUP_WIDTH', 'IssueQueueOneHotPath', 'opReady', ')'],
+        'outputs': ['IssueQueueOneHotPath', 'opReady', ')'],
+        'internals': []
+    },
+    'is': {
+        'inputs': ['clk', 'rst', 'rstStart', ')', 'selected', 'selectedPtr', 'selectedVector', 'stall', 'write', 'writePtr', 'writeSrcTag', 'writeDstTag', 'intIssueReq', '`ifndef', 'RSD_MARCH_UNIFIED_MULDIV_MEM_PIPE', 'complexIssueReq', '`endif', 'loadIssueReq', 'storeIssueReq', '`ifdef', 'RSD_MARCH_FP_PIPE', 'fpIssueReq', '`endif', 'notIssued', 'dispatchStore', 'dispatchLoad', 'memDependencyPred', ')', 'clk', 'rst', 'rstStart', 'write', 'writePtr', 'writeDstTag', 'wakeupPtr', 'wakeupDstTag', ')', 'clk', 'rst', 'rstStart', 'stall', 'write', 'writePtr', 'writeSrcTag', 'writeDstTag', 'wakeup', 'wakeupDstTag', 'wakeupVector', 'notIssued', 'dispatchStore', 'dispatchLoad', 'memDependencyPred', 'opReady', ')', 'opReady', 'intIssueReq', '`ifndef', 'RSD_MARCH_UNIFIED_MULDIV_MEM_PIPE', 'complexIssueReq', '`endif', 'loadIssueReq', 'storeIssueReq', '`ifdef', 'RSD_MARCH_FP_PIPE', 'fpIssueReq', '`endif', 'selected', 'selectedPtr', 'selectedVector', ')', 'clk', 'rst', 'stall', 'selected', 'selectedPtr', 'selectedVector', 'wakeup', 'wakeupPtr', 'wakeupVector', 'releaseEntry', 'releasePtr', ')', 'releaseEntry', 'releasePtr', ')'],
+        'outputs': ['stall', 'write', 'writePtr', 'writeSrcTag', 'writeDstTag', 'intIssueReq', '`ifndef', 'RSD_MARCH_UNIFIED_MULDIV_MEM_PIPE', 'complexIssueReq', '`endif', 'loadIssueReq', 'storeIssueReq', '`ifdef', 'RSD_MARCH_FP_PIPE', 'fpIssueReq', '`endif', 'notIssued', 'dispatchStore', 'dispatchLoad', 'memDependencyPred', ')', 'wakeupDstTag', ')', 'opReady', ')', 'selected', 'selectedPtr', 'selectedVector', ')', 'wakeup', 'wakeupPtr', 'wakeupVector', 'releaseEntry', 'releasePtr', ')'],
+        'internals': []
+    },
+    'logic': {
+        'inputs': ['clk', 'rst', ')', 'clk', 'rst', 'exceptionDetectedInCommitStage', 'refetchTypeFromCommitStage', 'exceptionDetectedInRwStage', 'refetchTypeFromRwStage', 'renameLogicRecoveryRMT', 'issueQueueReturnIndex', 'replayQueueFlushedOpExist', 'wakeupPipelineRegFlushedOpExist', 'recoveredPC_FromCommitStage', 'recoveredPC_FromRwStage', 'faultingDataAddr', 'notIssued', 'flushIQ_Entry', 'recoveryCauseFromCommitStage', 'phase', 'toRecoveryPhase', 'recoveredPC_FromRwCommit', 'toCommitPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'unableToStartRecovery', 'recoveryFromRwStage', 'loadQueueRecoveryTailPtr', 'storeQueueRecoveryTailPtr', ')', 'phase', 'unableToStartRecovery', 'renameLogicRecoveryRMT', 'exceptionDetectedInCommitStage', 'recoveryOpIndex', 'refetchTypeFromCommitStage', 'recoveryCauseFromCommitStage', ')', 'toCommitPhase', 'toRecoveryPhase', 'recoveredPC_FromRwCommit', 'recoverFromRename', 'recoveredPC_FromRename', ')', 'toRecoveryPhase', 'inRecoveryAL', 'renameLogicRecoveryRMT', ')', 'toRecoveryPhase', 'toCommitPhase', 'inRecoveryAL', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', 'notIssued', 'selected', 'selectedPtr', 'recoveryFromRwStage', 'flushIQ_Entry', 'issueQueueReturnIndex', 'selectedActiveListPtr', ')', 'toRecoveryPhase', 'flushIQ_Entry', 'notIssued', ')', 'toRecoveryPhase', 'flushIQ_Entry', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', 'recoveryFromRwStage', 'replayQueueFlushedOpExist', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', 'selectedActiveListPtr', 'flushIQ_Entry', 'recoveryFromRwStage', 'wakeupPipelineRegFlushedOpExist', ')', 'toRecoveryPhase', 'loadQueueRecoveryTailPtr', 'loadQueueHeadPtr', ')', 'toRecoveryPhase', 'storeQueueRecoveryTailPtr', 'storeQueueHeadPtr', ')', 'toRecoveryPhase', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'flushAllInsns', ')', 'toRecoveryPhase', 'toCommitPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'unableToStartRecovery', 'exceptionDetectedInRwStage', 'refetchTypeFromRwStage', 'recoveredPC_FromCommitStage', 'recoveredPC_FromRwStage', 'faultingDataAddr', 'flushAllInsns', ')', 'unableToStartRecovery', ')'],
+        'outputs': ['phase', 'toRecoveryPhase', 'recoveredPC_FromRwCommit', 'toCommitPhase', 'flushRangeHeadPtr', 'flushRangeTailPtr', 'unableToStartRecovery', 'recoveryFromRwStage', 'loadQueueRecoveryTailPtr', 'storeQueueRecoveryTailPtr', ')', 'recoverFromRename', 'recoveredPC_FromRename', ')', 'exceptionDetectedInCommitStage', 'recoveryOpIndex', 'refetchTypeFromCommitStage', 'recoveryCauseFromCommitStage', ')', 'renameLogicRecoveryRMT', ')', 'inRecoveryAL', ')', 'flushIQ_Entry', 'issueQueueReturnIndex', 'selectedActiveListPtr', ')', 'notIssued', ')', 'selected', 'selectedPtr', ')', 'replayQueueFlushedOpExist', ')', 'wakeupPipelineRegFlushedOpExist', ')', 'loadQueueHeadPtr', ')', 'storeQueueHeadPtr', ')', 'exceptionDetectedInRwStage', 'refetchTypeFromRwStage', 'recoveredPC_FromCommitStage', 'recoveredPC_FromRwStage', 'faultingDataAddr', 'flushAllInsns', ')'],
+        'internals': []
+    },
+},

@@ -3,7 +3,7 @@
 **Module:** cvxif_example_coprocessor
 **File:** cvxif_example_coprocessor.sv
 **Type:** Sequential
-**Total Candidates:** 4
+**Total Candidates:** 3
 
 ---
 
@@ -11,82 +11,64 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
 **Trigger Signals (5):**
 - cvxif_req_t
-- compressed_valid
-- issue_valid
+- cvxif_req_i
 - register_valid
+- we
 - alu_valid
 
 **Payload Signals (5):**
 - cvxif_req_t
-- compressed_valid
-- issue_valid
+- cvxif_req_i
 - register_valid
+- we
 - alu_valid
 
 **Generated File:** T1_cvxif_example_coprocessor_DoS.sv
 
 ---
 
-### T2: Availability - Performance Degradation
+### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** Critical
 **Confidence:** 1.00
-**Description:** Degrades performance through artificial delays
-
-**Trigger Signals (5):**
-- cvxif_req_t
-- compressed_valid
-- issue_valid
-- register_valid
-- alu_valid
-
-**Payload Signals (4):**
-- compressed_valid
-- issue_valid
-- register_valid
-- alu_valid
-
-**Generated File:** T2_cvxif_example_coprocessor_Availability.sv
-
----
-
-### T3: Leak - Information Leakage
-
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 0.60
 **Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (0):**
-
-**Payload Signals (1):**
-- register_valid
-
-**Generated File:** T3_cvxif_example_coprocessor_Leak.sv
-
----
-
-### T4: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
 
 **Trigger Signals (1):**
 - we
 
-**Payload Signals (0):**
+**Payload Signals (1):**
+- result
 
-**Generated File:** T4_cvxif_example_coprocessor_Privilege.sv
+**Generated File:** T2_cvxif_example_coprocessor_Leak.sv
+
+---
+
+### T3: Availability - Performance Degradation
+
+**Trust-Hub Status:** Category exists (gate-level only)
+**Severity:** Medium
+**Confidence:** 1.00
+**Description:** Degrades performance through artificial delays
+
+**Trigger Signals (4):**
+- cvxif_req_t
+- cvxif_req_i
+- register_valid
+- alu_valid
+
+**Payload Signals (2):**
+- register_valid
+- alu_valid
+
+**Generated File:** T3_cvxif_example_coprocessor_Availability.sv
 
 ---
 

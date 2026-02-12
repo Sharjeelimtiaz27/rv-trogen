@@ -11,105 +11,124 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (9):**
-- axi_arready
+**Trigger Signals (4):**
+- we
+- memory_we
 - axi_rvalid
-- slv_reg_rden
-- generation
-- axi_awready
-- ... and 4 more
+- axi_bvalid
 
-**Payload Signals (10):**
-- axi_arready
-- axi_rvalid
-- slv_reg_rden
-- generation
+**Payload Signals (5):**
+- we
+- memory_we
 - done
-- ... and 5 more
+- axi_rvalid
+- axi_bvalid
 
 **Generated File:** T1_Axi4LitePlToPsControlRegister_DoS.sv
 
 ---
 
-### T2: Availability - Performance Degradation
+### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** Critical
+**Confidence:** 1.00
+**Description:** Leaks sensitive data to attacker-accessible location
+
+**Trigger Signals (2):**
+- we
+- memory_we
+
+**Payload Signals (12):**
+- SerialDataPath
+- AddrPath
+- memory_addr
+- MemoryEntryDataPath
+- memory_data
+- ... and 7 more
+
+**Generated File:** T2_Axi4LitePlToPsControlRegister_Leak.sv
+
+---
+
+### T3: Integrity - Integrity Violation
+
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Corrupts computation results or data
+
+**Trigger Signals (13):**
+- SerialDataPath
+- AddrPath
+- memory_addr
+- MemoryEntryDataPath
+- memory_data
+- ... and 8 more
+
+**Payload Signals (8):**
+- SerialDataPath
+- MemoryEntryDataPath
+- memory_data
+- axi_rdata
+- headData
+- ... and 3 more
+
+**Generated File:** T3_Axi4LitePlToPsControlRegister_Integrity.sv
+
+---
+
+### T4: Availability - Performance Degradation
+
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (3):**
+**Trigger Signals (4):**
 - axi_rvalid
 - pop
 - axi_bvalid
-
-**Payload Signals (6):**
-- axi_arready
-- axi_rvalid
-- done
-- axi_awready
-- axi_wready
-- ... and 1 more
-
-**Generated File:** T2_Axi4LitePlToPsControlRegister_Availability.sv
-
----
-
-### T3: Leak - Information Leakage
-
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (0):**
+- poped_datacount
 
 **Payload Signals (3):**
-- AddrPath
-- slv_reg_rden
-- slv_reg_wren
+- done
+- axi_rvalid
+- axi_bvalid
 
-**Generated File:** T3_Axi4LitePlToPsControlRegister_Leak.sv
-
----
-
-### T4: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (3):**
-- we
-- AddrPath
-- memory_we
-
-**Payload Signals (0):**
-
-**Generated File:** T4_Axi4LitePlToPsControlRegister_Privilege.sv
+**Generated File:** T4_Axi4LitePlToPsControlRegister_Availability.sv
 
 ---
 
-### T5: Integrity - Integrity Violation
+### T5: Covert - Covert Channel
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
 **Severity:** High
-**Confidence:** 0.60
-**Description:** Corrupts computation results or data
+**Confidence:** 1.00
+**Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (2):**
-- AddrPath
-- pop
+**Trigger Signals (8):**
+- SerialDataPath
+- MemoryEntryDataPath
+- memory_data
+- axi_rdata
+- headData
+- ... and 3 more
 
-**Payload Signals (0):**
+**Payload Signals (10):**
+- SerialDataPath
+- MemoryEntryDataPath
+- memory_data
+- axi_rdata
+- axi_rvalid
+- ... and 5 more
 
-**Generated File:** T5_Axi4LitePlToPsControlRegister_Integrity.sv
+**Generated File:** T5_Axi4LitePlToPsControlRegister_Covert.sv
 
 ---
 

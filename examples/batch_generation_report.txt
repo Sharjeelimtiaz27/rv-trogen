@@ -1,0 +1,296 @@
+================================================================================
+RV-TROGEN BATCH GENERATION REPORT
+================================================================================
+
+Generated: 2026-02-06 18:18:10
+Duration: 15.7 seconds
+
+SUMMARY:
+  Total Modules: 265
+  Total Trojans: 707
+  Average: 2.7 trojans/module
+
+
+================================================================================
+IBEX PROCESSOR
+================================================================================
+
+Modules Statistics:
+  Total files: 30
+  Valid modules: 28
+  Modules with trojans: 28
+  Modules without candidates: 0
+  Failed: 0
+
+Trojan Statistics:
+  Total trojans: 136
+  Average per module: 4.9
+
+Pattern Distribution:
+  Covert Channel              26 ( 19.1%)
+  Data Integrity              26 ( 19.1%)
+  DoS                         28 ( 20.6%)
+  Information Leakage         22 ( 16.2%)
+  Performance Degradation     20 ( 14.7%)
+  Privilege Escalation        14 ( 10.3%)
+
+Module Details:
+  ibex_alu                                   5 trojans
+  ibex_branch_predict                        4 trojans
+  ibex_compressed_decoder                    2 trojans
+  ibex_controller                            6 trojans
+  ibex_core                                  6 trojans
+  ibex_counter                               1 trojans
+  ibex_csr                                   3 trojans
+  ibex_cs_registers                          6 trojans
+  ibex_decoder                               5 trojans
+  ibex_dummy_instr                           4 trojans
+  ibex_ex_block                              6 trojans
+  ibex_fetch_fifo                            5 trojans
+  ibex_icache                                5 trojans
+  ibex_id_stage                              6 trojans
+  ibex_if_stage                              6 trojans
+  ibex_load_store_unit                       5 trojans
+  ibex_lockstep                              5 trojans
+  ibex_multdiv_fast                          6 trojans
+  ibex_multdiv_slow                          6 trojans
+  ibex_pmp                                   5 trojans
+  ibex_prefetch_buffer                       4 trojans
+  ibex_register_file_ff                      4 trojans
+  ibex_register_file_fpga                    4 trojans
+  ibex_register_file_latch                   4 trojans
+  ibex_top                                   6 trojans
+  ibex_top_tracing                           6 trojans
+  ibex_tracer                                6 trojans
+  ibex_wb_stage                              5 trojans
+
+================================================================================
+CVA6 PROCESSOR
+================================================================================
+
+Modules Statistics:
+  Total files: 113
+  Valid modules: 85
+  Modules with trojans: 79
+  Modules without candidates: 6
+  Failed: 0
+
+Trojan Statistics:
+  Total trojans: 331
+  Average per module: 4.2
+
+Pattern Distribution:
+  Covert Channel              62 ( 18.7%)
+  Data Integrity              63 ( 19.0%)
+  DoS                         71 ( 21.5%)
+  Information Leakage         45 ( 13.6%)
+  Performance Degradation     66 ( 19.9%)
+  Privilege Escalation        24 (  7.3%)
+
+Module Details:
+  acc_dispatcher                             6 trojans
+  aes                                        2 trojans
+  alu                                        2 trojans
+  alu_wrapper                                2 trojans
+  amo_alu                                    2 trojans
+  amo_buffer                                 4 trojans
+  ariane_pkg                                 6 trojans
+  ariane_regfile_ff                          4 trojans
+  ariane_regfile_fpga                        4 trojans
+  axi_adapter                                5 trojans
+  axi_shim                                   4 trojans
+  bht                                        6 trojans
+  bht2lvl                                    2 trojans
+  branch_unit                                6 trojans
+  btb                                        5 trojans
+  cache_ctrl                                 5 trojans
+  commit_stage                               5 trojans
+  compressed_instr_decoder                   2 trojans
+  controller                                 3 trojans
+  copro_alu                                  4 trojans
+  csr_buffer                                 5 trojans
+  csr_regfile                                6 trojans
+  cva6                                       6 trojans
+  cva6_fifo_v3                               5 trojans
+  cva6_hpdcache_if_adapter                   4 trojans
+  cva6_hpdcache_subsystem                    6 trojans
+  cva6_hpdcache_subsystem_axi_arbiter        5 trojans
+  cva6_hpdcache_wrapper                      6 trojans
+  cva6_icache                                5 trojans
+  cva6_icache_axi_wrapper                    5 trojans
+  cva6_mmu                                   6 trojans
+  cva6_ptw                                   4 trojans
+  cva6_rvfi                                  6 trojans
+  cva6_rvfi_probes                           6 trojans
+  cva6_shared_tlb                            5 trojans
+  cva6_tlb                                   3 trojans
+  cvxif_compressed_if_driver                 2 trojans
+  cvxif_example_coprocessor                  3 trojans
+  cvxif_fu                                   3 trojans
+  cvxif_issue_register_commit_if_driver      2 trojans
+  decoder                                    3 trojans
+  ex_stage                                   6 trojans
+  fpu_wrap                                   4 trojans
+  frontend                                   6 trojans
+  id_stage                                   5 trojans
+  instr_decoder                              2 trojans
+  instr_queue                                4 trojans
+  instr_realign                              4 trojans
+  issue_read_operands                        5 trojans
+  issue_stage                                5 trojans
+  load_store_unit                            6 trojans
+  load_unit                                  4 trojans
+  lsu_bypass                                 3 trojans
+  miss_handler                               5 trojans
+  mult                                       4 trojans
+  multiplier                                 4 trojans
+  perf_counters                              6 trojans
+  pmp                                        1 trojans
+  pmp_data_if                                5 trojans
+  pmp_entry                                  2 trojans
+  ras                                        2 trojans
+  raw_checker                                2 trojans
+  scoreboard                                 5 trojans
+  serdiv                                     1 trojans
+  std_cache_subsystem                        2 trojans
+  std_nbdcache                               5 trojans
+  store_buffer                               4 trojans
+  store_unit                                 4 trojans
+  tag_cmp                                    5 trojans
+  trigger_module                             6 trojans
+  wt_axi_adapter                             4 trojans
+  wt_cache_subsystem                         4 trojans
+  wt_dcache                                  5 trojans
+  wt_dcache_ctrl                             5 trojans
+  wt_dcache_mem                              5 trojans
+  wt_dcache_missunit                         5 trojans
+  wt_dcache_wbuffer                          5 trojans
+  wt_l15_adapter                             4 trojans
+  zcmt_decoder                               2 trojans
+
+================================================================================
+RSD PROCESSOR
+================================================================================
+
+Modules Statistics:
+  Total files: 217
+  Valid modules: 152
+  Modules with trojans: 102
+  Modules without candidates: 50
+  Failed: 0
+
+Trojan Statistics:
+  Total trojans: 240
+  Average per module: 2.4
+
+Pattern Distribution:
+  Covert Channel              42 ( 17.5%)
+  Data Integrity              51 ( 21.2%)
+  DoS                         83 ( 34.6%)
+  Information Leakage         25 ( 10.4%)
+  Performance Degradation     37 ( 15.4%)
+  Privilege Escalation         2 (  0.8%)
+
+Module Details:
+  ActiveList                                 2 trojans
+  Axi4LiteControlRegister                    5 trojans
+  Axi4LiteMemory                             4 trojans
+  Axi4Memory                                 5 trojans
+  BitCounter                                 3 trojans
+  BypassController                           2 trojans
+  BypassNetwork                              1 trojans
+  CommitStage                                1 trojans
+  ComplexIntegerExecutionStage               2 trojans
+  ComplexIntegerIssueStage                   2 trojans
+  ComplexIntegerRegisterWriteStage           2 trojans
+  ControlQueue                               2 trojans
+  Core                                       4 trojans
+  DCache                                     4 trojans
+  DecodedBranchResolver                      1 trojans
+  DecodeStage                                2 trojans
+  Divider                                    3 trojans
+  DividerUnit                                4 trojans
+  FlipFlop                                   2 trojans
+  FP32DivSqrter                              3 trojans
+  FP32PipelinedFMA                           1 trojans
+  FP32PipelinedOther                         3 trojans
+  FPExecutionStage                           2 trojans
+  FPIssueStage                               2 trojans
+  FPRegisterWriteStage                       2 trojans
+  FreeList                                   2 trojans
+  ICache                                     5 trojans
+  IntALU                                     2 trojans
+  IntegerExecutionStage                      2 trojans
+  IntegerIssueStage                          2 trojans
+  IntegerRegisterReadStage                   2 trojans
+  IntegerRegisterWriteStage                  2 trojans
+  LRU_Counter                                1 trojans
+  Main                                       4 trojans
+  Main_Fpga                                  5 trojans
+  Main_Zynq                                  5 trojans
+  Main_Zynq_Wrapper                          4 trojans
+  Memory                                     5 trojans
+  MemoryAccessController                     4 trojans
+  MemoryAccessStage                          2 trojans
+  MemoryExecutionStage                       1 trojans
+  MemoryIssueStage                           2 trojans
+  MemoryLatencySimulator                     3 trojans
+  MemoryReadReqQueue                         3 trojans
+  MemoryRegisterReadStage                    2 trojans
+  MemoryRegisterWriteStage                   2 trojans
+  MemoryWriteDataQueue                       3 trojans
+  MultiplierUnit                             3 trojans
+  NextPCStage                                3 trojans
+  Picker                                     2 trojans
+  PipelinedRefDivider                        2 trojans
+  RAM                                        3 trojans
+  RAM_Synplify                               3 trojans
+  RAM_Vivado                                 3 trojans
+  ReadyBitTable                              2 trojans
+  RecoveryManagerIF                          3 trojans
+  RefDivider                                 3 trojans
+  RegisterFile                               1 trojans
+  RenameStage                                2 trojans
+  ReplayQueue                                3 trojans
+  RetirementRMT                              1 trojans
+  RMT                                        1 trojans
+  ScheduleStage                              2 trojans
+  Shifter                                    2 trojans
+  SourceCAM                                  2 trojans
+  StoreCommitter                             2 trojans
+  StoreQueue                                 4 trojans
+  TestBlockDualPortRAM                       1 trojans
+  TestBlockDualPortRAM_Top                   1 trojans
+  TestBlockMultiPortRAM                      1 trojans
+  TestBlockMultiPortRAM_Top                  1 trojans
+  TestCacheSystem                            1 trojans
+  TestCacheSystemTop                         4 trojans
+  TestDCache                                 1 trojans
+  TestDCacheFiller                           1 trojans
+  TestDCacheFillerTop                        3 trojans
+  TestDCacheTop                              4 trojans
+  TestDistributedDualPortRAM                 1 trojans
+  TestDistributedDualPortRAM_Top             1 trojans
+  TestDistributedMultiBankRAM_Top            1 trojans
+  TestDistributedMultiPortRAM                1 trojans
+  TestDistributedMultiPortRAM_Top            1 trojans
+  TestDistributedSharedMultiPortRAM_Top      1 trojans
+  TestDistributedSinglePortRAM_Top           1 trojans
+  TestDivider                                1 trojans
+  TestDividerTop                             3 trojans
+  TestDRAM_ControllerTop                     4 trojans
+  TestICacheFillerTop                        3 trojans
+  TestICacheSystemTop                        3 trojans
+  TestICacheTop                              2 trojans
+  TestInitializedBlockRAM_Top                1 trojans
+  TestMain                                   4 trojans
+  TestMemoryTop                              2 trojans
+  TestMultiWidthFreeList                     2 trojans
+  TestMultiWidthFreeListTop                  2 trojans
+  TestRegisterFile                           1 trojans
+  TestRegisterFileTop                        4 trojans
+  TestRegisterMultiPortRAM_Top               1 trojans
+  TestSourceCAM_Top                          1 trojans
+  WakeupLogic                                2 trojans
+  WakeupPipelineRegister                     2 trojans
+  WakeupSelectIF                             3 trojans

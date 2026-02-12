@@ -9,37 +9,54 @@
 
 ## Generated Trojans
 
-### T1: Availability - Performance Degradation
+### T1: Integrity - Integrity Violation
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
 **Confidence:** 1.00
-**Description:** Degrades performance through artificial delays
+**Description:** Corrupts computation results or data
 
-**Trigger Signals (1):**
-- unpackedPop
+**Trigger Signals (11):**
+- POP_WIDTH-1:0
+- pop
+- pushedData
+- POP_WIDTH-1:0
+- poppedData
+- ... and 6 more
 
-**Payload Signals (2):**
-- unpackedPush
-- unpackedPop
+**Payload Signals (5):**
+- pushedData
+- poppedData
+- poppedData
+- unpackedPushedData
+- unpackedPoppedData
 
-**Generated File:** T1_TestMultiWidthFreeListTop_Availability.sv
+**Generated File:** T1_TestMultiWidthFreeListTop_Integrity.sv
 
 ---
 
-### T2: Integrity - Integrity Violation
+### T2: Covert - Covert Channel
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
 **Severity:** High
-**Confidence:** 0.60
-**Description:** Corrupts computation results or data
+**Confidence:** 1.00
+**Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (1):**
-- unpackedPop
+**Trigger Signals (5):**
+- pushedData
+- poppedData
+- poppedData
+- unpackedPushedData
+- unpackedPoppedData
 
-**Payload Signals (0):**
+**Payload Signals (5):**
+- pushedData
+- poppedData
+- poppedData
+- unpackedPushedData
+- unpackedPoppedData
 
-**Generated File:** T2_TestMultiWidthFreeListTop_Integrity.sv
+**Generated File:** T2_TestMultiWidthFreeListTop_Covert.sv
 
 ---
 

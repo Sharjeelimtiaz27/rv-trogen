@@ -3,7 +3,7 @@
 **Module:** ibex_pmp
 **File:** ibex_pmp.sv
 **Type:** Combinational
-**Total Candidates:** 6
+**Total Candidates:** 5
 
 ---
 
@@ -11,111 +11,120 @@
 
 ### T1: Leak - Information Leakage
 
-**Trust-Hub Source:** RSA-T600
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** Critical
 **Confidence:** 1.00
 **Description:** Leaks sensitive data to attacker-accessible location
 
-**Trigger Signals (1):**
+**Trigger Signals (7):**
+- csr_pmp_cfg_i
+- csr_pmp_addr_i
+- csr_pmp_mseccfg_i
 - debug_mode_i
+- priv_mode_i
+- ... and 2 more
 
-**Payload Signals (3):**
-- csr_pmp_mseccfg_mml
-- csr_pmp_mseccfg_mmwp
-- unused_csr_pmp_mseccfg_rlb
+**Payload Signals (7):**
+- csr_pmp_cfg_i
+- csr_pmp_addr_i
+- csr_pmp_mseccfg_i
+- pmp_req_addr_i
+- region_start_addr
+- ... and 2 more
 
 **Generated File:** T1_ibex_pmp_Leak.sv
 
 ---
 
-### T2: Covert - Covert Channel
+### T2: Integrity - Integrity Violation
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
 **Confidence:** 1.00
-**Description:** Creates hidden communication channel through timing
-
-**Trigger Signals (2):**
-- access_fault_check
-- access_fail
-
-**Payload Signals (4):**
-- debug_mode_i
-- unused_cfg
-- unused_sigs
-- unused_csr_pmp_mseccfg_rlb
-
-**Generated File:** T2_ibex_pmp_Covert.sv
-
----
-
-### T3: DoS - Denial of Service
-
-**Trust-Hub Source:** AES-T1400
-**Severity:** High
-**Confidence:** 0.80
-**Description:** Disables functionality by forcing control signals to 0
-
-**Trigger Signals (1):**
-- pmp_req_err_o
-
-**Payload Signals (1):**
-- pmp_req_err_o
-
-**Generated File:** T3_ibex_pmp_DoS.sv
-
----
-
-### T4: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.80
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (4):**
-- debug_mode_i
-- csr_pmp_mseccfg_mml
-- csr_pmp_mseccfg_mmwp
-- unused_csr_pmp_mseccfg_rlb
-
-**Payload Signals (2):**
-- debug_mode_i
-- permission_check
-
-**Generated File:** T4_ibex_pmp_Privilege.sv
-
----
-
-### T5: Integrity - Integrity Violation
-
-**Trust-Hub Source:** AES-T800
-**Severity:** High
-**Confidence:** 0.60
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (0):**
+**Trigger Signals (4):**
+- csr_pmp_addr_i
+- pmp_req_addr_i
+- region_start_addr
+- region_addr_mask
 
 **Payload Signals (1):**
 - result
 
-**Generated File:** T5_ibex_pmp_Integrity.sv
+**Generated File:** T2_ibex_pmp_Integrity.sv
 
 ---
 
-### T6: Availability - Performance Degradation
+### T3: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.40
-**Description:** Degrades performance through artificial delays
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (1):**
+**Trigger Signals (3):**
+- access_fault_check_res
+- debug_mode_allowed_access
+- access_fail
+
+**Payload Signals (1):**
+- result
+
+**Generated File:** T3_ibex_pmp_Covert.sv
+
+---
+
+### T4: DoS - Denial of Service
+
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
+**Confidence:** 0.80
+**Description:** Disables functionality by forcing control signals to 0
+
+**Trigger Signals (6):**
+- pmp_req_addr_i
+- ibex_pkg::pmp_req_e
+- pmp_req_type_i
 - pmp_req_err_o
+- pmp_req_err_o
+- ... and 1 more
 
-**Payload Signals (0):**
+**Payload Signals (6):**
+- pmp_req_addr_i
+- ibex_pkg::pmp_req_e
+- pmp_req_type_i
+- pmp_req_err_o
+- pmp_req_err_o
+- ... and 1 more
 
-**Generated File:** T6_ibex_pmp_Availability.sv
+**Generated File:** T4_ibex_pmp_DoS.sv
+
+---
+
+### T5: Privilege - Privilege Escalation
+
+**Trust-Hub Status:** Not applicable (processor-specific)
+**Severity:** Critical
+**Confidence:** 0.80
+**Description:** Escalates privilege level to machine mode
+
+**Trigger Signals (10):**
+- csr_pmp_cfg_i
+- csr_pmp_addr_i
+- csr_pmp_mseccfg_i
+- debug_mode_i
+- priv_mode_i
+- ... and 5 more
+
+**Payload Signals (5):**
+- debug_mode_i
+- ibex_pkg::priv_lvl_e
+- priv_mode_i
+- debug_mode_allowed_access
+- |region_csr_pmp_cfg.mode
+
+**Generated File:** T5_ibex_pmp_Privilege.sv
 
 ---
 

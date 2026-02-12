@@ -3,7 +3,7 @@
 **Module:** wt_dcache_ctrl
 **File:** wt_dcache_ctrl.sv
 **Type:** Sequential
-**Total Candidates:** 6
+**Total Candidates:** 5
 
 ---
 
@@ -11,113 +11,124 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (5):**
+**Trigger Signals (13):**
 - cache_en_i
 - dcache_req_i_t
+- req_port_i
 - dcache_req_o_t
-- miss_req_o
-- rd_req_o
+- req_port_o
+- ... and 8 more
 
-**Payload Signals (5):**
+**Payload Signals (13):**
 - cache_en_i
 - dcache_req_i_t
+- req_port_i
 - dcache_req_o_t
-- miss_req_o
-- rd_req_o
+- req_port_o
+- ... and 8 more
 
 **Generated File:** T1_wt_dcache_ctrl_DoS.sv
 
 ---
 
-### T2: Integrity - Integrity Violation
+### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** Critical
+**Confidence:** 1.00
+**Description:** Leaks sensitive data to attacker-accessible location
+
+**Trigger Signals (2):**
+- miss_we_o
+- miss_we_o
+
+**Payload Signals (6):**
+- miss_wdata_o
+- miss_paddr_o
+- rd_data_i
+- miss_wdata_o
+- miss_paddr_o
+- ... and 1 more
+
+**Generated File:** T2_wt_dcache_ctrl_Leak.sv
+
+---
+
+### T3: Integrity - Integrity Violation
+
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (1):**
-- data_size_d
+**Trigger Signals (6):**
+- miss_wdata_o
+- miss_paddr_o
+- rd_data_i
+- miss_wdata_o
+- miss_paddr_o
+- ... and 1 more
 
-**Payload Signals (1):**
-- data_size_d
+**Payload Signals (4):**
+- miss_wdata_o
+- rd_data_i
+- miss_wdata_o
+- rd_data_i
 
-**Generated File:** T2_wt_dcache_ctrl_Integrity.sv
+**Generated File:** T3_wt_dcache_ctrl_Integrity.sv
 
 ---
 
-### T3: Availability - Performance Degradation
+### T4: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (5):**
+**Trigger Signals (10):**
 - dcache_req_i_t
+- req_port_i
 - dcache_req_o_t
+- req_port_o
 - miss_req_o
-- rd_req_o
-- data_size_d
+- ... and 5 more
 
-**Payload Signals (2):**
+**Payload Signals (4):**
+- miss_ack_i
+- rd_ack_i
 - miss_ack_i
 - rd_ack_i
 
-**Generated File:** T3_wt_dcache_ctrl_Availability.sv
+**Generated File:** T4_wt_dcache_ctrl_Availability.sv
 
 ---
 
-### T4: Leak - Information Leakage
+### T5: Covert - Covert Channel
 
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (0):**
-
-**Payload Signals (1):**
-- data_size_d
-
-**Generated File:** T4_wt_dcache_ctrl_Leak.sv
-
----
-
-### T5: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (1):**
-- miss_we_o
-
-**Payload Signals (0):**
-
-**Generated File:** T5_wt_dcache_ctrl_Privilege.sv
-
----
-
-### T6: Covert - Covert Channel
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (1):**
-- data_size_d
+**Trigger Signals (4):**
+- miss_wdata_o
+- rd_data_i
+- miss_wdata_o
+- rd_data_i
 
-**Payload Signals (0):**
+**Payload Signals (4):**
+- miss_wdata_o
+- rd_data_i
+- miss_wdata_o
+- rd_data_i
 
-**Generated File:** T6_wt_dcache_ctrl_Covert.sv
+**Generated File:** T5_wt_dcache_ctrl_Covert.sv
 
 ---
 

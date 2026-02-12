@@ -1,0 +1,253 @@
+╔═══════════════════════════════════════════════════════════════════════╗
+║             TRUST-HUB TO RV-TROGEN ADAPTATION (VERIFIED)              ║
+║                   Complete Pattern Mapping                            ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+
+┌───────────────────────────────────────────────────────────────────────┐
+│     PATTERN 1: DENIAL OF SERVICE (DoS)                                │
+└───────────────────────────────────────────────────────────────────────┘
+
+    Trust-Hub (AES-T1800, T1900)        RV-TroGen (RISC-V)
+    ┌──────────────────────────┐        ┌──────────────────────────┐
+    │ Target:                  │        │ Target:                  │
+    │  • Battery life          │   →    │  • CSR write operations  │
+    │  • Medical devices       │        │  • LSU requests          │
+    │                          │        │                          │
+    │ Mechanism:               │        │ Mechanism:               │
+    │  • Shift register        │   →    │  • Force enable = 0      │
+    │  • Continuous rotation   │        │  • Block operations      │
+    │  • Power drain           │        │                          │
+    │                          │        │                          │
+    │ Trigger:                 │        │ Trigger:                 │
+    │  • Predefined plaintext  │   →    │  • Counter threshold     │
+    │                          │        │  • Rare signal combo     │
+    │                          │        │                          │
+    │ Effect:                  │        │ Effect:                  │
+    │  • Battery exhaustion    │   →    │  • Operation blocking    │
+    │  • Device shutdown       │        │  • System unavailable    │
+    └──────────────────────────┘        └──────────────────────────┘
+    
+    THE BRIDGE: Power-based DoS → Functionality-based DoS
+    Both prevent legitimate operations, different domains
+
+
+┌───────────────────────────────────────────────────────────────────────┐
+│     PATTERN 2: INFORMATION LEAKAGE                                    │
+└───────────────────────────────────────────────────────────────────────┘
+
+    Trust-Hub (AES-T1000, T1100)        RV-TroGen (RISC-V)
+    ┌──────────────────────────┐        ┌──────────────────────────┐
+    │ Target:                  │        │ Target:                  │
+    │  • AES secret key        │   →    │  • Privilege mode bits   │
+    │  • 128-bit key           │        │  • M/S/U mode (mstatus)  │
+    │                          │        │                          │
+    │ Mechanism:               │        │ Mechanism:               │
+    │  • Leakage current       │   →    │  • Timing modulation     │
+    │  • Power side-channel    │        │  • Covert channel        │
+    │  • Shift register        │        │                          │
+    │                          │        │                          │
+    │ Channel:                 │        │ Channel:                 │
+    │  • Power (PMOS/NMOS)     │   →    │  • Timing (clock cycles) │
+    │  • Current measurement   │        │  • Signal delays         │
+    │                          │        │                          │
+    │ Effect:                  │        │ Effect:                  │
+    │  • Key compromise        │   →    │  • Privilege disclosure  │
+    │  • Crypto broken         │        │  • Security state leak   │
+    └──────────────────────────┘        └──────────────────────────┘
+    
+    THE BRIDGE: AES key leakage → Privilege information leakage
+    Both leak critical security state, different targets
+
+
+┌───────────────────────────────────────────────────────────────────────┐
+│     PATTERN 3: PRIVILEGE ESCALATION (RISC-V SPECIFIC)                 │
+└───────────────────────────────────────────────────────────────────────┘
+
+    Trust-Hub                            RV-TroGen (RISC-V)
+    ┌──────────────────────────┐        ┌──────────────────────────┐
+    │  NOT PRESENT           │        │ Target:                  │
+    │                          │   →    │  • mstatus register      │
+    │ Reason:                  │        │  • Privilege bits        │
+    │  • Crypto circuits have  │        │                          │
+    │    no privilege levels   │        │ Mechanism:               │
+    │  • AES/RSA run at same   │        │  • Force MPP = 11b       │
+    │    privilege always      │        │  • Grant M-mode access   │
+    │                          │        │                          │
+    │ No equivalent attack     │        │ Source:                  │
+    │                          │        │  • Bailey 2017 (MIT)     │
+    │                          │        │  • RISC-V exploits       │
+    │                          │        │                          │
+    │                          │        │ Effect:                  │
+    │                          │        │  • Complete compromise   │
+    │                          │        │  • Bypass all security   │
+    └──────────────────────────┘        └──────────────────────────┘
+    
+    NO BRIDGE: Processor-specific attack (privilege architecture)
+    Highest-impact RISC-V vulnerability
+
+
+┌───────────────────────────────────────────────────────────────────────┐
+│     PATTERN 4: DATA INTEGRITY                                         │
+└───────────────────────────────────────────────────────────────────────┘
+
+    Trust-Hub (AES-T2300, T2400)        RV-TroGen (RISC-V)
+    ┌──────────────────────────┐        ┌──────────────────────────┐
+    │ Target:                  │        │ Target:                  │
+    │  • AES ciphertext        │   →    │  • CSR read data         │
+    │  • Encrypted output      │        │  • LSU memory data       │
+    │                          │        │                          │
+    │ Mechanism:               │        │ Mechanism:               │
+    │  • Bit flip (LSB)        │   →    │  • XOR corruption        │
+    │  • Flip when triggered   │        │  • Mask: 0xDEADBEEF      │
+    │                          │        │                          │
+    │ Trigger:                 │        │ Trigger:                 │
+    │  • Rare signal combo     │   →    │  • Counter threshold     │
+    │  • s2[89] & s5[121] high │        │  • Rare conditions       │
+    │                          │        │                          │
+    │ Effect:                  │        │ Effect:                  │
+    │  • Incorrect encryption  │   →    │  • Corrupted registers   │
+    │  • Data compromise       │        │  • Data compromise       │
+    └──────────────────────────┘        └──────────────────────────┘
+    
+    THE BRIDGE: AES state corruption → Data path corruption
+    Same mechanism (bit flip), different target
+
+
+┌───────────────────────────────────────────────────────────────────────┐
+│     PATTERN 5: PERFORMANCE DEGRADATION                                │
+└───────────────────────────────────────────────────────────────────────┘
+
+    Trust-Hub (MEMCTRL-T100,            RV-TroGen (RISC-V)
+                S35932-T300)             
+    ┌──────────────────────────┐        ┌──────────────────────────┐
+    │ Target:                  │        │ Target:                  │
+    │  • Memory controller     │   →    │  • Load-store unit (LSU) │
+    │  • ISCAS circuits        │        │  • Memory operations     │
+    │                          │        │                          │
+    │ Mechanism:               │        │ Mechanism:               │
+    │  • Flash sleep command   │   →    │  • Stall LSU requests    │
+    │  • Ring oscillator       │        │  • Force ready = 0       │
+    │                          │        │                          │
+    │ Level:                   │        │ Level:                   │
+    │  • RTL + Gate-level      │   →    │  • RTL-level             │
+    │                          │        │                          │
+    │ Effect:                  │        │ Effect:                  │
+    │  • Delayed memory access │   →    │  • Memory stalls         │
+    │  • Path slowdown         │        │  • Reduced throughput    │
+    │                          │        │                          │
+    │ Source:                  │        │ Additional Source:       │
+    │  • Trust-Hub benchmarks  │        │  • Boraten & Kodi 2016   │
+    │                          │        │    (NoC methodology)     │
+    └──────────────────────────┘        └──────────────────────────┘
+    
+    THE BRIDGE: Memory controller → LSU (load-store unit)
+    Both degrade memory/data access performance
+
+
+┌───────────────────────────────────────────────────────────────────────┐
+│     PATTERN 6: COVERT CHANNELS (EXTENDED)                             │
+└───────────────────────────────────────────────────────────────────────┘
+
+    Trust-Hub (AES-T800)                RV-TroGen (RISC-V)
+    Side-channel concept                
+    ┌──────────────────────────┐        ┌──────────────────────────┐
+    │ Target:                  │        │ Target:                  │
+    │  • AES operations        │   →    │  • Processor timing      │
+    │  • Crypto computations   │        │  • Signal delays         │
+    │                          │        │                          │
+    │ Mechanism:               │        │ Mechanism:               │
+    │  • Power modulation      │   →    │  • Timing modulation     │
+    │  • CDMA encoding         │        │  • Clock cycle variation │
+    │  • 8 flip-flops (LC)     │        │                          │
+    │                          │        │                          │
+    │ Channel:                 │        │ Channel:                 │
+    │  • Power side-channel    │   →    │  • Timing channel        │
+    │  • Current measurement   │        │  • Delay observation     │
+    │                          │        │                          │
+    │ Source:                  │        │ Additional Source:       │
+    │  • Trust-Hub (passive)   │        │  • Lin et al. 2009       │
+    │                          │        │    (active trojans)      │
+    └──────────────────────────┘        └──────────────────────────┘
+    
+    THE BRIDGE: Power side-channel → Timing covert channel
+    Extension from passive to active, power to timing
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                      KEY INSIGHT: WHY LEAKAGE ≠ PRIVILEGE             ║
+╠═══════════════════════════════════════════════════════════════════════╣
+║                                                                       ║
+║   Question: If both deal with M/S/U modes, why two patterns?          ║
+║                                                                       ║
+║   Answer: PASSIVE vs ACTIVE attack!                                   ║
+║  ───────────────────────────────────────────────────────────────────  ║
+║                                                                       ║
+║   Information Leakage (Pattern 2):                                    ║
+║   ┌─────────────────────────────────────────────────────────────────┐ ║
+║   │ • READS privilege bits (passive observation)                    │ ║
+║   │ • Leaks information via covert channel                          │ ║
+║   │ • Does NOT modify system state                                  │ ║
+║   │ • Goal: Intelligence gathering                                  │ ║
+║   │ • CIA Triad: Violates CONFIDENTIALITY                           │ ║
+║   │ • Analogy: Spy reading classified documents                     │ ║
+║   └─────────────────────────────────────────────────────────────────┘ ║
+║                                                                       ║
+║   Privilege Escalation (Pattern 3):                                   ║
+║   ┌─────────────────────────────────────────────────────────────────┐ ║
+║   │ • WRITES privilege bits (active modification)                   │ ║
+║   │ • Forces mstatus to M-mode                                      │ ║
+║   │ • MODIFIES system state                                         │ ║
+║   │ • Goal: System compromise                                       │ ║
+║   │ • CIA Triad: Violates INTEGRITY & AUTHORIZATION                 │ ║
+║   │ • Analogy: Hacker changing user → admin                         │ ║
+║   └─────────────────────────────────────────────────────────────────┘ ║
+║                                                                       ║
+║   Both are critical security concerns!                                ║
+║   Different attack types, different defenses needed                   ║
+║                                                                       ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                    ADAPTATION SUMMARY TABLE                           ║
+╠═══════════════════════════════════════════════════════════════════════╣
+║                                                                       ║
+║   Pattern      │ Trust-Hub    │ TH Domain  │ RV Domain │ Adaptation   ║
+║   ─────────────┼──────────────┼────────────┼───────────┼────────────  ║
+║   DoS          │ T1800, T1900 │ Battery    │ CSR/LSU   │ Power→Func   ║
+║   Leak         │ T1000, T1100 │ AES key    │ Priv bits │ Key→Priv     ║
+║   Privilege    │  None        │  N/A       │ M/S/U     │ RISC-V only  ║
+║   Integrity    │ T2300, T2400 │ Ciphertext │ Data path │ State→Data   ║
+║   Performance  │ MEMCTRL-T100 │ Memory     │ LSU       │ Mem→Proc     ║
+║   Covert       │ T800 (side)  │ Power      │ Timing    │ Power→Time   ║
+║                                                                       ║
+║    Result: 4 adapted + 1 RISC-V + 1 extended = 6 comprehensive        ║
+║                                                                       ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                   WHY RV-TROGEN MATTERS (QUICK VIEW)                  ║
+╠═══════════════════════════════════════════════════════════════════════╣
+║                                                                       ║
+║   Trust-Hub (2008-2026):                                              ║
+║   • 90+ manual benchmarks                                             ║
+║   • Cryptographic circuits (AES, RSA)                                 ║
+║   • Gate-level (post-synthesis)                                       ║
+║   • Manual insertion (days/weeks)                                     ║
+║   • Registration required                                             ║
+║                                                                       ║
+║   RV-TroGen (2026):                                                   ║
+║   • 929 automated trojans                                             ║
+║   • RISC-V processors (3 cores)                                       ║
+║   • RTL-level (pre-synthesis)                                         ║
+║   • Automated generation (4.1 seconds)                                ║
+║   • Open-source (MIT license)                                         ║
+║                                                                       ║
+║   Innovation: Systematic adaptation + processor-specific patterns     ║
+║                                                                       ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+
+

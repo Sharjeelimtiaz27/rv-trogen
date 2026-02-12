@@ -3,7 +3,7 @@
 **Module:** BypassCtrlStage
 **File:** BypassController.sv
 **Type:** Sequential
-**Total Candidates:** 4
+**Total Candidates:** 2
 
 ---
 
@@ -11,19 +11,17 @@
 
 ### T1: Leak - Information Leakage
 
-**Trust-Hub Source:** RSA-T600
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** Critical
 **Confidence:** 1.00
 **Description:** Leaks sensitive data to attacker-accessible location
 
-**Trigger Signals (3):**
-- PipelineControll
-- BypassCtrlOperand
-- BypassCtrlOperand
+**Trigger Signals (1):**
+- writeReg
 
 **Payload Signals (2):**
-- PRegNumPath
-- writeReg
+- out
+- out
 
 **Generated File:** T1_BypassCtrlStage_Leak.sv
 
@@ -31,55 +29,25 @@
 
 ### T2: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (2):**
+**Trigger Signals (7):**
 - BypassCtrlOperand
 - BypassCtrlOperand
+- BypassCtrlOperand
+- BypassCtrlOperand
+- BypassCtrlOperand
+- ... and 2 more
 
-**Payload Signals (1):**
+**Payload Signals (3):**
+- out
+- out
 - writeReg
 
 **Generated File:** T2_BypassCtrlStage_Integrity.sv
-
----
-
-### T3: Privilege - Privilege Escalation
-
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (4):**
-- PipelineControll
-- BypassCtrlOperand
-- BypassCtrlOperand
-- writeReg
-
-**Payload Signals (0):**
-
-**Generated File:** T3_BypassCtrlStage_Privilege.sv
-
----
-
-### T4: Availability - Performance Degradation
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Degrades performance through artificial delays
-
-**Trigger Signals (2):**
-- BypassCtrlOperand
-- BypassCtrlOperand
-
-**Payload Signals (0):**
-
-**Generated File:** T4_BypassCtrlStage_Availability.sv
 
 ---
 

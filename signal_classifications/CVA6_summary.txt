@@ -1,0 +1,1447 @@
+================================================================================
+CVA6 SIGNAL CLASSIFICATION SUMMARY
+================================================================================
+
+Total Modules: 78
+
+
+acc_dispatcher:
+------------------------------------------------------------
+  Availability    - Triggers: 13, Payloads:  8
+    Triggers: acc_dcache_req_ports_i, acc_dcache_req_ports_o, acc_fflags_valid_o
+              ... and 10 more
+    Payloads: acc_fflags_valid_o, acc_stall_st_pending_o, acc_valid_ex_o
+              ... and 5 more
+  Covert          - Triggers:  2, Payloads:  8
+    Triggers: fu_data_i, fu_data_t
+    Payloads: acc_fflags_valid_o, acc_result_o, acc_valid_ex_o
+              ... and 5 more
+  DoS             - Triggers: 16, Payloads: 16
+    Triggers: acc_cons_en_i, acc_dcache_req_ports_i, acc_dcache_req_ports_o
+              ... and 13 more
+    Payloads: acc_cons_en_i, acc_dcache_req_ports_i, acc_dcache_req_ports_o
+              ... and 13 more
+  Integrity       - Triggers:  4, Payloads:  3
+    Triggers: csr_addr_i, fu_data_i, fu_data_t
+              ... and 1 more
+    Payloads: acc_result_o, fu_data_i, fu_data_t
+  Leak            - Triggers:  1, Payloads:  5
+    Triggers: csr_addr_i
+    Payloads: acc_result_o, csr_addr_i, fu_data_i
+              ... and 2 more
+  Privilege       - Triggers:  2, Payloads:  2
+    Triggers: csr_addr_i, inval_addr_o
+    Payloads: ld_st_priv_lvl_i, priv_lvl_t
+
+aes:
+------------------------------------------------------------
+  Covert          - Triggers:  2, Payloads:  3
+    Triggers: fu_data_i, fu_data_t
+    Payloads: fu_data_i, fu_data_t, result_o
+  Integrity       - Triggers:  2, Payloads:  3
+    Triggers: fu_data_i, fu_data_t
+    Payloads: fu_data_i, fu_data_t, result_o
+  Leak            - Triggers:  0, Payloads:  3
+    Payloads: fu_data_i, fu_data_t, result_o
+
+alu:
+------------------------------------------------------------
+  Covert          - Triggers:  3, Payloads:  4
+    Triggers: fu_data_cpop_i, fu_data_i, fu_data_t
+    Payloads: fu_data_cpop_i, fu_data_i, fu_data_t
+              ... and 1 more
+  Integrity       - Triggers:  3, Payloads:  4
+    Triggers: fu_data_cpop_i, fu_data_i, fu_data_t
+    Payloads: fu_data_cpop_i, fu_data_i, fu_data_t
+              ... and 1 more
+  Leak            - Triggers:  0, Payloads:  4
+    Payloads: fu_data_cpop_i, fu_data_i, fu_data_t
+              ... and 1 more
+
+alu_wrapper:
+------------------------------------------------------------
+  Covert          - Triggers:  2, Payloads:  3
+    Triggers: fu_data_i, fu_data_t
+    Payloads: fu_data_i, fu_data_t, result_o
+  Integrity       - Triggers:  2, Payloads:  3
+    Triggers: fu_data_i, fu_data_t
+    Payloads: fu_data_i, fu_data_t, result_o
+  Leak            - Triggers:  0, Payloads:  3
+    Payloads: fu_data_i, fu_data_t, result_o
+
+amo_alu:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: amo_op_i
+  Covert          - Triggers:  2, Payloads:  1
+    Triggers: amo_operand_a_i, amo_operand_b_i
+    Payloads: amo_result_o
+  Integrity       - Triggers:  1, Payloads:  1
+    Triggers: amo_op_i
+    Payloads: amo_result_o
+  Leak            - Triggers:  0, Payloads:  3
+    Payloads: amo_operand_a_i, amo_operand_b_i, amo_result_o
+
+amo_buffer:
+------------------------------------------------------------
+  Availability    - Triggers:  5, Payloads:  3
+    Triggers: amo_op_i, amo_req_o, amo_valid_commit_i
+              ... and 2 more
+    Payloads: amo_valid_commit_i, ready_o, valid_i
+  Covert          - Triggers:  2, Payloads:  5
+    Triggers: data_i, data_size_i
+    Payloads: amo_valid_commit_i, data_i, data_size_i
+              ... and 2 more
+  DoS             - Triggers:  5, Payloads:  5
+    Triggers: amo_req_o, amo_valid_commit_i, ariane_pkg::amo_req_t
+              ... and 2 more
+    Payloads: amo_req_o, amo_valid_commit_i, ariane_pkg::amo_req_t
+              ... and 2 more
+  Integrity       - Triggers:  3, Payloads:  2
+    Triggers: amo_op_i, data_i, data_size_i
+    Payloads: data_i, data_size_i
+  Leak            - Triggers:  0, Payloads:  2
+    Payloads: data_i, data_size_i
+
+ariane_regfile:
+------------------------------------------------------------
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: test_en_i, we_i
+    Payloads: test_en_i, we_i
+  Integrity       - Triggers:  0, Payloads:  2
+    Payloads: rdata_o, wdata_i
+  Leak            - Triggers:  2, Payloads:  2
+    Triggers: test_en_i, we_i
+    Payloads: rdata_o, wdata_i
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: we_i
+
+ariane_regfile_fpga:
+------------------------------------------------------------
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: test_en_i, we_i
+    Payloads: test_en_i, we_i
+  Integrity       - Triggers:  0, Payloads:  2
+    Payloads: rdata_o, wdata_i
+  Leak            - Triggers:  2, Payloads:  2
+    Triggers: test_en_i, we_i
+    Payloads: rdata_o, wdata_i
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: we_i
+
+axi_adapter:
+------------------------------------------------------------
+  Availability    - Triggers:  6, Payloads:  3
+    Triggers: ariane_pkg::ad_req_t, axi_req_o, axi_req_t
+              ... and 3 more
+    Payloads: critical_word_valid_o, gnt_o, valid_o
+  Covert          - Triggers:  0, Payloads:  2
+    Payloads: critical_word_valid_o, valid_o
+  DoS             - Triggers:  7, Payloads:  7
+    Triggers: ariane_pkg::ad_req_t, axi_req_o, axi_req_t
+              ... and 4 more
+    Payloads: ariane_pkg::ad_req_t, axi_req_o, axi_req_t
+              ... and 4 more
+  Integrity       - Triggers:  1, Payloads:  2
+    Triggers: addr_i
+    Payloads: rdata_o, wdata_i
+  Leak            - Triggers:  1, Payloads:  3
+    Triggers: we_i
+    Payloads: addr_i, rdata_o, wdata_i
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: addr_i, we_i
+
+axi_shim:
+------------------------------------------------------------
+  Availability    - Triggers:  6, Payloads:  4
+    Triggers: axi_req_o, axi_req_t, rd_req_i
+              ... and 3 more
+    Payloads: rd_gnt_o, rd_valid_o, wr_gnt_o
+              ... and 1 more
+  Covert          - Triggers:  2, Payloads:  4
+    Triggers: rd_data_o, wr_data_i
+    Payloads: rd_data_o, rd_valid_o, wr_data_i
+              ... and 1 more
+  DoS             - Triggers:  6, Payloads:  6
+    Triggers: axi_req_o, axi_req_t, rd_req_i
+              ... and 3 more
+    Payloads: axi_req_o, axi_req_t, rd_req_i
+              ... and 3 more
+  Integrity       - Triggers:  4, Payloads:  2
+    Triggers: rd_addr_i, rd_data_o, wr_addr_i
+              ... and 1 more
+    Payloads: rd_data_o, wr_data_i
+  Leak            - Triggers:  0, Payloads:  4
+    Payloads: rd_addr_i, rd_data_o, wr_addr_i
+              ... and 1 more
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: rd_addr_i, wr_addr_i
+
+bht:
+------------------------------------------------------------
+  Leak            - Triggers:  1, Payloads:  0
+    Triggers: debug_mode_i
+  Privilege       - Triggers:  1, Payloads:  1
+    Triggers: debug_mode_i
+    Payloads: debug_mode_i
+
+bht2lvl:
+------------------------------------------------------------
+
+branch_unit:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  1
+    Triggers: branch_valid_i
+    Payloads: branch_valid_i
+  Covert          - Triggers:  2, Payloads:  4
+    Triggers: fu_data_i, fu_data_t
+    Payloads: branch_result_o, branch_valid_i, fu_data_i
+              ... and 1 more
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: branch_valid_i
+    Payloads: branch_valid_i
+  Integrity       - Triggers:  2, Payloads:  3
+    Triggers: fu_data_i, fu_data_t
+    Payloads: branch_result_o, fu_data_i, fu_data_t
+  Leak            - Triggers:  1, Payloads:  3
+    Triggers: debug_mode_i
+    Payloads: branch_result_o, fu_data_i, fu_data_t
+  Privilege       - Triggers:  1, Payloads:  1
+    Triggers: debug_mode_i
+    Payloads: debug_mode_i
+
+cache_ctrl:
+------------------------------------------------------------
+  Availability    - Triggers:  9, Payloads:  6
+    Triggers: bypass_valid_i, critical_word_valid_i, dcache_req_i_t
+              ... and 6 more
+    Payloads: busy_o, bypass_gnt_i, bypass_valid_i
+              ... and 3 more
+  Covert          - Triggers:  3, Payloads:  6
+    Triggers: bypass_data_i, data_i, data_o
+    Payloads: busy_o, bypass_data_i, bypass_valid_i
+              ... and 3 more
+  DoS             - Triggers: 11, Payloads: 11
+    Triggers: active_serving_i, bypass_valid_i, critical_word_valid_i
+              ... and 8 more
+    Payloads: active_serving_i, bypass_valid_i, critical_word_valid_i
+              ... and 8 more
+  Integrity       - Triggers:  6, Payloads:  3
+    Triggers: addr_o, bypass_data_i, data_i
+              ... and 3 more
+    Payloads: bypass_data_i, data_i, data_o
+  Leak            - Triggers:  1, Payloads:  6
+    Triggers: we_o
+    Payloads: addr_o, bypass_data_i, data_i
+              ... and 3 more
+  Privilege       - Triggers:  4, Payloads:  0
+    Triggers: addr_o, mshr_addr_matches_i, mshr_addr_o
+              ... and 1 more
+
+commit_stage:
+------------------------------------------------------------
+  Availability    - Triggers:  6, Payloads:  4
+    Triggers: amo_valid_commit_o, break_from_trigger_i, commit_lsu_o
+              ... and 3 more
+    Payloads: amo_valid_commit_o, commit_ack_o, commit_lsu_ready_i
+              ... and 1 more
+  Covert          - Triggers:  0, Payloads:  2
+    Payloads: amo_valid_commit_o, commit_lsu_ready_i
+  DoS             - Triggers:  5, Payloads:  4
+    Triggers: amo_valid_commit_o, break_from_trigger_i, commit_lsu_ready_i
+              ... and 2 more
+    Payloads: amo_valid_commit_o, commit_lsu_ready_i, we_fpr_o
+              ... and 1 more
+  Integrity       - Triggers:  2, Payloads:  4
+    Triggers: csr_op_o, fu_op
+    Payloads: csr_rdata_i, csr_wdata_o, csr_write_fflags_o
+              ... and 1 more
+  Leak            - Triggers:  8, Payloads:  7
+    Triggers: commit_csr_o, csr_exception_i, csr_op_o
+              ... and 5 more
+    Payloads: commit_csr_o, csr_exception_i, csr_op_o
+              ... and 4 more
+  Privilege       - Triggers:  8, Payloads:  0
+    Triggers: commit_csr_o, csr_exception_i, csr_op_o
+              ... and 5 more
+
+compressed_instr_decoder:
+------------------------------------------------------------
+  Availability    - Triggers:  3, Payloads:  2
+    Triggers: compressed_req_i, compressed_valid_i, x_compressed_req_t
+    Payloads: compressed_ready_o, compressed_valid_i
+  Covert          - Triggers:  0, Payloads:  2
+    Payloads: compressed_ready_o, compressed_valid_i
+  DoS             - Triggers:  4, Payloads:  4
+    Triggers: compressed_ready_o, compressed_req_i, compressed_valid_i
+              ... and 1 more
+    Payloads: compressed_ready_o, compressed_req_i, compressed_valid_i
+              ... and 1 more
+
+controller:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  2
+    Triggers: ex_valid_i
+    Payloads: ex_valid_i, flush_dcache_ack_i
+  Covert          - Triggers:  0, Payloads:  1
+    Payloads: ex_valid_i
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: ex_valid_i
+    Payloads: ex_valid_i
+  Leak            - Triggers:  3, Payloads:  2
+    Triggers: flush_csr_i, halt_csr_i, set_debug_pc_i
+    Payloads: flush_csr_i, halt_csr_i
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: flush_csr_i, halt_csr_i
+
+copro_alu:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  1
+    Triggers: valid_o
+    Payloads: valid_o
+  Covert          - Triggers:  0, Payloads:  2
+    Payloads: result_o, valid_o
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: valid_o, we_o
+    Payloads: valid_o, we_o
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: result_o
+  Leak            - Triggers:  1, Payloads:  1
+    Triggers: we_o
+    Payloads: result_o
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: we_o
+
+csr_buffer:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  2
+    Triggers: csr_valid_i
+    Payloads: csr_ready_o, csr_valid_i
+  Covert          - Triggers:  2, Payloads:  5
+    Triggers: fu_data_i, fu_data_t
+    Payloads: csr_ready_o, csr_result_o, csr_valid_i
+              ... and 2 more
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: csr_ready_o, csr_valid_i
+    Payloads: csr_ready_o, csr_valid_i
+  Integrity       - Triggers:  3, Payloads:  3
+    Triggers: csr_addr_o, fu_data_i, fu_data_t
+    Payloads: csr_result_o, fu_data_i, fu_data_t
+  Leak            - Triggers:  5, Payloads:  7
+    Triggers: csr_addr_o, csr_commit_i, csr_ready_o
+              ... and 2 more
+    Payloads: csr_addr_o, csr_commit_i, csr_ready_o
+              ... and 4 more
+  Privilege       - Triggers:  5, Payloads:  0
+    Triggers: csr_addr_o, csr_commit_i, csr_ready_o
+              ... and 2 more
+
+csr_regfile:
+------------------------------------------------------------
+  Availability    - Triggers:  8, Payloads:  2
+    Triggers: acc_fflags_ex_valid_i, break_from_trigger_o, csr_op_i
+              ... and 5 more
+    Payloads: acc_fflags_ex_valid_i, commit_ack_i
+  Covert          - Triggers:  2, Payloads:  4
+    Triggers: perf_data_i, perf_data_o
+    Payloads: acc_fflags_ex_valid_i, perf_data_i, perf_data_o
+              ... and 1 more
+  DoS             - Triggers: 12, Payloads: 10
+    Triggers: acc_cons_en_o, acc_fflags_ex_valid_i, break_from_trigger_o
+              ... and 9 more
+    Payloads: acc_cons_en_o, acc_fflags_ex_valid_i, dcache_en_o
+              ... and 7 more
+  Integrity       - Triggers:  7, Payloads:  6
+    Triggers: boot_addr_i, csr_addr_i, csr_op_i
+              ... and 4 more
+    Payloads: csr_rdata_o, csr_wdata_i, csr_write_fflags_i
+              ... and 3 more
+  Leak            - Triggers: 15, Payloads: 15
+    Triggers: csr_addr_i, csr_exception_o, csr_hs_ld_st_inst_i
+              ... and 12 more
+    Payloads: boot_addr_i, csr_addr_i, csr_exception_o
+              ... and 12 more
+  Privilege       - Triggers: 14, Payloads:  4
+    Triggers: boot_addr_i, csr_addr_i, csr_exception_o
+              ... and 11 more
+    Payloads: debug_mode_o, ld_st_priv_lvl_o, priv_lvl_o
+              ... and 1 more
+
+cva6:
+------------------------------------------------------------
+  Availability    - Triggers:  5, Payloads:  0
+    Triggers: cvxif_req_o, cvxif_req_t, debug_req_i
+              ... and 2 more
+  DoS             - Triggers:  5, Payloads:  5
+    Triggers: cvxif_req_o, cvxif_req_t, debug_req_i
+              ... and 2 more
+    Payloads: cvxif_req_o, cvxif_req_t, debug_req_i
+              ... and 2 more
+  Integrity       - Triggers:  1, Payloads:  0
+    Triggers: boot_addr_i
+  Leak            - Triggers:  1, Payloads:  1
+    Triggers: debug_req_i
+    Payloads: boot_addr_i
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: boot_addr_i
+
+cva6_accel_first_pass_decoder:
+------------------------------------------------------------
+
+cva6_fifo_v3:
+------------------------------------------------------------
+  Covert          - Triggers:  2, Payloads:  2
+    Triggers: data_i, data_o
+    Payloads: data_i, data_o
+  Integrity       - Triggers:  2, Payloads:  2
+    Triggers: data_i, data_o
+    Payloads: data_i, data_o
+  Leak            - Triggers:  0, Payloads:  2
+    Payloads: data_i, data_o
+
+cva6_hpdcache_if_adapter:
+------------------------------------------------------------
+  Availability    - Triggers: 16, Payloads:  4
+    Triggers: ariane_pkg::amo_req_t, cva6_amo_req_i, cva6_req_i
+              ... and 13 more
+    Payloads: cva6_dcache_flush_ack_o, hpdcache_req_ready_i, hpdcache_req_valid_o
+              ... and 1 more
+  Covert          - Triggers:  0, Payloads:  3
+    Payloads: hpdcache_req_ready_i, hpdcache_req_valid_o, hpdcache_rsp_valid_i
+  DoS             - Triggers: 16, Payloads: 16
+    Triggers: ariane_pkg::amo_req_t, cva6_amo_req_i, cva6_req_i
+              ... and 13 more
+    Payloads: ariane_pkg::amo_req_t, cva6_amo_req_i, cva6_req_i
+              ... and 13 more
+
+cva6_hpdcache_subsystem:
+------------------------------------------------------------
+  Availability    - Triggers: 10, Payloads:  1
+    Triggers: ariane_pkg::amo_req_t, cmo_req_t, dcache_amo_req_i
+              ... and 7 more
+    Payloads: dcache_flush_ack_o
+  DoS             - Triggers: 12, Payloads: 12
+    Triggers: ariane_pkg::amo_req_t, cmo_req_t, dcache_amo_req_i
+              ... and 9 more
+    Payloads: ariane_pkg::amo_req_t, cmo_req_t, dcache_amo_req_i
+              ... and 9 more
+  Privilege       - Triggers:  0, Payloads:  1
+    Payloads: hwpf_status_o
+
+cva6_hpdcache_subsystem_axi_arbiter:
+------------------------------------------------------------
+  Availability    - Triggers: 12, Payloads: 13
+    Triggers: axi_req_o, axi_req_t, dcache_read_resp_valid_o
+              ... and 9 more
+    Payloads: dcache_read_ready_o, dcache_read_resp_ready_i, dcache_read_resp_valid_o
+              ... and 10 more
+  Covert          - Triggers:  3, Payloads: 14
+    Triggers: dcache_write_data_i, dcache_write_data_ready_o, dcache_write_data_valid_i
+    Payloads: dcache_read_ready_o, dcache_read_resp_ready_i, dcache_read_resp_valid_o
+              ... and 11 more
+  DoS             - Triggers: 18, Payloads: 18
+    Triggers: axi_req_o, axi_req_t, dcache_read_ready_o
+              ... and 15 more
+    Payloads: axi_req_o, axi_req_t, dcache_read_ready_o
+              ... and 15 more
+  Integrity       - Triggers:  3, Payloads:  9
+    Triggers: dcache_write_data_i, dcache_write_data_ready_o, dcache_write_data_valid_i
+    Payloads: dcache_write_data_i, dcache_write_data_ready_o, dcache_write_data_valid_i
+              ... and 6 more
+  Leak            - Triggers:  9, Payloads:  3
+    Triggers: dcache_write_data_i, dcache_write_data_ready_o, dcache_write_data_valid_i
+              ... and 6 more
+    Payloads: dcache_write_data_i, dcache_write_data_ready_o, dcache_write_data_valid_i
+  Privilege       - Triggers:  9, Payloads:  0
+    Triggers: dcache_write_data_i, dcache_write_data_ready_o, dcache_write_data_valid_i
+              ... and 6 more
+
+cva6_hpdcache_wrapper:
+------------------------------------------------------------
+  Availability    - Triggers: 21, Payloads: 11
+    Triggers: ariane_pkg::amo_req_t, cmo_req_t, dcache_amo_req_i
+              ... and 18 more
+    Payloads: dcache_flush_ack_o, dcache_mem_req_read_ready_i, dcache_mem_req_read_valid_o
+              ... and 8 more
+  Covert          - Triggers:  3, Payloads: 11
+    Triggers: dcache_mem_req_write_data_o, dcache_mem_req_write_data_ready_i, dcache_mem_req_write_data_valid_o
+    Payloads: dcache_mem_req_read_ready_i, dcache_mem_req_read_valid_o, dcache_mem_req_write_data_o
+              ... and 8 more
+  DoS             - Triggers: 24, Payloads: 24
+    Triggers: ariane_pkg::amo_req_t, cmo_req_t, dcache_amo_req_i
+              ... and 21 more
+    Payloads: ariane_pkg::amo_req_t, cmo_req_t, dcache_amo_req_i
+              ... and 21 more
+  Integrity       - Triggers:  3, Payloads:  9
+    Triggers: dcache_mem_req_write_data_o, dcache_mem_req_write_data_ready_i, dcache_mem_req_write_data_valid_o
+    Payloads: dcache_mem_req_write_data_o, dcache_mem_req_write_data_ready_i, dcache_mem_req_write_data_valid_o
+              ... and 6 more
+  Leak            - Triggers:  9, Payloads:  3
+    Triggers: dcache_mem_req_write_data_o, dcache_mem_req_write_data_ready_i, dcache_mem_req_write_data_valid_o
+              ... and 6 more
+    Payloads: dcache_mem_req_write_data_o, dcache_mem_req_write_data_ready_i, dcache_mem_req_write_data_valid_o
+  Privilege       - Triggers:  9, Payloads:  1
+    Triggers: dcache_mem_req_write_data_o, dcache_mem_req_write_data_ready_i, dcache_mem_req_write_data_valid_o
+              ... and 6 more
+    Payloads: hwpf_status_o
+
+cva6_icache:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  1
+    Triggers: icache_req_t, mem_data_req_o
+    Payloads: mem_data_ack_i
+  Covert          - Triggers:  3, Payloads:  3
+    Triggers: mem_data_ack_i, mem_data_o, mem_data_req_o
+    Payloads: mem_data_ack_i, mem_data_o, mem_data_req_o
+  DoS             - Triggers:  3, Payloads:  3
+    Triggers: en_i, icache_req_t, mem_data_req_o
+    Payloads: en_i, icache_req_t, mem_data_req_o
+  Integrity       - Triggers:  3, Payloads:  3
+    Triggers: mem_data_ack_i, mem_data_o, mem_data_req_o
+    Payloads: mem_data_ack_i, mem_data_o, mem_data_req_o
+  Leak            - Triggers:  0, Payloads:  3
+    Payloads: mem_data_ack_i, mem_data_o, mem_data_req_o
+
+cva6_rvfi:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  0
+    Triggers: amo_op, fu_op
+  Integrity       - Triggers:  2, Payloads:  0
+    Triggers: amo_op, fu_op
+  Leak            - Triggers:  2, Payloads:  2
+    Triggers: rvfi_csr_o, rvfi_csr_t
+    Payloads: rvfi_csr_o, rvfi_csr_t
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: rvfi_csr_o, rvfi_csr_t
+
+cva6_rvfi_probes:
+------------------------------------------------------------
+  Availability    - Triggers:  4, Payloads:  5
+    Triggers: decoded_instr_valid_i, fetch_entry_valid_i, lsu_ctrl_i
+              ... and 1 more
+    Payloads: commit_ack_i, decoded_instr_ack_i, decoded_instr_valid_i
+              ... and 2 more
+  Covert          - Triggers:  1, Payloads:  2
+    Triggers: fetch_entry_valid_i
+    Payloads: decoded_instr_valid_i, fetch_entry_valid_i
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: decoded_instr_valid_i, fetch_entry_valid_i
+    Payloads: decoded_instr_valid_i, fetch_entry_valid_i
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: wdata_i
+  Leak            - Triggers:  3, Payloads:  3
+    Triggers: csr_i, debug_mode_i, rvfi_probes_csr_t
+    Payloads: csr_i, rvfi_probes_csr_t, wdata_i
+  Privilege       - Triggers:  3, Payloads:  3
+    Triggers: csr_i, debug_mode_i, rvfi_probes_csr_t
+    Payloads: debug_mode_i, priv_lvl_i, riscv::priv_lvl_t
+
+cvxif_compressed_if_driver:
+------------------------------------------------------------
+  Availability    - Triggers:  3, Payloads:  4
+    Triggers: compressed_req_o, compressed_valid_o, x_compressed_req_t
+    Payloads: compressed_ready_i, compressed_valid_o, stall_i
+              ... and 1 more
+  Covert          - Triggers:  0, Payloads:  2
+    Payloads: compressed_ready_i, compressed_valid_o
+  DoS             - Triggers:  4, Payloads:  4
+    Triggers: compressed_ready_i, compressed_req_o, compressed_valid_o
+              ... and 1 more
+    Payloads: compressed_ready_i, compressed_req_o, compressed_valid_o
+              ... and 1 more
+
+cvxif_example_coprocessor:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  0
+    Triggers: cvxif_req_i, cvxif_req_t
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: cvxif_req_i, cvxif_req_t
+    Payloads: cvxif_req_i, cvxif_req_t
+
+cvxif_fu:
+------------------------------------------------------------
+  Availability    - Triggers:  3, Payloads:  5
+    Triggers: result_valid_i, x_valid_i, x_valid_o
+    Payloads: result_ready_o, result_valid_i, x_ready_o
+              ... and 2 more
+  Covert          - Triggers:  0, Payloads:  8
+    Payloads: result_i, result_ready_o, result_valid_i
+              ... and 5 more
+  DoS             - Triggers:  6, Payloads:  6
+    Triggers: result_ready_o, result_valid_i, x_ready_o
+              ... and 3 more
+    Payloads: result_ready_o, result_valid_i, x_ready_o
+              ... and 3 more
+  Integrity       - Triggers:  0, Payloads:  5
+    Payloads: result_i, result_ready_o, result_valid_i
+              ... and 2 more
+  Leak            - Triggers:  1, Payloads:  5
+    Triggers: x_we_o
+    Payloads: result_i, result_ready_o, result_valid_i
+              ... and 2 more
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: x_we_o
+
+cvxif_issue_register_commit_if_driver:
+------------------------------------------------------------
+  Availability    - Triggers:  6, Payloads:  5
+    Triggers: commit_valid_o, issue_req_o, issue_valid_o
+              ... and 3 more
+    Payloads: commit_valid_o, issue_ready_i, issue_valid_o
+              ... and 2 more
+  Covert          - Triggers:  0, Payloads:  5
+    Payloads: commit_valid_o, issue_ready_i, issue_valid_o
+              ... and 2 more
+  DoS             - Triggers:  7, Payloads:  7
+    Triggers: commit_valid_o, issue_ready_i, issue_req_o
+              ... and 4 more
+    Payloads: commit_valid_o, issue_ready_i, issue_req_o
+              ... and 4 more
+
+decoder:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  0
+    Triggers: debug_from_trigger_i, debug_req_i
+  DoS             - Triggers:  2, Payloads:  1
+    Triggers: debug_from_trigger_i, debug_req_i
+    Payloads: debug_req_i
+  Integrity       - Triggers:  1, Payloads:  0
+    Triggers: jump_address_i
+  Leak            - Triggers:  3, Payloads:  1
+    Triggers: debug_from_trigger_i, debug_mode_i, debug_req_i
+    Payloads: jump_address_i
+  Privilege       - Triggers:  2, Payloads:  3
+    Triggers: debug_mode_i, jump_address_i
+    Payloads: debug_mode_i, priv_lvl_i, riscv::priv_lvl_t
+
+ex_stage:
+------------------------------------------------------------
+  Availability    - Triggers: 37, Payloads: 25
+    Triggers: acc_mmu_req_i, acc_mmu_req_t, acc_valid_i
+              ... and 34 more
+    Payloads: acc_valid_i, aes_valid_i, alu2_valid_i
+              ... and 22 more
+  Covert          - Triggers:  6, Payloads: 33
+    Triggers: fu_data_i, fu_data_t, load_exception_o
+              ... and 3 more
+    Payloads: acc_valid_i, aes_valid_i, alu2_valid_i
+              ... and 30 more
+  DoS             - Triggers: 37, Payloads: 37
+    Triggers: acc_mmu_req_i, acc_mmu_req_t, acc_valid_i
+              ... and 34 more
+    Payloads: acc_mmu_req_i, acc_mmu_req_t, acc_valid_i
+              ... and 34 more
+  Integrity       - Triggers:  3, Payloads: 14
+    Triggers: csr_addr_o, fu_data_i, fu_data_t
+    Payloads: flu_result_o, fpu_result_o, fu_data_i
+              ... and 11 more
+  Leak            - Triggers:  6, Payloads: 15
+    Triggers: csr_addr_o, csr_commit_i, csr_hs_ld_st_inst_o
+              ... and 3 more
+    Payloads: csr_addr_o, csr_commit_i, csr_hs_ld_st_inst_o
+              ... and 12 more
+  Privilege       - Triggers:  6, Payloads:  4
+    Triggers: csr_addr_o, csr_commit_i, csr_hs_ld_st_inst_o
+              ... and 3 more
+    Payloads: debug_mode_i, ld_st_priv_lvl_i, priv_lvl_i
+              ... and 1 more
+
+fpu_wrap:
+------------------------------------------------------------
+  Availability    - Triggers:  3, Payloads:  4
+    Triggers: fpu_early_valid_o, fpu_valid_i, fpu_valid_o
+    Payloads: fpu_early_valid_o, fpu_ready_o, fpu_valid_i
+              ... and 1 more
+  Covert          - Triggers:  2, Payloads:  7
+    Triggers: fu_data_i, fu_data_t
+    Payloads: fpu_early_valid_o, fpu_ready_o, fpu_valid_i
+              ... and 4 more
+  DoS             - Triggers:  4, Payloads:  4
+    Triggers: fpu_early_valid_o, fpu_ready_o, fpu_valid_i
+              ... and 1 more
+    Payloads: fpu_early_valid_o, fpu_ready_o, fpu_valid_i
+              ... and 1 more
+  Integrity       - Triggers:  2, Payloads:  3
+    Triggers: fu_data_i, fu_data_t
+    Payloads: fu_data_i, fu_data_t, result_o
+  Leak            - Triggers:  0, Payloads:  3
+    Payloads: fu_data_i, fu_data_t, result_o
+
+id_stage:
+------------------------------------------------------------
+  Availability    - Triggers: 11, Payloads:  6
+    Triggers: compressed_req_o, compressed_valid_o, dcache_req_i_t
+              ... and 8 more
+    Payloads: compressed_ready_i, compressed_valid_o, fetch_entry_ready_o
+              ... and 3 more
+  Covert          - Triggers:  4, Payloads:  5
+    Triggers: fetch_entry_i, fetch_entry_ready_o, fetch_entry_t
+              ... and 1 more
+    Payloads: compressed_ready_i, compressed_valid_o, fetch_entry_ready_o
+              ... and 2 more
+  DoS             - Triggers: 13, Payloads: 12
+    Triggers: compressed_ready_i, compressed_req_o, compressed_valid_o
+              ... and 10 more
+    Payloads: compressed_ready_i, compressed_req_o, compressed_valid_o
+              ... and 9 more
+  Leak            - Triggers:  3, Payloads:  0
+    Triggers: debug_from_trigger_i, debug_mode_i, debug_req_i
+  Privilege       - Triggers:  1, Payloads:  3
+    Triggers: debug_mode_i
+    Payloads: debug_mode_i, priv_lvl_i, riscv::priv_lvl_t
+
+instr_decoder:
+------------------------------------------------------------
+  Availability    - Triggers:  3, Payloads:  2
+    Triggers: issue_req_i, issue_valid_i, x_issue_req_t
+    Payloads: issue_ready_o, issue_valid_i
+  Covert          - Triggers:  0, Payloads:  2
+    Payloads: issue_ready_o, issue_valid_i
+  DoS             - Triggers:  4, Payloads:  4
+    Triggers: issue_ready_o, issue_req_i, issue_valid_i
+              ... and 1 more
+    Payloads: issue_ready_o, issue_req_i, issue_valid_i
+              ... and 1 more
+
+instr_queue:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  4
+    Triggers: fetch_entry_valid_o, valid_i
+    Payloads: fetch_entry_ready_i, fetch_entry_valid_o, ready_o
+              ... and 1 more
+  Covert          - Triggers:  4, Payloads:  4
+    Triggers: fetch_entry_o, fetch_entry_ready_i, fetch_entry_t
+              ... and 1 more
+    Payloads: fetch_entry_ready_i, fetch_entry_valid_o, ready_o
+              ... and 1 more
+  DoS             - Triggers:  4, Payloads:  4
+    Triggers: fetch_entry_ready_i, fetch_entry_valid_o, ready_o
+              ... and 1 more
+    Payloads: fetch_entry_ready_i, fetch_entry_valid_o, ready_o
+              ... and 1 more
+  Integrity       - Triggers:  4, Payloads:  0
+    Triggers: addr_i, exception_addr_i, predict_address_i
+              ... and 1 more
+  Leak            - Triggers:  0, Payloads:  4
+    Payloads: addr_i, exception_addr_i, predict_address_i
+              ... and 1 more
+  Privilege       - Triggers:  4, Payloads:  0
+    Triggers: addr_i, exception_addr_i, predict_address_i
+              ... and 1 more
+
+instr_scan:
+------------------------------------------------------------
+
+interfaces:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  3
+    Triggers: ex_valid_i, fetch_entry_valid_o
+    Payloads: ex_valid_i, fetch_entry_ready_i, fetch_entry_valid_o
+  Covert          - Triggers:  4, Payloads:  3
+    Triggers: fetch_entry_o, fetch_entry_ready_i, fetch_entry_t
+              ... and 1 more
+    Payloads: ex_valid_i, fetch_entry_ready_i, fetch_entry_valid_o
+  DoS             - Triggers:  3, Payloads:  3
+    Triggers: ex_valid_i, fetch_entry_ready_i, fetch_entry_valid_o
+    Payloads: ex_valid_i, fetch_entry_ready_i, fetch_entry_valid_o
+  Integrity       - Triggers:  1, Payloads:  0
+    Triggers: boot_addr_i
+  Leak            - Triggers:  2, Payloads:  1
+    Triggers: debug_mode_i, set_debug_pc_i
+    Payloads: boot_addr_i
+  Privilege       - Triggers:  2, Payloads:  1
+    Triggers: boot_addr_i, debug_mode_i
+    Payloads: debug_mode_i
+
+is:
+------------------------------------------------------------
+  Covert          - Triggers:  1, Payloads:  0
+    Triggers: lu_access_i
+
+issue_read_operands:
+------------------------------------------------------------
+  Availability    - Triggers: 16, Payloads: 21
+    Triggers: aes_valid_o, alu2_valid_o, alu_valid_o
+              ... and 13 more
+    Payloads: aes_valid_o, alu2_valid_o, alu_valid_o
+              ... and 18 more
+  Covert          - Triggers:  2, Payloads: 20
+    Triggers: fu_data_o, fu_data_t
+    Payloads: aes_valid_o, alu2_valid_o, alu_valid_o
+              ... and 17 more
+  DoS             - Triggers: 22, Payloads: 22
+    Triggers: aes_valid_o, alu2_valid_o, alu_valid_o
+              ... and 19 more
+    Payloads: aes_valid_o, alu2_valid_o, alu_valid_o
+              ... and 19 more
+  Integrity       - Triggers:  2, Payloads:  3
+    Triggers: fu_data_o, fu_data_t
+    Payloads: fu_data_o, fu_data_t, wdata_i
+  Leak            - Triggers:  3, Payloads:  4
+    Triggers: csr_valid_o, we_fpr_i, we_gpr_i
+    Payloads: csr_valid_o, fu_data_o, fu_data_t
+              ... and 1 more
+  Privilege       - Triggers:  3, Payloads:  0
+    Triggers: csr_valid_o, we_fpr_i, we_gpr_i
+
+issue_stage:
+------------------------------------------------------------
+  Availability    - Triggers: 17, Payloads: 23
+    Triggers: aes_valid_o, alu2_valid_o, alu_valid_o
+              ... and 14 more
+    Payloads: aes_valid_o, alu2_valid_o, alu_valid_o
+              ... and 20 more
+  Covert          - Triggers:  2, Payloads: 21
+    Triggers: fu_data_o, fu_data_t
+    Payloads: aes_valid_o, alu2_valid_o, alu_valid_o
+              ... and 18 more
+  DoS             - Triggers: 24, Payloads: 24
+    Triggers: aes_valid_o, alu2_valid_o, alu_valid_o
+              ... and 21 more
+    Payloads: aes_valid_o, alu2_valid_o, alu_valid_o
+              ... and 21 more
+  Integrity       - Triggers:  2, Payloads:  3
+    Triggers: fu_data_o, fu_data_t
+    Payloads: fu_data_o, fu_data_t, wdata_i
+  Leak            - Triggers:  4, Payloads:  4
+    Triggers: csr_valid_o, we_fpr_i, we_gpr_i
+              ... and 1 more
+    Payloads: csr_valid_o, fu_data_o, fu_data_t
+              ... and 1 more
+  Privilege       - Triggers:  4, Payloads:  0
+    Triggers: csr_valid_o, we_fpr_i, we_gpr_i
+              ... and 1 more
+
+load_store_unit:
+------------------------------------------------------------
+  Availability    - Triggers: 21, Payloads:  7
+    Triggers: acc_mmu_req_i, acc_mmu_req_t, amo_req_o
+              ... and 18 more
+    Payloads: amo_valid_commit_i, commit_ready_o, load_valid_o
+              ... and 4 more
+  Covert          - Triggers:  6, Payloads: 10
+    Triggers: fu_data_i, fu_data_t, load_exception_o
+              ... and 3 more
+    Payloads: amo_valid_commit_i, commit_ready_o, fu_data_i
+              ... and 7 more
+  DoS             - Triggers: 18, Payloads: 18
+    Triggers: acc_mmu_req_i, acc_mmu_req_t, amo_req_o
+              ... and 15 more
+    Payloads: acc_mmu_req_i, acc_mmu_req_t, amo_req_o
+              ... and 15 more
+  Integrity       - Triggers:  2, Payloads:  7
+    Triggers: fu_data_i, fu_data_t
+    Payloads: fu_data_i, fu_data_t, load_result_o
+              ... and 4 more
+  Leak            - Triggers:  1, Payloads:  5
+    Triggers: csr_hs_ld_st_inst_o
+    Payloads: csr_hs_ld_st_inst_o, fu_data_i, fu_data_t
+              ... and 2 more
+  Privilege       - Triggers:  1, Payloads:  3
+    Triggers: csr_hs_ld_st_inst_o
+    Payloads: ld_st_priv_lvl_i, priv_lvl_i, riscv::priv_lvl_t
+
+load_unit:
+------------------------------------------------------------
+  Availability    - Triggers: 11, Payloads:  2
+    Triggers: dcache_req_i_t, dcache_req_o_t, lsu_ctrl_i
+              ... and 8 more
+    Payloads: valid_i, valid_o
+  Covert          - Triggers:  1, Payloads:  4
+    Triggers: req_port_i.data_rvalid
+    Payloads: req_port_i.data_rvalid, result_o, valid_i
+              ... and 1 more
+  DoS             - Triggers:  8, Payloads:  8
+    Triggers: dcache_req_i_t, dcache_req_o_t, req_port_i
+              ... and 5 more
+    Payloads: dcache_req_i_t, dcache_req_o_t, req_port_i
+              ... and 5 more
+  Integrity       - Triggers:  1, Payloads:  3
+    Triggers: req_port_i.data_rvalid
+    Payloads: req_port_i.data_rvalid, result_o, store_buffer_empty_i
+  Leak            - Triggers:  0, Payloads:  2
+    Payloads: req_port_i.data_rvalid, result_o
+
+logic:
+------------------------------------------------------------
+
+lsu_bypass:
+------------------------------------------------------------
+  Availability    - Triggers:  4, Payloads:  2
+    Triggers: lsu_ctrl_o, lsu_ctrl_t, lsu_req_i
+              ... and 1 more
+    Payloads: lsu_req_valid_i, ready_o
+  Covert          - Triggers:  0, Payloads:  2
+    Payloads: lsu_req_valid_i, ready_o
+  DoS             - Triggers:  3, Payloads:  3
+    Triggers: lsu_req_i, lsu_req_valid_i, ready_o
+    Payloads: lsu_req_i, lsu_req_valid_i, ready_o
+
+macro_decoder:
+------------------------------------------------------------
+  Availability    - Triggers:  0, Payloads:  2
+    Payloads: fetch_stall_o, issue_ack_i
+  Covert          - Triggers:  1, Payloads:  0
+    Triggers: fetch_stall_o
+
+miss_handler:
+------------------------------------------------------------
+  Availability    - Triggers: 10, Payloads:  7
+    Triggers: amo_req_i, amo_req_t, axi_req_t
+              ... and 7 more
+    Payloads: busy_i, bypass_gnt_o, bypass_valid_o
+              ... and 4 more
+  Covert          - Triggers:  5, Payloads:  9
+    Triggers: axi_data_i, axi_data_o, bypass_data_o
+              ... and 2 more
+    Payloads: axi_data_i, axi_data_o, busy_i
+              ... and 6 more
+  DoS             - Triggers: 12, Payloads: 12
+    Triggers: active_serving_o, amo_req_i, amo_req_t
+              ... and 9 more
+    Payloads: active_serving_o, amo_req_i, amo_req_t
+              ... and 9 more
+  Integrity       - Triggers:  8, Payloads:  5
+    Triggers: addr_o, axi_data_i, axi_data_o
+              ... and 5 more
+    Payloads: axi_data_i, axi_data_o, bypass_data_o
+              ... and 2 more
+  Leak            - Triggers:  1, Payloads:  8
+    Triggers: we_o
+    Payloads: addr_o, axi_data_i, axi_data_o
+              ... and 5 more
+  Privilege       - Triggers:  4, Payloads:  0
+    Triggers: addr_o, mshr_addr_i, mshr_addr_matches_o
+              ... and 1 more
+
+mult:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  3
+    Triggers: mult_valid_i, mult_valid_o
+    Payloads: mult_ready_o, mult_valid_i, mult_valid_o
+  Covert          - Triggers:  2, Payloads:  6
+    Triggers: fu_data_i, fu_data_t
+    Payloads: fu_data_i, fu_data_t, mult_ready_o
+              ... and 3 more
+  DoS             - Triggers:  3, Payloads:  3
+    Triggers: mult_ready_o, mult_valid_i, mult_valid_o
+    Payloads: mult_ready_o, mult_valid_i, mult_valid_o
+  Integrity       - Triggers:  2, Payloads:  3
+    Triggers: fu_data_i, fu_data_t
+    Payloads: fu_data_i, fu_data_t, result_o
+  Leak            - Triggers:  0, Payloads:  3
+    Payloads: fu_data_i, fu_data_t, result_o
+
+multiplier:
+------------------------------------------------------------
+  Availability    - Triggers:  4, Payloads:  2
+    Triggers: fu_op, mult_valid_i, mult_valid_o
+              ... and 1 more
+    Payloads: mult_valid_i, mult_valid_o
+  Covert          - Triggers:  2, Payloads:  3
+    Triggers: operand_a_i, operand_b_i
+    Payloads: mult_valid_i, mult_valid_o, result_o
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: mult_valid_i, mult_valid_o
+    Payloads: mult_valid_i, mult_valid_o
+  Integrity       - Triggers:  1, Payloads:  1
+    Triggers: fu_op
+    Payloads: result_o
+  Leak            - Triggers:  0, Payloads:  3
+    Payloads: operand_a_i, operand_b_i, result_o
+
+needs:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  0
+    Triggers: fu_op
+  Integrity       - Triggers:  1, Payloads:  0
+    Triggers: fu_op
+
+perf_counters:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  2
+    Triggers: dcache_req_i_t
+    Payloads: commit_ack_i, stall_issue_i
+  Covert          - Triggers:  4, Payloads:  2
+    Triggers: data_i, data_o, l1_dcache_access_i
+              ... and 1 more
+    Payloads: data_i, data_o
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: dcache_req_i_t, we_i
+    Payloads: dcache_req_i_t, we_i
+  Integrity       - Triggers:  3, Payloads:  2
+    Triggers: addr_i, data_i, data_o
+    Payloads: data_i, data_o
+  Leak            - Triggers:  2, Payloads:  3
+    Triggers: debug_mode_i, we_i
+    Payloads: addr_i, data_i, data_o
+  Privilege       - Triggers:  3, Payloads:  1
+    Triggers: addr_i, debug_mode_i, we_i
+    Payloads: debug_mode_i
+
+pmp:
+------------------------------------------------------------
+  Covert          - Triggers:  2, Payloads:  0
+    Triggers: access_type_i, riscv::pmp_access_t
+  Integrity       - Triggers:  2, Payloads:  0
+    Triggers: addr_i, conf_addr_i
+  Leak            - Triggers:  0, Payloads:  2
+    Payloads: addr_i, conf_addr_i
+  Privilege       - Triggers:  2, Payloads:  2
+    Triggers: addr_i, conf_addr_i
+    Payloads: priv_lvl_i, riscv::priv_lvl_t
+
+pmp_data_if:
+------------------------------------------------------------
+  Availability    - Triggers:  8, Payloads:  2
+    Triggers: lsu_exception_i, lsu_exception_o, lsu_is_store_i
+              ... and 5 more
+    Payloads: lsu_valid_i, lsu_valid_o
+  Covert          - Triggers:  1, Payloads:  2
+    Triggers: icache_fetch_vaddr_i
+    Payloads: lsu_valid_i, lsu_valid_o
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: lsu_valid_i, lsu_valid_o
+    Payloads: lsu_valid_i, lsu_valid_o
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: lsu_is_store_i
+  Privilege       - Triggers:  0, Payloads:  3
+    Payloads: ld_st_priv_lvl_i, priv_lvl_i, riscv::priv_lvl_t
+
+pmp_entry:
+------------------------------------------------------------
+  Integrity       - Triggers:  5, Payloads:  0
+    Triggers: addr_i, conf_addr_i, conf_addr_mode_i
+              ... and 2 more
+  Leak            - Triggers:  2, Payloads:  5
+    Triggers: conf_addr_mode_i, riscv::pmp_addr_mode_t
+    Payloads: addr_i, conf_addr_i, conf_addr_mode_i
+              ... and 2 more
+  Privilege       - Triggers:  5, Payloads:  2
+    Triggers: addr_i, conf_addr_i, conf_addr_mode_i
+              ... and 2 more
+    Payloads: conf_addr_mode_i, riscv::pmp_addr_mode_t
+
+pmp_tb:
+------------------------------------------------------------
+
+ras:
+------------------------------------------------------------
+  Covert          - Triggers:  2, Payloads:  2
+    Triggers: data_i, data_o
+    Payloads: data_i, data_o
+  Integrity       - Triggers:  2, Payloads:  2
+    Triggers: data_i, data_o
+    Payloads: data_i, data_o
+  Leak            - Triggers:  0, Payloads:  2
+    Payloads: data_i, data_o
+
+raw_checker:
+------------------------------------------------------------
+  Availability    - Triggers:  1, Payloads:  1
+    Triggers: valid_o
+    Payloads: valid_o
+  Covert          - Triggers:  0, Payloads:  1
+    Payloads: valid_o
+  DoS             - Triggers:  1, Payloads:  1
+    Triggers: valid_o
+    Payloads: valid_o
+
+scoreboard:
+------------------------------------------------------------
+  Availability    - Triggers:  3, Payloads:  6
+    Triggers: decoded_instr_valid_i, issue_instr_valid_o, wt_valid_i
+    Payloads: commit_ack_i, decoded_instr_ack_o, decoded_instr_valid_i
+              ... and 3 more
+  Covert          - Triggers:  0, Payloads:  3
+    Payloads: decoded_instr_valid_i, issue_instr_valid_o, wt_valid_i
+  DoS             - Triggers:  4, Payloads:  4
+    Triggers: decoded_instr_valid_i, issue_instr_valid_o, wt_valid_i
+              ... and 1 more
+    Payloads: decoded_instr_valid_i, issue_instr_valid_o, wt_valid_i
+              ... and 1 more
+  Leak            - Triggers:  1, Payloads:  0
+    Triggers: x_we_i
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: x_we_i
+
+serdiv:
+------------------------------------------------------------
+  Availability    - Triggers:  4, Payloads:  0
+    Triggers: op_a_i, op_a_sign), op_b_i
+              ... and 1 more
+  Covert          - Triggers:  0, Payloads:  2
+    Payloads: out_rdy_i, out_vld_o
+  Integrity       - Triggers:  4, Payloads:  2
+    Triggers: op_a_i, op_a_sign), op_b_i
+              ... and 1 more
+    Payloads: out_rdy_i, out_vld_o
+  Leak            - Triggers:  0, Payloads:  2
+    Payloads: out_rdy_i, out_vld_o
+
+std_cache_subsystem:
+------------------------------------------------------------
+  Availability    - Triggers:  8, Payloads:  1
+    Triggers: amo_req_i, amo_req_t, axi_req_o
+              ... and 5 more
+    Payloads: dcache_flush_ack_o
+  DoS             - Triggers: 10, Payloads: 10
+    Triggers: amo_req_i, amo_req_t, axi_req_o
+              ... and 7 more
+    Payloads: amo_req_i, amo_req_t, axi_req_o
+              ... and 7 more
+  Privilege       - Triggers:  0, Payloads:  2
+    Payloads: priv_lvl_i, riscv::priv_lvl_t
+
+std_nbdcache:
+------------------------------------------------------------
+  Availability    - Triggers:  7, Payloads:  1
+    Triggers: amo_req_i, amo_req_t, axi_req_t
+              ... and 4 more
+    Payloads: flush_ack_o
+  Covert          - Triggers:  2, Payloads:  2
+    Triggers: axi_data_i, axi_data_o
+    Payloads: axi_data_i, axi_data_o
+  DoS             - Triggers:  8, Payloads:  8
+    Triggers: amo_req_i, amo_req_t, axi_req_t
+              ... and 5 more
+    Payloads: amo_req_i, amo_req_t, axi_req_t
+              ... and 5 more
+  Integrity       - Triggers:  2, Payloads:  2
+    Triggers: axi_data_i, axi_data_o
+    Payloads: axi_data_i, axi_data_o
+  Leak            - Triggers:  0, Payloads:  2
+    Payloads: axi_data_i, axi_data_o
+
+store_buffer:
+------------------------------------------------------------
+  Availability    - Triggers:  7, Payloads:  5
+    Triggers: dcache_req_i_t, dcache_req_o_t, req_port_i
+              ... and 4 more
+    Payloads: commit_ready_o, ready_o, stall_st_pending_i
+              ... and 2 more
+  Covert          - Triggers:  2, Payloads:  6
+    Triggers: data_i, data_size_i
+    Payloads: commit_ready_o, data_i, data_size_i
+              ... and 3 more
+  DoS             - Triggers:  8, Payloads:  8
+    Triggers: commit_ready_o, dcache_req_i_t, dcache_req_o_t
+              ... and 5 more
+    Payloads: commit_ready_o, dcache_req_i_t, dcache_req_o_t
+              ... and 5 more
+  Integrity       - Triggers:  2, Payloads:  3
+    Triggers: data_i, data_size_i
+    Payloads: data_i, data_size_i, store_buffer_empty_o
+  Leak            - Triggers:  0, Payloads:  2
+    Payloads: data_i, data_size_i
+
+store_unit:
+------------------------------------------------------------
+  Availability    - Triggers: 13, Payloads:  5
+    Triggers: amo_req_o, amo_req_t, amo_valid_commit_i
+              ... and 10 more
+    Payloads: amo_valid_commit_i, commit_ready_o, stall_st_pending_i
+              ... and 2 more
+  Covert          - Triggers:  0, Payloads:  5
+    Payloads: amo_valid_commit_i, commit_ready_o, result_o
+              ... and 2 more
+  DoS             - Triggers: 11, Payloads: 11
+    Triggers: amo_req_o, amo_req_t, amo_valid_commit_i
+              ... and 8 more
+    Payloads: amo_req_o, amo_req_t, amo_valid_commit_i
+              ... and 8 more
+  Integrity       - Triggers:  0, Payloads:  2
+    Payloads: result_o, store_buffer_empty_o
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: result_o
+
+tag_cmp:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  1
+    Triggers: req_i, req_o
+    Payloads: gnt_o
+  Covert          - Triggers:  1, Payloads:  1
+    Triggers: l_data_t
+    Payloads: l_data_t
+  DoS             - Triggers:  4, Payloads:  4
+    Triggers: req_i, req_o, we_i
+              ... and 1 more
+    Payloads: req_i, req_o, we_i
+              ... and 1 more
+  Integrity       - Triggers:  3, Payloads:  5
+    Triggers: addr_i, addr_o, l_data_t
+    Payloads: l_data_t, rdata_i, rdata_o
+              ... and 2 more
+  Leak            - Triggers:  2, Payloads:  7
+    Triggers: we_i, we_o
+    Payloads: addr_i, addr_o, l_data_t
+              ... and 4 more
+  Privilege       - Triggers:  4, Payloads:  0
+    Triggers: addr_i, addr_o, we_i
+              ... and 1 more
+
+takes:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  2
+    Triggers: valid_i, valid_o
+    Payloads: valid_i, valid_o
+  Covert          - Triggers:  1, Payloads:  3
+    Triggers: data_i
+    Payloads: data_i, valid_i, valid_o
+  DoS             - Triggers:  2, Payloads:  2
+    Triggers: valid_i, valid_o
+    Payloads: valid_i, valid_o
+  Integrity       - Triggers:  3, Payloads:  1
+    Triggers: addr_o, address_i, data_i
+    Payloads: data_i
+  Leak            - Triggers:  0, Payloads:  3
+    Payloads: addr_o, address_i, data_i
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: addr_o, address_i
+
+to:
+------------------------------------------------------------
+  Availability    - Triggers:  6, Payloads:  2
+    Triggers: dcache_data_req_i, dcache_req_t, icache_data_req_i
+              ... and 3 more
+    Payloads: dcache_data_ack_o, icache_data_ack_o
+  Covert          - Triggers:  6, Payloads:  6
+    Triggers: dcache_data_ack_o, dcache_data_i, dcache_data_req_i
+              ... and 3 more
+    Payloads: dcache_data_ack_o, dcache_data_i, dcache_data_req_i
+              ... and 3 more
+  DoS             - Triggers:  6, Payloads:  6
+    Triggers: dcache_data_req_i, dcache_req_t, icache_data_req_i
+              ... and 3 more
+    Payloads: dcache_data_req_i, dcache_req_t, icache_data_req_i
+              ... and 3 more
+  Integrity       - Triggers:  6, Payloads:  6
+    Triggers: dcache_data_ack_o, dcache_data_i, dcache_data_req_i
+              ... and 3 more
+    Payloads: dcache_data_ack_o, dcache_data_i, dcache_data_req_i
+              ... and 3 more
+  Leak            - Triggers:  0, Payloads:  6
+    Payloads: dcache_data_ack_o, dcache_data_i, dcache_data_req_i
+              ... and 3 more
+
+trigger_module:
+------------------------------------------------------------
+  Availability    - Triggers:  4, Payloads:  1
+    Triggers: break_from_trigger_o, debug_from_trigger_o, store_result_i
+              ... and 1 more
+    Payloads: commit_ack_i
+  Covert          - Triggers:  0, Payloads:  1
+    Payloads: store_result_i
+  DoS             - Triggers:  6, Payloads:  4
+    Triggers: break_from_trigger_o, debug_from_trigger_o, tdata1_we
+              ... and 3 more
+    Payloads: tdata1_we, tdata2_we, tdata3_we
+              ... and 1 more
+  Integrity       - Triggers:  0, Payloads:  1
+    Payloads: store_result_i
+  Leak            - Triggers:  7, Payloads:  1
+    Triggers: debug_from_mcontrol_o, debug_from_trigger_o, debug_mode_i
+              ... and 4 more
+    Payloads: store_result_i
+  Privilege       - Triggers:  5, Payloads:  3
+    Triggers: debug_mode_i, tdata1_we, tdata2_we
+              ... and 2 more
+    Payloads: debug_mode_i, priv_lvl_i, riscv::priv_lvl_t
+
+wt_cache_subsystem:
+------------------------------------------------------------
+  Availability    - Triggers:  9, Payloads:  3
+    Triggers: amo_req_t, dcache_amo_req_i, dcache_req_i_t
+              ... and 6 more
+    Payloads: dcache_flush_ack_o, inval_ready_o, inval_valid_i
+  Covert          - Triggers:  0, Payloads:  2
+    Payloads: inval_ready_o, inval_valid_i
+  DoS             - Triggers: 12, Payloads: 12
+    Triggers: amo_req_t, dcache_amo_req_i, dcache_enable_i
+              ... and 9 more
+    Payloads: amo_req_t, dcache_amo_req_i, dcache_enable_i
+              ... and 9 more
+  Integrity       - Triggers:  1, Payloads:  0
+    Triggers: inval_addr_i
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: inval_addr_i
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: inval_addr_i
+
+wt_dcache:
+------------------------------------------------------------
+  Availability    - Triggers:  8, Payloads:  2
+    Triggers: amo_req_i, amo_req_t, dcache_req_i_t
+              ... and 5 more
+    Payloads: flush_ack_o, mem_data_ack_i
+  Covert          - Triggers:  3, Payloads:  3
+    Triggers: mem_data_ack_i, mem_data_o, mem_data_req_o
+    Payloads: mem_data_ack_i, mem_data_o, mem_data_req_o
+  DoS             - Triggers:  9, Payloads:  9
+    Triggers: amo_req_i, amo_req_t, dcache_req_i_t
+              ... and 6 more
+    Payloads: amo_req_i, amo_req_t, dcache_req_i_t
+              ... and 6 more
+  Integrity       - Triggers:  3, Payloads:  3
+    Triggers: mem_data_ack_i, mem_data_o, mem_data_req_o
+    Payloads: mem_data_ack_i, mem_data_o, mem_data_req_o
+  Leak            - Triggers:  0, Payloads:  3
+    Payloads: mem_data_ack_i, mem_data_o, mem_data_req_o
+
+wt_dcache_ctrl:
+------------------------------------------------------------
+  Availability    - Triggers:  6, Payloads:  2
+    Triggers: dcache_req_i_t, dcache_req_o_t, miss_req_o
+              ... and 3 more
+    Payloads: miss_ack_i, rd_ack_i
+  Covert          - Triggers:  1, Payloads:  1
+    Triggers: rd_data_i
+    Payloads: rd_data_i
+  DoS             - Triggers:  8, Payloads:  8
+    Triggers: cache_en_i, dcache_req_i_t, dcache_req_o_t
+              ... and 5 more
+    Payloads: cache_en_i, dcache_req_i_t, dcache_req_o_t
+              ... and 5 more
+  Integrity       - Triggers:  1, Payloads:  2
+    Triggers: rd_data_i
+    Payloads: miss_wdata_o, rd_data_i
+  Leak            - Triggers:  1, Payloads:  2
+    Triggers: miss_we_o
+    Payloads: miss_wdata_o, rd_data_i
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: miss_we_o
+
+wt_dcache_mem:
+------------------------------------------------------------
+  Availability    - Triggers:  2, Payloads:  2
+    Triggers: rd_req_i, wr_req_i
+    Payloads: rd_ack_o, wr_ack_o
+  Covert          - Triggers:  6, Payloads:  6
+    Triggers: rd_data_o, wbuffer_data_i, wr_cl_data_be_i
+              ... and 3 more
+    Payloads: rd_data_o, wbuffer_data_i, wr_cl_data_be_i
+              ... and 3 more
+  DoS             - Triggers:  3, Payloads:  3
+    Triggers: rd_req_i, wr_cl_we_i, wr_req_i
+    Payloads: rd_req_i, wr_cl_we_i, wr_req_i
+  Integrity       - Triggers:  6, Payloads:  6
+    Triggers: rd_data_o, wbuffer_data_i, wr_cl_data_be_i
+              ... and 3 more
+    Payloads: rd_data_o, wbuffer_data_i, wr_cl_data_be_i
+              ... and 3 more
+  Leak            - Triggers:  1, Payloads:  6
+    Triggers: wr_cl_we_i
+    Payloads: rd_data_o, wbuffer_data_i, wr_cl_data_be_i
+              ... and 3 more
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: wr_cl_we_i
+
+wt_dcache_missunit:
+------------------------------------------------------------
+  Availability    - Triggers:  5, Payloads:  3
+    Triggers: amo_req_i, amo_req_t, dcache_req_t
+              ... and 2 more
+    Payloads: flush_ack_o, mem_data_ack_i, miss_ack_o
+  Covert          - Triggers:  5, Payloads:  5
+    Triggers: mem_data_ack_i, mem_data_o, mem_data_req_o
+              ... and 2 more
+    Payloads: mem_data_ack_i, mem_data_o, mem_data_req_o
+              ... and 2 more
+  DoS             - Triggers:  9, Payloads:  9
+    Triggers: amo_req_i, amo_req_t, cache_en_o
+              ... and 6 more
+    Payloads: amo_req_i, amo_req_t, cache_en_o
+              ... and 6 more
+  Integrity       - Triggers:  5, Payloads:  6
+    Triggers: mem_data_ack_i, mem_data_o, mem_data_req_o
+              ... and 2 more
+    Payloads: mem_data_ack_i, mem_data_o, mem_data_req_o
+              ... and 3 more
+  Leak            - Triggers:  2, Payloads:  6
+    Triggers: miss_we_i, wr_cl_we_o
+    Payloads: mem_data_ack_i, mem_data_o, mem_data_req_o
+              ... and 3 more
+  Privilege       - Triggers:  2, Payloads:  0
+    Triggers: miss_we_i, wr_cl_we_o
+
+wt_dcache_wbuffer:
+------------------------------------------------------------
+  Availability    - Triggers:  7, Payloads:  3
+    Triggers: dcache_req_i_t, dcache_req_o_t, miss_req_o
+              ... and 4 more
+    Payloads: miss_ack_i, rd_ack_i, wr_ack_i
+  Covert          - Triggers:  5, Payloads:  5
+    Triggers: data, rd_data_i, wbuffer_data_o
+              ... and 2 more
+    Payloads: data, rd_data_i, wbuffer_data_o
+              ... and 2 more
+  DoS             - Triggers:  9, Payloads:  9
+    Triggers: cache_en_i, dcache_req_i_t, dcache_req_o_t
+              ... and 6 more
+    Payloads: cache_en_i, dcache_req_i_t, dcache_req_o_t
+              ... and 6 more
+  Integrity       - Triggers:  5, Payloads:  6
+    Triggers: data, rd_data_i, wbuffer_data_o
+              ... and 2 more
+    Payloads: data, miss_wdata_o, rd_data_i
+              ... and 3 more
+  Leak            - Triggers:  1, Payloads:  6
+    Triggers: miss_we_o
+    Payloads: data, miss_wdata_o, rd_data_i
+              ... and 3 more
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: miss_we_o
+
+zcmt_decoder:
+------------------------------------------------------------
+  Availability    - Triggers:  4, Payloads:  1
+    Triggers: dcache_req_i_t, dcache_req_o_t, req_port_i
+              ... and 1 more
+    Payloads: fetch_stall_o
+  Covert          - Triggers:  1, Payloads:  0
+    Triggers: fetch_stall_o
+  DoS             - Triggers:  4, Payloads:  4
+    Triggers: dcache_req_i_t, dcache_req_o_t, req_port_i
+              ... and 1 more
+    Payloads: dcache_req_i_t, dcache_req_o_t, req_port_i
+              ... and 1 more
+  Integrity       - Triggers:  1, Payloads:  0
+    Triggers: jump_address_o
+  Leak            - Triggers:  0, Payloads:  1
+    Payloads: jump_address_o
+  Privilege       - Triggers:  1, Payloads:  0
+    Triggers: jump_address_o
+
+================================================================================
+OVERALL STATISTICS
+================================================================================
+
+Availability:
+  Applicable modules: 62
+  Total trigger signals: 400
+  Total payload signals: 245
+
+Covert:
+  Applicable modules: 62
+  Total trigger signals: 120
+  Total payload signals: 293
+
+DoS:
+  Applicable modules: 59
+  Total trigger signals: 452
+  Total payload signals: 445
+
+Integrity:
+  Applicable modules: 57
+  Total trigger signals: 138
+  Total payload signals: 165
+
+Leak:
+  Applicable modules: 59
+  Total trigger signals: 108
+  Total payload signals: 208
+
+Privilege:
+  Applicable modules: 44
+  Total trigger signals: 125
+  Total payload signals: 40

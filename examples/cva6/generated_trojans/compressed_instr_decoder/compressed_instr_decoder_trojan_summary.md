@@ -11,19 +11,23 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (3):**
+**Trigger Signals (5):**
 - compressed_valid_i
 - x_compressed_req_t
+- compressed_req_i
+- compressed_ready_o
 - compressed_ready_o
 
-**Payload Signals (3):**
+**Payload Signals (5):**
 - compressed_valid_i
 - x_compressed_req_t
+- compressed_req_i
+- compressed_ready_o
 - compressed_ready_o
 
 **Generated File:** T1_compressed_instr_decoder_DoS.sv
@@ -32,17 +36,19 @@
 
 ### T2: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (2):**
+**Trigger Signals (3):**
 - compressed_valid_i
 - x_compressed_req_t
+- compressed_req_i
 
-**Payload Signals (2):**
+**Payload Signals (3):**
 - compressed_valid_i
+- compressed_ready_o
 - compressed_ready_o
 
 **Generated File:** T2_compressed_instr_decoder_Availability.sv

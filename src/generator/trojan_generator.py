@@ -26,16 +26,37 @@ class TrojanGenerator:
     NO fallbacks to hardcoded signal names
     """
     
-    def __init__(self, rtl_file: str):
+    def __init__(self, rtl_file: str, processor: str = None):
         """
         Initialize generator
         
         Args:
             rtl_file: Path to Verilog/SystemVerilog file
+            processor: Processor name (ibex, cva6, rsd). Auto-detected if not provided.
         """
         self.rtl_file = Path(rtl_file)
         self.module = None
         self.candidates = []
+        
+        # Auto-detect processor from path if not provided
+        if processor is None:
+            processor = self._detect_processor()
+        
+        self.processor = processor
+    
+    def _detect_processor(self) -> str:
+        """Auto-detect processor from file path"""
+        path_str = str(self.rtl_file).lower()
+        
+        if 'ibex' in path_str:
+            return 'ibex'
+        elif 'cva6' in path_str:
+            return 'cva6'
+        elif 'rsd' in path_str:
+            return 'rsd'
+        else:
+            # Default to ibex if can't detect
+            return 'ibex'
         
     def parse_module(self):
         """Parse the RTL module"""
@@ -45,6 +66,7 @@ class TrojanGenerator:
         self.module = parser.parse()
         
         print(f"   Module: {self.module.name}")
+        print(f"   Processor: {self.processor}")  # ADD THIS LINE
         print(f"   Type: {'Sequential' if self.module.is_sequential else 'Combinational'}")
         print(f"   Signals: {len(self.module.get_all_signals())}")
     
@@ -170,7 +192,7 @@ class TrojanGenerator:
                 filepath = output_path / filename
                 
                 # Write to file
-                with open(filepath, 'w') as f:
+                with open(filepath, 'w', encoding='utf-8') as f:
                     f.write(trojan_code.code)
                 
                 generated_files.append(filepath)
@@ -194,7 +216,7 @@ class TrojanGenerator:
         output_path = Path(output_dir)
         report_file = output_path / f"{self.module.name}_trojan_summary.md"
         
-        with open(report_file, 'w') as f:
+        with open(report_file, 'w',encoding='utf-8') as f:
             f.write(f"# Trojan Generation Summary\n\n")
             f.write(f"**Module:** {self.module.name}\n")
             f.write(f"**File:** {self.rtl_file.name}\n")

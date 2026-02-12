@@ -1,0 +1,394 @@
+# Copy this into classify_signals.py PROCESSOR_SIGNALS dict
+
+'CVA6': {
+    'acc_dispatcher': {
+        'inputs': ['clk_i', 'rst_ni', 'acc_cons_en_i', 'acc_fflags_valid_o', 'acc_fflags_o', 'priv_lvl_t', 'ld_st_priv_lvl_i', 'sum_i', 'pmpcfg_t', 'pmpcfg_i', 'pmpaddr_i', 'fcsr_frm_i', 'dirty_v_state_o', 'acc_mmu_en_i', 'scoreboard_entry_t', 'issue_instr_i', 'issue_instr_hs_i', 'issue_stall_o', 'fu_data_t', 'fu_data_i', 'scoreboard_entry_t', 'commit_instr_i', 'acc_trans_id_o', 'acc_result_o', 'acc_valid_o', 'exception_t', 'acc_exception_o', 'acc_valid_ex_o', 'commit_ack_i', 'commit_st_barrier_i', 'acc_stall_st_pending_o', 'acc_no_st_pending_i', 'dcache_req_i_t', 'dcache_req_ports_i', 'acc_mmu_req_t', 'acc_mmu_req_o', 'acc_mmu_resp_t', 'acc_mmu_resp_i', 'ctrl_halt_o', 'csr_addr_i', 'flush_unissued_instr_i', 'flush_ex_i', 'flush_pipeline_o', 'single_step_o', 'dcache_req_i_t', 'acc_dcache_req_ports_o', 'dcache_req_o_t', 'acc_dcache_req_ports_i', 'inval_ready_i', 'inval_valid_o', 'inval_addr_o', 'acc_req_t', 'acc_req_o', 'acc_resp_t', 'acc_resp_i', ')'],
+        'outputs': ['acc_fflags_valid_o', 'acc_fflags_o', 'priv_lvl_t', 'ld_st_priv_lvl_i', 'sum_i', 'pmpcfg_t', 'pmpcfg_i', 'pmpaddr_i', 'fcsr_frm_i', 'dirty_v_state_o', 'acc_mmu_en_i', 'scoreboard_entry_t', 'issue_instr_i', 'issue_instr_hs_i', 'issue_stall_o', 'fu_data_t', 'fu_data_i', 'scoreboard_entry_t', 'commit_instr_i', 'acc_trans_id_o', 'acc_result_o', 'acc_valid_o', 'exception_t', 'acc_exception_o', 'acc_valid_ex_o', 'commit_ack_i', 'commit_st_barrier_i', 'acc_stall_st_pending_o', 'acc_no_st_pending_i', 'dcache_req_i_t', 'dcache_req_ports_i', 'acc_mmu_req_t', 'acc_mmu_req_o', 'acc_mmu_resp_t', 'acc_mmu_resp_i', 'ctrl_halt_o', 'csr_addr_i', 'flush_unissued_instr_i', 'flush_ex_i', 'flush_pipeline_o', 'single_step_o', 'dcache_req_i_t', 'acc_dcache_req_ports_o', 'dcache_req_o_t', 'acc_dcache_req_ports_i', 'inval_ready_i', 'inval_valid_o', 'inval_addr_o', 'acc_req_t', 'acc_req_o', 'acc_resp_t', 'acc_resp_i', ')'],
+        'internals': []
+    },
+    'aes': {
+        'inputs': ['clk_i', 'rst_ni', 'fu_data_t', 'fu_data_i', 'orig_instr_aes', 'result_o', ')'],
+        'outputs': ['result_o', ')'],
+        'internals': []
+    },
+    'alu': {
+        'inputs': ['clk_i', 'rst_ni', 'fu_data_t', 'fu_data_i', 'fu_data_t', 'fu_data_cpop_i', 'result_o', 'alu_branch_res_o', ')'],
+        'outputs': ['result_o', 'alu_branch_res_o', ')'],
+        'internals': []
+    },
+    'alu_wrapper': {
+        'inputs': ['clk_i', 'rst_ni', 'alu_bypass_t', 'alu_bypass_i', 'fu_data_t', 'fu_data_i', 'result_o', 'alu_branch_res_o', ')'],
+        'outputs': ['result_o', 'alu_branch_res_o', ')'],
+        'internals': []
+    },
+    'amo_alu': {
+        'inputs': ['ariane_pkg::amo_t', 'amo_op_i', 'amo_operand_a_i', 'amo_operand_b_i', 'amo_result_o', ')'],
+        'outputs': ['amo_result_o', ')'],
+        'internals': []
+    },
+    'amo_buffer': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'valid_i', 'ready_o', 'ariane_pkg::amo_t', 'amo_op_i', 'paddr_i', 'data_i', 'data_size_i', 'ariane_pkg::amo_req_t', 'amo_req_o', 'ariane_pkg::amo_resp_t', 'amo_resp_i', 'amo_valid_commit_i', 'no_st_pending_i', ')'],
+        'outputs': ['ready_o', 'ariane_pkg::amo_t', 'amo_op_i', 'paddr_i', 'data_i', 'data_size_i', 'ariane_pkg::amo_req_t', 'amo_req_o', 'ariane_pkg::amo_resp_t', 'amo_resp_i', 'amo_valid_commit_i', 'no_st_pending_i', ')'],
+        'internals': []
+    },
+    'ariane_regfile': {
+        'inputs': ['clk_i', 'rst_ni', 'test_en_i', 'raddr_i', 'rdata_o', 'waddr_i', 'wdata_i', 'we_i', ')'],
+        'outputs': ['rdata_o', 'waddr_i', 'wdata_i', 'we_i', ')'],
+        'internals': []
+    },
+    'ariane_regfile_fpga': {
+        'inputs': ['clk_i', 'rst_ni', 'test_en_i', 'raddr_i', 'rdata_o', 'waddr_i', 'wdata_i', 'we_i', ')'],
+        'outputs': ['rdata_o', 'waddr_i', 'wdata_i', 'we_i', ')'],
+        'internals': []
+    },
+    'axi_adapter': {
+        'inputs': ['clk_i', 'rst_ni', 'req_i', 'ariane_pkg::ad_req_t', 'type_i', 'ariane_pkg::amo_t', 'amo_i', 'gnt_o', 'addr_i', 'we_i', 'wdata_i', 'be_i', 'size_i', 'id_i', 'valid_o', 'rdata_o', 'id_o', 'critical_word_o', 'critical_word_valid_o', 'axi_req_t', 'axi_req_o', 'axi_rsp_t', 'axi_resp_i', ')'],
+        'outputs': ['gnt_o', 'addr_i', 'we_i', 'wdata_i', 'be_i', 'size_i', 'id_i', 'valid_o', 'rdata_o', 'id_o', 'critical_word_o', 'critical_word_valid_o', 'axi_req_t', 'axi_req_o', 'axi_rsp_t', 'axi_resp_i', ')'],
+        'internals': []
+    },
+    'axi_shim': {
+        'inputs': ['clk_i', 'rst_ni', 'rd_req_i', 'rd_gnt_o', 'rd_addr_i', 'rd_blen_i', 'rd_size_i', 'rd_id_i', 'rd_lock_i', 'rd_rdy_i', 'rd_last_o', 'rd_valid_o', 'rd_data_o', 'rd_user_o', 'rd_id_o', 'rd_exokay_o', 'wr_req_i', 'wr_gnt_o', 'wr_addr_i', 'wr_data_i', 'wr_user_i', 'wr_be_i', 'wr_blen_i', 'wr_size_i', 'wr_id_i', 'wr_lock_i', 'wr_atop_i', 'wr_rdy_i', 'wr_valid_o', 'wr_id_o', 'wr_exokay_o', 'axi_req_t', 'axi_req_o', 'axi_rsp_t', 'axi_resp_i', ')'],
+        'outputs': ['rd_gnt_o', 'rd_addr_i', 'rd_blen_i', 'rd_size_i', 'rd_id_i', 'rd_lock_i', 'rd_rdy_i', 'rd_last_o', 'rd_valid_o', 'rd_data_o', 'rd_user_o', 'rd_id_o', 'rd_exokay_o', 'wr_req_i', 'wr_gnt_o', 'wr_addr_i', 'wr_data_i', 'wr_user_i', 'wr_be_i', 'wr_blen_i', 'wr_size_i', 'wr_id_i', 'wr_lock_i', 'wr_atop_i', 'wr_rdy_i', 'wr_valid_o', 'wr_id_o', 'wr_exokay_o', 'axi_req_t', 'axi_req_o', 'axi_rsp_t', 'axi_resp_i', ')'],
+        'internals': []
+    },
+    'bht': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_bp_i', 'debug_mode_i', 'vpc_i', 'bht_update_t', 'bht_update_i', 'ariane_pkg::bht_prediction_t', 'bht_prediction_o', ')'],
+        'outputs': ['ariane_pkg::bht_prediction_t', 'bht_prediction_o', ')', 'assign', '='],
+        'internals': []
+    },
+    'bht2lvl': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'vpc_i', 'bht_update_t', 'bht_update_i', 'ariane_pkg::bht_prediction_t', 'bht_prediction_o', ')'],
+        'outputs': ['ariane_pkg::bht_prediction_t', 'bht_prediction_o', ')', 'assign', '='],
+        'internals': []
+    },
+    'branch_unit': {
+        'inputs': ['clk_i', 'rst_ni', 'v_i', 'debug_mode_i', 'fu_data_t', 'fu_data_i', 'pc_i', 'is_zcmt_i', 'is_compressed_instr_i', 'branch_valid_i', 'branch_comp_res_i', 'branch_result_o', 'branchpredict_sbe_t', 'branch_predict_i', 'bp_resolve_t', 'resolved_branch_o', 'resolve_branch_o', 'exception_t', 'branch_exception_o', ')'],
+        'outputs': ['branch_result_o', 'branchpredict_sbe_t', 'branch_predict_i', 'bp_resolve_t', 'resolved_branch_o', 'resolve_branch_o', 'exception_t', 'branch_exception_o', ')'],
+        'internals': []
+    },
+    'cache_ctrl': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'bypass_i', 'busy_o', 'dcache_req_i_t', 'req_port_i', 'dcache_req_o_t', 'req_port_o', 'req_o', 'addr_o', 'gnt_i', 'cache_line_t', 'data_o', 'cl_be_t', 'be_o', 'tag_o', 'cache_line_t', 'data_i', 'we_o', 'hit_way_i', 'miss_req_t', 'miss_req_o', 'miss_gnt_i', 'active_serving_i', 'critical_word_i', 'critical_word_valid_i', 'bypass_gnt_i', 'bypass_valid_i', 'bypass_data_i', 'mshr_addr_o', 'mshr_addr_matches_i', 'mshr_index_matches_i', ')'],
+        'outputs': ['busy_o', 'dcache_req_i_t', 'req_port_i', 'dcache_req_o_t', 'req_port_o', 'req_o', 'addr_o', 'gnt_i', 'cache_line_t', 'data_o', 'cl_be_t', 'be_o', 'tag_o', 'cache_line_t', 'data_i', 'we_o', 'hit_way_i', 'miss_req_t', 'miss_req_o', 'miss_gnt_i', 'active_serving_i', 'critical_word_i', 'critical_word_valid_i', 'bypass_gnt_i', 'bypass_valid_i', 'bypass_data_i', 'mshr_addr_o', 'mshr_addr_matches_i', 'mshr_index_matches_i', ')'],
+        'internals': []
+    },
+    'commit_stage': {
+        'inputs': ['clk_i', 'rst_ni', 'halt_i', 'flush_dcache_i', 'exception_t', 'exception_o', 'dirty_fp_state_o', 'single_step_i', 'scoreboard_entry_t', 'commit_instr_i', 'commit_drop_i', 'commit_ack_o', 'commit_macro_ack_o', 'waddr_o', 'wdata_o', 'we_gpr_o', 'we_fpr_o', 'amo_resp_t', 'amo_resp_i', 'pc_o', 'fu_op', 'csr_op_o', 'csr_wdata_o', 'csr_rdata_i', 'csr_write_fflags_o', 'exception_t', 'csr_exception_i', 'commit_lsu_o', 'commit_lsu_ready_i', 'commit_tran_id_o', 'amo_valid_commit_o', 'no_st_pending_i', 'commit_csr_o', 'fence_i_o', 'fence_o', 'flush_commit_o', 'sfence_vma_o', 'hfence_vvma_o', 'hfence_gvma_o', 'break_from_trigger_i', ')'],
+        'outputs': ['exception_t', 'exception_o', 'dirty_fp_state_o', 'single_step_i', 'scoreboard_entry_t', 'commit_instr_i', 'commit_drop_i', 'commit_ack_o', 'commit_macro_ack_o', 'waddr_o', 'wdata_o', 'we_gpr_o', 'we_fpr_o', 'amo_resp_t', 'amo_resp_i', 'pc_o', 'fu_op', 'csr_op_o', 'csr_wdata_o', 'csr_rdata_i', 'csr_write_fflags_o', 'exception_t', 'csr_exception_i', 'commit_lsu_o', 'commit_lsu_ready_i', 'commit_tran_id_o', 'amo_valid_commit_o', 'no_st_pending_i', 'commit_csr_o', 'fence_i_o', 'fence_o', 'flush_commit_o', 'sfence_vma_o', 'hfence_vvma_o', 'hfence_gvma_o', 'break_from_trigger_i', ')'],
+        'internals': []
+    },
+    'compressed_instr_decoder': {
+        'inputs': ['clk_i', 'rst_ni', 'compressed_valid_i', 'x_compressed_req_t', 'compressed_req_i', 'compressed_ready_o', 'x_compressed_resp_t', 'compressed_resp_o', ')'],
+        'outputs': ['compressed_ready_o', 'x_compressed_resp_t', 'compressed_resp_o', ')'],
+        'internals': []
+    },
+    'controller': {
+        'inputs': ['clk_i', 'rst_ni', 'v_i', 'set_pc_commit_o', 'flush_if_o', 'flush_unissued_instr_o', 'flush_id_o', 'flush_ex_o', 'flush_bp_o', 'flush_icache_o', 'flush_dcache_o', 'flush_dcache_ack_i', 'flush_tlb_o', 'flush_tlb_vvma_o', 'flush_tlb_gvma_o', 'halt_csr_i', 'halt_acc_i', 'halt_frontend_o', 'halt_o', 'eret_i', 'ex_valid_i', 'set_debug_pc_i', 'bp_resolve_t', 'resolved_branch_i', 'flush_csr_i', 'fence_i_i', 'fence_i', 'sfence_vma_i', 'hfence_vvma_i', 'hfence_gvma_i', 'flush_commit_i', 'flush_acc_i', ')'],
+        'outputs': ['set_pc_commit_o', 'flush_if_o', 'flush_unissued_instr_o', 'flush_id_o', 'flush_ex_o', 'flush_bp_o', 'flush_icache_o', 'flush_dcache_o', 'flush_dcache_ack_i', 'flush_tlb_o', 'flush_tlb_vvma_o', 'flush_tlb_gvma_o', 'halt_csr_i', 'halt_acc_i', 'halt_frontend_o', 'halt_o', 'eret_i', 'ex_valid_i', 'set_debug_pc_i', 'bp_resolve_t', 'resolved_branch_i', 'flush_csr_i', 'fence_i_i', 'fence_i', 'sfence_vma_i', 'hfence_vvma_i', 'hfence_gvma_i', 'flush_commit_i', 'flush_acc_i', ')'],
+        'internals': []
+    },
+    'copro_alu': {
+        'inputs': ['clk_i', 'rst_ni', 'opcode_t', 'opcode_i', 'hartid_t', 'hartid_i', 'id_t', 'id_i', 'rd_i', 'result_o', 'hartid_t', 'hartid_o', 'id_t', 'id_o', 'rd_o', 'valid_o', 'we_o', ')'],
+        'outputs': ['result_o', 'hartid_t', 'hartid_o', 'id_t', 'id_o', 'rd_o', 'valid_o', 'we_o', ')'],
+        'internals': []
+    },
+    'csr_buffer': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'fu_data_t', 'fu_data_i', 'csr_ready_o', 'csr_valid_i', 'csr_result_o', 'csr_commit_i', 'csr_addr_o', ')'],
+        'outputs': ['csr_ready_o', 'csr_valid_i', 'csr_result_o', 'csr_commit_i', 'csr_addr_o', ')'],
+        'internals': []
+    },
+    'csr_regfile': {
+        'inputs': ['clk_i', 'rst_ni', 'time_irq_i', 'flush_o', 'halt_csr_o', 'scoreboard_entry_t', 'commit_instr_i', 'commit_ack_i', 'boot_addr_i', 'hart_id_i', 'exception_t', 'ex_i', 'fu_op', 'csr_op_i', 'csr_addr_i', 'csr_wdata_i', 'csr_rdata_o', 'dirty_fp_state_i', 'csr_write_fflags_i', 'dirty_v_state_i', 'pc_i', 'exception_t', 'csr_exception_o', 'epc_o', 'eret_o', 'trap_vector_base_o', 'riscv::priv_lvl_t', 'priv_lvl_o', 'v_o', 'acc_fflags_ex_i', 'acc_fflags_ex_valid_i', 'riscv::xs_t', 'fs_o', 'riscv::xs_t', 'vfs_o', 'fflags_o', 'frm_o', 'fprec_o', 'riscv::xs_t', 'vs_o', 'irq_ctrl_t', 'irq_ctrl_o', 'en_translation_o', 'en_g_translation_o', 'en_ld_st_translation_o', 'en_ld_st_g_translation_o', 'riscv::priv_lvl_t', 'ld_st_priv_lvl_o', 'ld_st_v_o', 'csr_hs_ld_st_inst_i', 'sum_o', 'vs_sum_o', 'mxr_o', 'vmxr_o', 'satp_ppn_o', 'asid_o', 'vsatp_ppn_o', 'vs_asid_o', 'hgatp_ppn_o', 'vmid_o', 'irq_i', 'ipi_i', 'debug_req_i', 'set_debug_pc_o', 'tvm_o', 'tw_o', 'vtw_o', 'tsr_o', 'hu_o', 'debug_mode_o', 'single_step_o', 'icache_en_o', 'dcache_en_o', 'acc_cons_en_o', 'perf_addr_o', 'perf_data_o', 'perf_data_i', 'perf_we_o', 'riscv::pmpcfg_t', 'pmpcfg_o', 'pmpaddr_o', 'mcountinhibit_o', 'rvfi_probes_csr_t', 'rvfi_csr_o', 'jvt_t', 'jvt_o', 'debug_from_trigger_o', 'vaddr_from_lsu_i', 'orig_instr_i', 'store_result_i', 'break_from_trigger_o', ')'],
+        'outputs': ['flush_o', 'halt_csr_o', 'scoreboard_entry_t', 'commit_instr_i', 'commit_ack_i', 'boot_addr_i', 'hart_id_i', 'exception_t', 'ex_i', 'fu_op', 'csr_op_i', 'csr_addr_i', 'csr_wdata_i', 'csr_rdata_o', 'dirty_fp_state_i', 'csr_write_fflags_i', 'dirty_v_state_i', 'pc_i', 'exception_t', 'csr_exception_o', 'epc_o', 'eret_o', 'trap_vector_base_o', 'riscv::priv_lvl_t', 'priv_lvl_o', 'v_o', 'acc_fflags_ex_i', 'acc_fflags_ex_valid_i', 'riscv::xs_t', 'fs_o', 'riscv::xs_t', 'vfs_o', 'fflags_o', 'frm_o', 'fprec_o', 'riscv::xs_t', 'vs_o', 'irq_ctrl_t', 'irq_ctrl_o', 'en_translation_o', 'en_g_translation_o', 'en_ld_st_translation_o', 'en_ld_st_g_translation_o', 'riscv::priv_lvl_t', 'ld_st_priv_lvl_o', 'ld_st_v_o', 'csr_hs_ld_st_inst_i', 'sum_o', 'vs_sum_o', 'mxr_o', 'vmxr_o', 'satp_ppn_o', 'asid_o', 'vsatp_ppn_o', 'vs_asid_o', 'hgatp_ppn_o', 'vmid_o', 'irq_i', 'ipi_i', 'debug_req_i', 'set_debug_pc_o', 'tvm_o', 'tw_o', 'vtw_o', 'tsr_o', 'hu_o', 'debug_mode_o', 'single_step_o', 'icache_en_o', 'dcache_en_o', 'acc_cons_en_o', 'perf_addr_o', 'perf_data_o', 'perf_data_i', 'perf_we_o', 'riscv::pmpcfg_t', 'pmpcfg_o', 'pmpaddr_o', 'mcountinhibit_o', 'rvfi_probes_csr_t', 'rvfi_csr_o', 'jvt_t', 'jvt_o', 'debug_from_trigger_o', 'vaddr_from_lsu_i', 'orig_instr_i', 'store_result_i', 'break_from_trigger_o', ')', 'trap_vector_base_o', '=', "2'b0}"],
+        'internals': []
+    },
+    'cva6': {
+        'inputs': ['clk_i', 'rst_ni', 'boot_addr_i', 'hart_id_i', 'irq_i', 'ipi_i', 'time_irq_i', 'debug_req_i', 'rvfi_probes_t', 'rvfi_probes_o', 'cvxif_req_t', 'cvxif_req_o', 'cvxif_resp_t', 'cvxif_resp_i', 'noc_req_t', 'noc_req_o', 'noc_resp_t', 'noc_resp_i', ')'],
+        'outputs': ['rvfi_probes_t', 'rvfi_probes_o', 'cvxif_req_t', 'cvxif_req_o', 'cvxif_resp_t', 'cvxif_resp_i', 'noc_req_t', 'noc_req_o', 'noc_resp_t', 'noc_resp_i', ')'],
+        'internals': []
+    },
+    'cva6_accel_first_pass_decoder': {
+        'inputs': ['instruction_i', 'riscv::xs_t', 'fs_i', 'riscv::xs_t', 'vs_i', 'is_accel_o', 'scoreboard_entry_t', 'instruction_o', 'illegal_instr_o', 'is_control_flow_instr_o', ')'],
+        'outputs': ['is_accel_o', 'scoreboard_entry_t', 'instruction_o', 'illegal_instr_o', 'is_control_flow_instr_o', ')'],
+        'internals': []
+    },
+    'cva6_fifo_v3': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'testmode_i', 'full_o', 'empty_o', 'usage_o', 'dtype', 'data_i', 'push_i', 'dtype', 'data_o', 'pop_i', ')'],
+        'outputs': ['full_o', 'empty_o', 'usage_o', 'dtype', 'data_i', 'push_i', 'dtype', 'data_o', 'pop_i', ')'],
+        'internals': []
+    },
+    'cva6_hpdcache_if_adapter': {
+        'inputs': ['clk_i', 'rst_ni', 'hpdcache_req_sid_t', 'hpdcache_req_sid_i', 'dcache_req_i_t', 'cva6_req_i', 'dcache_req_o_t', 'cva6_req_o', 'ariane_pkg::amo_req_t', 'cva6_amo_req_i', 'ariane_pkg::amo_resp_t', 'cva6_amo_resp_o', 'cva6_dcache_flush_i', 'cva6_dcache_flush_ack_o', 'hpdcache_req_valid_o', 'hpdcache_req_ready_i', 'hpdcache_req_t', 'hpdcache_req_o', 'hpdcache_req_abort_o', 'hpdcache_tag_t', 'hpdcache_req_tag_o', 'hpdcache_pkg::hpdcache_pma_t', 'hpdcache_req_pma_o', 'hpdcache_rsp_valid_i', 'hpdcache_rsp_t', 'hpdcache_rsp_i', ')'],
+        'outputs': ['dcache_req_o_t', 'cva6_req_o', 'ariane_pkg::amo_req_t', 'cva6_amo_req_i', 'ariane_pkg::amo_resp_t', 'cva6_amo_resp_o', 'cva6_dcache_flush_i', 'cva6_dcache_flush_ack_o', 'hpdcache_req_valid_o', 'hpdcache_req_ready_i', 'hpdcache_req_t', 'hpdcache_req_o', 'hpdcache_req_abort_o', 'hpdcache_tag_t', 'hpdcache_req_tag_o', 'hpdcache_pkg::hpdcache_pma_t', 'hpdcache_req_pma_o', 'hpdcache_rsp_valid_i', 'hpdcache_rsp_t', 'hpdcache_rsp_i', ')'],
+        'internals': []
+    },
+    'cva6_hpdcache_subsystem': {
+        'inputs': ['clk_i', 'rst_ni', 'noc_req_t', 'noc_req_o', 'noc_resp_t', 'noc_resp_i', 'icache_en_i', 'icache_flush_i', 'icache_miss_o', 'icache_areq_t', 'icache_areq_i', 'icache_arsp_t', 'icache_areq_o', 'icache_dreq_t', 'icache_dreq_i', 'icache_drsp_t', 'icache_dreq_o', 'dcache_enable_i', 'dcache_flush_i', 'dcache_flush_ack_o', 'dcache_miss_o', 'ariane_pkg::amo_req_t', 'dcache_amo_req_i', 'ariane_pkg::amo_resp_t', 'dcache_amo_resp_o', 'cmo_req_t', 'dcache_cmo_req_i', 'cmo_rsp_t', 'dcache_cmo_resp_o', 'dcache_req_i_t', 'dcache_req_ports_i', 'dcache_req_o_t', 'dcache_req_ports_o', 'wbuffer_empty_o', 'wbuffer_not_ni_o', 'hwpf_base_set_i', 'hwpf_base_i', 'hwpf_base_o', 'hwpf_param_set_i', 'hwpf_param_i', 'hwpf_param_o', 'hwpf_throttle_set_i', 'hwpf_throttle_i', 'hwpf_throttle_o', 'hwpf_status_o', ')'],
+        'outputs': ['noc_req_t', 'noc_req_o', 'noc_resp_t', 'noc_resp_i', 'icache_en_i', 'icache_flush_i', 'icache_miss_o', 'icache_areq_t', 'icache_areq_i', 'icache_arsp_t', 'icache_areq_o', 'icache_dreq_t', 'icache_dreq_i', 'icache_drsp_t', 'icache_dreq_o', 'dcache_enable_i', 'dcache_flush_i', 'dcache_flush_ack_o', 'dcache_miss_o', 'ariane_pkg::amo_req_t', 'dcache_amo_req_i', 'ariane_pkg::amo_resp_t', 'dcache_amo_resp_o', 'cmo_req_t', 'dcache_cmo_req_i', 'cmo_rsp_t', 'dcache_cmo_resp_o', 'dcache_req_i_t', 'dcache_req_ports_i', 'dcache_req_o_t', 'dcache_req_ports_o', 'wbuffer_empty_o', 'wbuffer_not_ni_o', 'hwpf_base_set_i', 'hwpf_base_i', 'hwpf_base_o', 'hwpf_param_set_i', 'hwpf_param_i', 'hwpf_param_o', 'hwpf_throttle_set_i', 'hwpf_throttle_i', 'hwpf_throttle_o', 'hwpf_status_o', ')'],
+        'internals': []
+    },
+    'cva6_hpdcache_subsystem_axi_arbiter': {
+        'inputs': ['clk_i', 'rst_ni', 'icache_miss_valid_i', 'icache_miss_ready_o', 'icache_req_t', 'icache_miss_i', 'hpdcache_mem_id_t', 'icache_miss_id_i', 'icache_miss_resp_valid_o', 'icache_rtrn_t', 'icache_miss_resp_o', 'dcache_read_ready_o', 'dcache_read_valid_i', 'hpdcache_mem_req_t', 'dcache_read_i', 'dcache_read_resp_ready_i', 'dcache_read_resp_valid_o', 'hpdcache_mem_resp_r_t', 'dcache_read_resp_o', 'dcache_write_ready_o', 'dcache_write_valid_i', 'hpdcache_mem_req_t', 'dcache_write_i', 'dcache_write_data_ready_o', 'dcache_write_data_valid_i', 'hpdcache_mem_req_w_t', 'dcache_write_data_i', 'dcache_write_resp_ready_i', 'dcache_write_resp_valid_o', 'hpdcache_mem_resp_w_t', 'dcache_write_resp_o', 'axi_req_t', 'axi_req_o', 'axi_rsp_t', 'axi_resp_i', ')'],
+        'outputs': ['icache_miss_ready_o', 'icache_req_t', 'icache_miss_i', 'hpdcache_mem_id_t', 'icache_miss_id_i', 'icache_miss_resp_valid_o', 'icache_rtrn_t', 'icache_miss_resp_o', 'dcache_read_ready_o', 'dcache_read_valid_i', 'hpdcache_mem_req_t', 'dcache_read_i', 'dcache_read_resp_ready_i', 'dcache_read_resp_valid_o', 'hpdcache_mem_resp_r_t', 'dcache_read_resp_o', 'dcache_write_ready_o', 'dcache_write_valid_i', 'hpdcache_mem_req_t', 'dcache_write_i', 'dcache_write_data_ready_o', 'dcache_write_data_valid_i', 'hpdcache_mem_req_w_t', 'dcache_write_data_i', 'dcache_write_resp_ready_i', 'dcache_write_resp_valid_o', 'hpdcache_mem_resp_w_t', 'dcache_write_resp_o', 'axi_req_t', 'axi_req_o', 'axi_rsp_t', 'axi_resp_i', ')'],
+        'internals': []
+    },
+    'cva6_hpdcache_wrapper': {
+        'inputs': ['clk_i', 'rst_ni', 'dcache_enable_i', 'dcache_flush_i', 'dcache_flush_ack_o', 'dcache_miss_o', 'ariane_pkg::amo_req_t', 'dcache_amo_req_i', 'ariane_pkg::amo_resp_t', 'dcache_amo_resp_o', 'cmo_req_t', 'dcache_cmo_req_i', 'cmo_rsp_t', 'dcache_cmo_resp_o', 'dcache_req_i_t', 'dcache_req_ports_i', 'dcache_req_o_t', 'dcache_req_ports_o', 'wbuffer_empty_o', 'wbuffer_not_ni_o', 'hwpf_base_set_i', 'hwpf_base_i', 'hwpf_base_o', 'hwpf_param_set_i', 'hwpf_param_i', 'hwpf_param_o', 'hwpf_throttle_set_i', 'hwpf_throttle_i', 'hwpf_throttle_o', 'hwpf_status_o', 'dcache_mem_req_read_ready_i', 'dcache_mem_req_read_valid_o', 'hpdcache_mem_req_t', 'dcache_mem_req_read_o', 'dcache_mem_resp_read_ready_o', 'dcache_mem_resp_read_valid_i', 'hpdcache_mem_resp_r_t', 'dcache_mem_resp_read_i', 'dcache_mem_req_write_ready_i', 'dcache_mem_req_write_valid_o', 'hpdcache_mem_req_t', 'dcache_mem_req_write_o', 'dcache_mem_req_write_data_ready_i', 'dcache_mem_req_write_data_valid_o', 'hpdcache_mem_req_w_t', 'dcache_mem_req_write_data_o', 'dcache_mem_resp_write_ready_o', 'dcache_mem_resp_write_valid_i', 'hpdcache_mem_resp_w_t', 'dcache_mem_resp_write_i', ')'],
+        'outputs': ['dcache_flush_ack_o', 'dcache_miss_o', 'ariane_pkg::amo_req_t', 'dcache_amo_req_i', 'ariane_pkg::amo_resp_t', 'dcache_amo_resp_o', 'cmo_req_t', 'dcache_cmo_req_i', 'cmo_rsp_t', 'dcache_cmo_resp_o', 'dcache_req_i_t', 'dcache_req_ports_i', 'dcache_req_o_t', 'dcache_req_ports_o', 'wbuffer_empty_o', 'wbuffer_not_ni_o', 'hwpf_base_set_i', 'hwpf_base_i', 'hwpf_base_o', 'hwpf_param_set_i', 'hwpf_param_i', 'hwpf_param_o', 'hwpf_throttle_set_i', 'hwpf_throttle_i', 'hwpf_throttle_o', 'hwpf_status_o', 'dcache_mem_req_read_ready_i', 'dcache_mem_req_read_valid_o', 'hpdcache_mem_req_t', 'dcache_mem_req_read_o', 'dcache_mem_resp_read_ready_o', 'dcache_mem_resp_read_valid_i', 'hpdcache_mem_resp_r_t', 'dcache_mem_resp_read_i', 'dcache_mem_req_write_ready_i', 'dcache_mem_req_write_valid_o', 'hpdcache_mem_req_t', 'dcache_mem_req_write_o', 'dcache_mem_req_write_data_ready_i', 'dcache_mem_req_write_data_valid_o', 'hpdcache_mem_req_w_t', 'dcache_mem_req_write_data_o', 'dcache_mem_resp_write_ready_o', 'dcache_mem_resp_write_valid_i', 'hpdcache_mem_resp_w_t', 'dcache_mem_resp_write_i', ')'],
+        'internals': []
+    },
+    'cva6_icache': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'en_i', 'miss_o', 'icache_areq_t', 'areq_i', 'icache_arsp_t', 'areq_o', 'icache_dreq_t', 'dreq_i', 'icache_drsp_t', 'dreq_o', 'mem_rtrn_vld_i', 'icache_rtrn_t', 'mem_rtrn_i', 'mem_data_req_o', 'mem_data_ack_i', 'icache_req_t', 'mem_data_o', ')', 'in)'],
+        'outputs': ['miss_o', 'icache_areq_t', 'areq_i', 'icache_arsp_t', 'areq_o', 'icache_dreq_t', 'dreq_i', 'icache_drsp_t', 'dreq_o', 'mem_rtrn_vld_i', 'icache_rtrn_t', 'mem_rtrn_i', 'mem_data_req_o', 'mem_data_ack_i', 'icache_req_t', 'mem_data_o', ')'],
+        'internals': []
+    },
+    'cva6_rvfi': {
+        'inputs': ['clk_i', 'rst_ni', 'rvfi_probes_t', 'rvfi_probes_i', 'rvfi_instr_t', 'rvfi_instr_o', 'rvfi_to_iti_t', 'rvfi_to_iti_o', 'rvfi_csr_t', 'rvfi_csr_o', ')', 'fu_op', 'amo_op', 'mem_old_val'],
+        'outputs': ['rvfi_instr_t', 'rvfi_instr_o', 'rvfi_to_iti_t', 'rvfi_to_iti_o', 'rvfi_csr_t', 'rvfi_csr_o', ')'],
+        'internals': []
+    },
+    'cva6_rvfi_probes': {
+        'inputs': ['flush_i', 'issue_instr_ack_i', 'fetch_entry_valid_i', 'instruction_i', 'is_compressed_i', ':', 'issue_pointer_i', 'commit_pointer_i', 'flush_unissued_instr_i', 'decoded_instr_valid_i', 'decoded_instr_ack_i', 'rs1_i', 'rs2_i', 'scoreboard_entry_t', 'commit_instr_i', 'commit_drop_i', 'exception_t', 'ex_commit_i', 'riscv::priv_lvl_t', 'priv_lvl_i', 'lsu_ctrl_t', 'lsu_ctrl_i', 'wbdata_i', 'commit_ack_i', 'mem_paddr_i', 'debug_mode_i', 'wdata_i', 'rvfi_probes_csr_t', 'csr_i', 'irq_i', 'bp_resolve_t', 'resolved_branch_i', 'flu_trans_id_ex_id_i', 'rvfi_probes_t', 'rvfi_probes_o', ')'],
+        'outputs': ['rvfi_probes_t', 'rvfi_probes_o', ')'],
+        'internals': []
+    },
+    'cvxif_compressed_if_driver': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'hart_id_i', 'is_compressed_i', 'is_illegal_i', 'instruction_i', 'is_compressed_o', 'is_illegal_o', 'instruction_o', 'stall_i', 'stall_o', 'compressed_ready_i', 'x_compressed_resp_t', 'compressed_resp_i', 'compressed_valid_o', 'x_compressed_req_t', 'compressed_req_o', ')'],
+        'outputs': ['is_compressed_o', 'is_illegal_o', 'instruction_o', 'stall_i', 'stall_o', 'compressed_ready_i', 'x_compressed_resp_t', 'compressed_resp_i', 'compressed_valid_o', 'x_compressed_req_t', 'compressed_req_o', ')'],
+        'internals': []
+    },
+    'cvxif_example_coprocessor': {
+        'inputs': ['clk_i', 'rst_ni', 'cvxif_req_t', 'cvxif_req_i', 'cvxif_resp_t', 'cvxif_resp_o', ')'],
+        'outputs': ['cvxif_resp_t', 'cvxif_resp_o', ')'],
+        'internals': []
+    },
+    'cvxif_fu': {
+        'inputs': ['clk_i', 'rst_ni', 'v_i', 'x_valid_i', 'x_trans_id_i', 'x_illegal_i', 'x_off_instr_i', 'x_ready_o', 'x_trans_id_o', 'exception_t', 'x_exception_o', 'x_result_o', 'x_valid_o', 'x_we_o', 'x_rd_o', 'result_valid_i', 'x_result_t', 'result_i', 'result_ready_o', ')'],
+        'outputs': ['x_ready_o', 'x_trans_id_o', 'exception_t', 'x_exception_o', 'x_result_o', 'x_valid_o', 'x_we_o', 'x_rd_o', 'result_valid_i', 'x_result_t', 'result_i', 'result_ready_o', ')'],
+        'internals': []
+    },
+    'cvxif_issue_register_commit_if_driver': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'hart_id_i', 'issue_ready_i', 'x_issue_resp_t', 'issue_resp_i', 'issue_valid_o', 'x_issue_req_t', 'issue_req_o', 'commit_valid_o', 'x_commit_t', 'commit_o', 'valid_i', 'x_off_instr_i', 'x_trans_id_i', 'rs_valid_i', ')'],
+        'outputs': ['issue_valid_o', 'x_issue_req_t', 'issue_req_o', 'commit_valid_o', 'x_commit_t', 'commit_o', 'valid_i', 'x_off_instr_i', 'x_trans_id_i', 'rs_valid_i', ')'],
+        'internals': []
+    },
+    'decoder': {
+        'inputs': ['debug_req_i', 'pc_i', 'is_compressed_i', 'compressed_instr_i', 'is_illegal_i', 'instruction_i', 'is_macro_instr_i', 'is_last_macro_instr_i', 'is_double_rd_macro_instr_i', 'is_zcmt_i', 'jump_address_i', 'branchpredict_sbe_t', 'branch_predict_i', 'exception_t', 'ex_i', 'irq_i', 'irq_ctrl_t', 'irq_ctrl_i', 'riscv::priv_lvl_t', 'priv_lvl_i', 'v_i', 'debug_mode_i', 'riscv::xs_t', 'fs_i', 'riscv::xs_t', 'vfs_i', 'frm_i', 'riscv::xs_t', 'vs_i', 'tvm_i', 'tw_i', 'vtw_i', 'tsr_i', 'hu_i', 'scoreboard_entry_t', 'instruction_o', 'orig_instr_o', 'is_control_flow_instr_o', 'debug_from_trigger_i', ')'],
+        'outputs': ['scoreboard_entry_t', 'instruction_o', 'orig_instr_o', 'is_control_flow_instr_o', 'debug_from_trigger_i', ')'],
+        'internals': []
+    },
+    'ex_stage': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'debug_mode_i', 'rs1_forwarding_i', 'rs2_forwarding_i', 'fu_data_t', 'fu_data_i', 'alu_bypass_t', 'alu_bypass_i', 'pc_i', 'is_zcmt_i', 'is_compressed_instr_i', 'tinst_i', 'flu_result_o', 'flu_trans_id_o', 'exception_t', 'flu_exception_o', 'flu_ready_o', 'flu_valid_o', 'alu_valid_i', 'aes_valid_i', 'branch_valid_i', 'branchpredict_sbe_t', 'branch_predict_i', 'bp_resolve_t', 'resolved_branch_o', 'resolve_branch_o', 'csr_valid_i', 'csr_addr_o', 'csr_commit_i', 'mult_valid_i', 'lsu_ready_o', 'lsu_valid_i', 'load_valid_o', 'load_result_o', 'load_trans_id_o', 'exception_t', 'load_exception_o', 'store_valid_o', 'store_result_o', 'store_trans_id_o', 'exception_t', 'store_exception_o', 'lsu_commit_i', 'lsu_commit_ready_o', 'commit_tran_id_i', 'stall_st_pending_i', 'no_st_pending_o', 'amo_valid_commit_i', 'fpu_ready_o', 'fpu_valid_i', 'fpu_fmt_i', 'fpu_rm_i', 'fpu_frm_i', 'fpu_prec_i', 'fpu_trans_id_o', 'fpu_result_o', 'fpu_valid_o', 'exception_t', 'fpu_exception_o', 'fpu_early_valid_o', 'alu2_valid_i', 'x_valid_i', 'x_ready_o', 'x_off_instr_i', 'x_trans_id_o', 'exception_t', 'x_exception_o', 'x_result_o', 'x_valid_o', 'x_we_o', 'x_rd_o', 'x_result_valid_i', 'x_result_t', 'x_result_i', 'x_result_ready_o', 'x_transaction_rejected_i', 'acc_valid_i', 'acc_mmu_req_t', 'acc_mmu_req_i', 'acc_mmu_resp_t', 'acc_mmu_resp_o', 'enable_translation_i', 'enable_g_translation_i', 'en_ld_st_translation_i', 'en_ld_st_g_translation_i', 'flush_tlb_i', 'flush_tlb_vvma_i', 'flush_tlb_gvma_i', 'riscv::priv_lvl_t', 'priv_lvl_i', 'v_i', 'riscv::priv_lvl_t', 'ld_st_priv_lvl_i', 'ld_st_v_i', 'csr_hs_ld_st_inst_o', 'sum_i', 'vs_sum_i', 'mxr_i', 'vmxr_i', 'satp_ppn_i', 'asid_i', 'vsatp_ppn_i', 'vs_asid_i', 'hgatp_ppn_i', 'vmid_i', 'icache_arsp_t', 'icache_areq_i', 'icache_areq_t', 'icache_areq_o', 'dcache_req_o_t', 'dcache_req_ports_i', 'dcache_req_i_t', 'dcache_req_ports_o', 'dcache_wbuffer_empty_i', 'dcache_wbuffer_not_ni_i', 'amo_req_t', 'amo_req_o', 'amo_resp_t', 'amo_resp_i', 'itlb_miss_o', 'dtlb_miss_o', 'riscv::pmpcfg_t', 'pmpcfg_i', 'pmpaddr_i', 'lsu_ctrl_t', 'rvfi_lsu_ctrl_o', 'rvfi_mem_paddr_o', 'orig_instr_aes_i', ')'],
+        'outputs': ['flu_result_o', 'flu_trans_id_o', 'exception_t', 'flu_exception_o', 'flu_ready_o', 'flu_valid_o', 'alu_valid_i', 'aes_valid_i', 'branch_valid_i', 'branchpredict_sbe_t', 'branch_predict_i', 'bp_resolve_t', 'resolved_branch_o', 'resolve_branch_o', 'csr_valid_i', 'csr_addr_o', 'csr_commit_i', 'mult_valid_i', 'lsu_ready_o', 'lsu_valid_i', 'load_valid_o', 'load_result_o', 'load_trans_id_o', 'exception_t', 'load_exception_o', 'store_valid_o', 'store_result_o', 'store_trans_id_o', 'exception_t', 'store_exception_o', 'lsu_commit_i', 'lsu_commit_ready_o', 'commit_tran_id_i', 'stall_st_pending_i', 'no_st_pending_o', 'amo_valid_commit_i', 'fpu_ready_o', 'fpu_valid_i', 'fpu_fmt_i', 'fpu_rm_i', 'fpu_frm_i', 'fpu_prec_i', 'fpu_trans_id_o', 'fpu_result_o', 'fpu_valid_o', 'exception_t', 'fpu_exception_o', 'fpu_early_valid_o', 'alu2_valid_i', 'x_valid_i', 'x_ready_o', 'x_off_instr_i', 'x_trans_id_o', 'exception_t', 'x_exception_o', 'x_result_o', 'x_valid_o', 'x_we_o', 'x_rd_o', 'x_result_valid_i', 'x_result_t', 'x_result_i', 'x_result_ready_o', 'x_transaction_rejected_i', 'acc_valid_i', 'acc_mmu_req_t', 'acc_mmu_req_i', 'acc_mmu_resp_t', 'acc_mmu_resp_o', 'enable_translation_i', 'enable_g_translation_i', 'en_ld_st_translation_i', 'en_ld_st_g_translation_i', 'flush_tlb_i', 'flush_tlb_vvma_i', 'flush_tlb_gvma_i', 'riscv::priv_lvl_t', 'priv_lvl_i', 'v_i', 'riscv::priv_lvl_t', 'ld_st_priv_lvl_i', 'ld_st_v_i', 'csr_hs_ld_st_inst_o', 'sum_i', 'vs_sum_i', 'mxr_i', 'vmxr_i', 'satp_ppn_i', 'asid_i', 'vsatp_ppn_i', 'vs_asid_i', 'hgatp_ppn_i', 'vmid_i', 'icache_arsp_t', 'icache_areq_i', 'icache_areq_t', 'icache_areq_o', 'dcache_req_o_t', 'dcache_req_ports_i', 'dcache_req_i_t', 'dcache_req_ports_o', 'dcache_wbuffer_empty_i', 'dcache_wbuffer_not_ni_i', 'amo_req_t', 'amo_req_o', 'amo_resp_t', 'amo_resp_i', 'itlb_miss_o', 'dtlb_miss_o', 'riscv::pmpcfg_t', 'pmpcfg_i', 'pmpaddr_i', 'lsu_ctrl_t', 'rvfi_lsu_ctrl_o', 'rvfi_mem_paddr_o', 'orig_instr_aes_i', ')'],
+        'internals': []
+    },
+    'fpu_wrap': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'fpu_valid_i', 'fpu_ready_o', 'fu_data_t', 'fu_data_i', 'fpu_fmt_i', 'fpu_rm_i', 'fpu_frm_i', 'fpu_prec_i', 'fpu_trans_id_o', 'result_o', 'fpu_valid_o', 'exception_t', 'fpu_exception_o', 'fpu_early_valid_o', ')'],
+        'outputs': ['fpu_ready_o', 'fu_data_t', 'fu_data_i', 'fpu_fmt_i', 'fpu_rm_i', 'fpu_frm_i', 'fpu_prec_i', 'fpu_trans_id_o', 'result_o', 'fpu_valid_o', 'exception_t', 'fpu_exception_o', 'fpu_early_valid_o', ')'],
+        'internals': []
+    },
+    'id_stage': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'debug_req_i', 'fetch_entry_t', 'fetch_entry_i', 'fetch_entry_valid_i', 'fetch_entry_ready_o', 'scoreboard_entry_t', 'issue_entry_o', 'scoreboard_entry_t', 'issue_entry_o_prev', 'orig_instr_o', 'issue_entry_valid_o', 'is_ctrl_flow_o', 'issue_instr_ack_i', 'rvfi_is_compressed_o', 'riscv::priv_lvl_t', 'priv_lvl_i', 'v_i', 'riscv::xs_t', 'fs_i', 'riscv::xs_t', 'vfs_i', 'frm_i', 'riscv::xs_t', 'vs_i', 'irq_i', 'irq_ctrl_t', 'irq_ctrl_i', 'debug_mode_i', 'tvm_i', 'tw_i', 'vtw_i', 'tsr_i', 'hu_i', 'hart_id_i', 'compressed_ready_i', 'jvt_t', 'jvt_i', 'x_compressed_resp_t', 'compressed_resp_i', 'compressed_valid_o', 'x_compressed_req_t', 'compressed_req_o', 'debug_from_trigger_i', 'dcache_req_o_t', 'dcache_req_ports_i', 'dcache_req_i_t', 'dcache_req_ports_o', ')'],
+        'outputs': ['fetch_entry_ready_o', 'scoreboard_entry_t', 'issue_entry_o', 'scoreboard_entry_t', 'issue_entry_o_prev', 'orig_instr_o', 'issue_entry_valid_o', 'is_ctrl_flow_o', 'issue_instr_ack_i', 'rvfi_is_compressed_o', 'riscv::priv_lvl_t', 'priv_lvl_i', 'v_i', 'riscv::xs_t', 'fs_i', 'riscv::xs_t', 'vfs_i', 'frm_i', 'riscv::xs_t', 'vs_i', 'irq_i', 'irq_ctrl_t', 'irq_ctrl_i', 'debug_mode_i', 'tvm_i', 'tw_i', 'vtw_i', 'tsr_i', 'hu_i', 'hart_id_i', 'compressed_ready_i', 'jvt_t', 'jvt_i', 'x_compressed_resp_t', 'compressed_resp_i', 'compressed_valid_o', 'x_compressed_req_t', 'compressed_req_o', 'debug_from_trigger_i', 'dcache_req_o_t', 'dcache_req_ports_i', 'dcache_req_i_t', 'dcache_req_ports_o', ')'],
+        'internals': []
+    },
+    'instr_decoder': {
+        'inputs': ['clk_i', 'rst_ni', 'issue_valid_i', 'x_issue_req_t', 'issue_req_i', 'issue_ready_o', 'x_issue_resp_t', 'issue_resp_o', 'opcode_t', 'opcode_o', 'hartid_t', 'hartid_o', 'id_t', 'id_o', 'rd_o', ')'],
+        'outputs': ['issue_ready_o', 'x_issue_resp_t', 'issue_resp_o', 'opcode_t', 'opcode_o', 'hartid_t', 'hartid_o', 'id_t', 'id_o', 'rd_o', ')'],
+        'internals': []
+    },
+    'instr_queue': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'instr_i', 'addr_i', 'valid_i', 'ready_o', 'consumed_o', 'ariane_pkg::frontend_exception_t', 'exception_i', 'exception_addr_i', 'exception_gpaddr_i', 'exception_tinst_i', 'exception_gva_i', 'predict_address_i', 'ariane_pkg::cf_t', 'cf_type_i', 'replay_o', 'replay_addr_o', 'fetch_entry_t', 'fetch_entry_o', 'fetch_entry_valid_o', 'fetch_entry_ready_i', ')', 'assign', '='],
+        'outputs': ['ready_o', 'consumed_o', 'ariane_pkg::frontend_exception_t', 'exception_i', 'exception_addr_i', 'exception_gpaddr_i', 'exception_tinst_i', 'exception_gva_i', 'predict_address_i', 'ariane_pkg::cf_t', 'cf_type_i', 'replay_o', 'replay_addr_o', 'fetch_entry_t', 'fetch_entry_o', 'fetch_entry_valid_o', 'fetch_entry_ready_i', ')'],
+        'internals': []
+    },
+    'instr_scan': {
+        'inputs': ['instr_i', 'rvi_return_o', 'rvi_call_o', 'rvi_branch_o', 'rvi_jalr_o', 'rvi_jump_o', 'rvi_imm_o', 'rvc_branch_o', 'rvc_jump_o', 'rvc_jr_o', 'rvc_return_o', 'rvc_jalr_o', 'rvc_call_o', 'rvc_imm_o', ')'],
+        'outputs': ['rvi_return_o', 'rvi_call_o', 'rvi_branch_o', 'rvi_jalr_o', 'rvi_jump_o', 'rvi_imm_o', 'rvc_branch_o', 'rvc_jump_o', 'rvc_jr_o', 'rvc_return_o', 'rvc_jalr_o', 'rvc_call_o', 'rvc_imm_o', ')'],
+        'internals': []
+    },
+    'interfaces': {
+        'inputs': ['clk_i', 'rst_ni', 'boot_addr_i', 'flush_bp_i', 'flush_i', 'halt_i', 'halt_frontend_i', 'set_pc_commit_i', 'pc_commit_i', 'ex_valid_i', 'bp_resolve_t', 'resolved_branch_i', 'eret_i', 'epc_i', 'trap_vector_base_i', 'set_debug_pc_i', 'debug_mode_i', 'icache_dreq_t', 'icache_dreq_o', 'icache_drsp_t', 'icache_dreq_i', 'fetch_entry_t', 'fetch_entry_o', 'fetch_entry_valid_o', 'fetch_entry_ready_i', ')'],
+        'outputs': ['icache_dreq_t', 'icache_dreq_o', 'icache_drsp_t', 'icache_dreq_i', 'fetch_entry_t', 'fetch_entry_o', 'fetch_entry_valid_o', 'fetch_entry_ready_i', ')'],
+        'internals': []
+    },
+    'is': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'flush_vvma_i', 'flush_gvma_i', 's_st_enbl_i', 'g_st_enbl_i', 'v_i', 'tlb_update_cva6_t', 'update_i', 'lu_access_i', 'lu_asid_i', 'lu_vmid_i', 'lu_vaddr_i', 'lu_gpaddr_o', 'pte_cva6_t', 'lu_content_o', 'pte_cva6_t', 'lu_g_content_o', 'asid_to_be_flushed_i', 'vmid_to_be_flushed_i', 'vaddr_to_be_flushed_i', 'gpaddr_to_be_flushed_i', 'lu_is_page_o', 'lu_hit_o', ')'],
+        'outputs': ['lu_gpaddr_o', 'pte_cva6_t', 'lu_content_o', 'pte_cva6_t', 'lu_g_content_o', 'asid_to_be_flushed_i', 'vmid_to_be_flushed_i', 'vaddr_to_be_flushed_i', 'gpaddr_to_be_flushed_i', 'lu_is_page_o', 'lu_hit_o', ')'],
+        'internals': []
+    },
+    'issue_read_operands': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'stall_i', 'scoreboard_entry_t', 'issue_instr_i', 'scoreboard_entry_t', 'issue_instr_i_prev', 'orig_instr_i', 'issue_instr_valid_i', 'issue_ack_o', 'forwarding_t', 'fwd_i', 'fu_data_t', 'fu_data_o', 'alu_bypass_t', 'alu_bypass_o', 'rs1_forwarding_o', 'rs2_forwarding_o', 'pc_o', 'is_zcmt_o', 'is_compressed_instr_o', 'flu_ready_i', 'alu_valid_o', 'aes_valid_o', 'branch_valid_o', 'tinst_o', 'branchpredict_sbe_t', 'branch_predict_o', 'lsu_ready_i', 'lsu_valid_o', 'mult_valid_o', 'fpu_ready_i', 'fpu_early_valid_i', 'fpu_valid_o', 'fpu_fmt_o', 'fpu_rm_o', 'alu2_valid_o', 'csr_valid_o', 'cvxif_valid_o', 'cvxif_ready_i', 'cvxif_off_instr_o', 'hart_id_i', 'x_issue_ready_i', 'x_issue_resp_t', 'x_issue_resp_i', 'x_issue_valid_o', 'x_issue_req_t', 'x_issue_req_o', 'x_commit_valid_o', 'x_commit_t', 'x_commit_o', 'x_transaction_accepted_o', 'x_transaction_rejected_o', 'x_issue_writeback_o', 'x_id_o', 'waddr_i', 'wdata_i', 'we_gpr_i', 'we_fpr_i', 'stall_issue_o', 'rvfi_rs1_o', 'rvfi_rs2_o', 'orig_instr_aes_bits', ')'],
+        'outputs': ['issue_ack_o', 'forwarding_t', 'fwd_i', 'fu_data_t', 'fu_data_o', 'alu_bypass_t', 'alu_bypass_o', 'rs1_forwarding_o', 'rs2_forwarding_o', 'pc_o', 'is_zcmt_o', 'is_compressed_instr_o', 'flu_ready_i', 'alu_valid_o', 'aes_valid_o', 'branch_valid_o', 'tinst_o', 'branchpredict_sbe_t', 'branch_predict_o', 'lsu_ready_i', 'lsu_valid_o', 'mult_valid_o', 'fpu_ready_i', 'fpu_early_valid_i', 'fpu_valid_o', 'fpu_fmt_o', 'fpu_rm_o', 'alu2_valid_o', 'csr_valid_o', 'cvxif_valid_o', 'cvxif_ready_i', 'cvxif_off_instr_o', 'hart_id_i', 'x_issue_ready_i', 'x_issue_resp_t', 'x_issue_resp_i', 'x_issue_valid_o', 'x_issue_req_t', 'x_issue_req_o', 'x_commit_valid_o', 'x_commit_t', 'x_commit_o', 'x_transaction_accepted_o', 'x_transaction_rejected_o', 'x_issue_writeback_o', 'x_id_o', 'waddr_i', 'wdata_i', 'we_gpr_i', 'we_fpr_i', 'stall_issue_o', 'rvfi_rs1_o', 'rvfi_rs2_o', 'orig_instr_aes_bits', ')'],
+        'internals': []
+    },
+    'issue_stage': {
+        'inputs': ['clk_i', 'rst_ni', 'sb_full_o', 'flush_unissued_instr_i', 'flush_i', 'stall_i', 'scoreboard_entry_t', 'decoded_instr_i', 'scoreboard_entry_t', 'decoded_instr_i_prev', 'orig_instr_i', 'decoded_instr_valid_i', 'is_ctrl_flow_i', 'decoded_instr_ack_o', 'rs1_forwarding_o', 'rs2_forwarding_o', 'fu_data_t', 'fu_data_o', 'alu_bypass_t', 'alu_bypass_o', 'pc_o', 'is_zcmt_o', 'is_compressed_instr_o', 'tinst_o', 'flu_ready_i', 'alu_valid_o', 'aes_valid_o', 'branch_valid_o', 'branchpredict_sbe_t', 'branch_predict_o', 'resolve_branch_i', 'lsu_ready_i', 'lsu_valid_o', 'mult_valid_o', 'fpu_ready_i', 'fpu_valid_o', 'fpu_fmt_o', 'fpu_rm_o', 'fpu_early_valid_i', 'alu2_valid_o', 'csr_valid_o', 'xfu_valid_o', 'xfu_ready_i', 'x_off_instr_o', 'hart_id_i', 'x_issue_ready_i', 'x_issue_resp_t', 'x_issue_resp_i', 'x_issue_valid_o', 'x_issue_req_t', 'x_issue_req_o', 'x_commit_valid_o', 'x_commit_t', 'x_commit_o', 'x_transaction_rejected_o', 'scoreboard_entry_t', 'issue_instr_o', 'issue_instr_hs_o', 'trans_id_i', 'bp_resolve_t', 'resolved_branch_i', 'wbdata_i', 'exception_t', 'ex_ex_i', 'wt_valid_i', 'x_we_i', 'x_rd_i', 'waddr_i', 'wdata_i', 'we_gpr_i', 'we_fpr_i', 'scoreboard_entry_t', 'commit_instr_o', 'commit_drop_o', 'commit_ack_i', 'stall_issue_o', 'rvfi_issue_pointer_o', 'rvfi_commit_pointer_o', 'rvfi_rs1_o', 'rvfi_rs2_o', 'orig_instr_aes_bits', ')'],
+        'outputs': ['sb_full_o', 'flush_unissued_instr_i', 'flush_i', 'stall_i', 'scoreboard_entry_t', 'decoded_instr_i', 'scoreboard_entry_t', 'decoded_instr_i_prev', 'orig_instr_i', 'decoded_instr_valid_i', 'is_ctrl_flow_i', 'decoded_instr_ack_o', 'rs1_forwarding_o', 'rs2_forwarding_o', 'fu_data_t', 'fu_data_o', 'alu_bypass_t', 'alu_bypass_o', 'pc_o', 'is_zcmt_o', 'is_compressed_instr_o', 'tinst_o', 'flu_ready_i', 'alu_valid_o', 'aes_valid_o', 'branch_valid_o', 'branchpredict_sbe_t', 'branch_predict_o', 'resolve_branch_i', 'lsu_ready_i', 'lsu_valid_o', 'mult_valid_o', 'fpu_ready_i', 'fpu_valid_o', 'fpu_fmt_o', 'fpu_rm_o', 'fpu_early_valid_i', 'alu2_valid_o', 'csr_valid_o', 'xfu_valid_o', 'xfu_ready_i', 'x_off_instr_o', 'hart_id_i', 'x_issue_ready_i', 'x_issue_resp_t', 'x_issue_resp_i', 'x_issue_valid_o', 'x_issue_req_t', 'x_issue_req_o', 'x_commit_valid_o', 'x_commit_t', 'x_commit_o', 'x_transaction_rejected_o', 'scoreboard_entry_t', 'issue_instr_o', 'issue_instr_hs_o', 'trans_id_i', 'bp_resolve_t', 'resolved_branch_i', 'wbdata_i', 'exception_t', 'ex_ex_i', 'wt_valid_i', 'x_we_i', 'x_rd_i', 'waddr_i', 'wdata_i', 'we_gpr_i', 'we_fpr_i', 'scoreboard_entry_t', 'commit_instr_o', 'commit_drop_o', 'commit_ack_i', 'stall_issue_o', 'rvfi_issue_pointer_o', 'rvfi_commit_pointer_o', 'rvfi_rs1_o', 'rvfi_rs2_o', 'orig_instr_aes_bits', ')'],
+        'internals': []
+    },
+    'load_store_unit': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'stall_st_pending_i', 'no_st_pending_o', 'amo_valid_commit_i', 'tinst_i', 'fu_data_t', 'fu_data_i', 'lsu_ready_o', 'lsu_valid_i', 'load_trans_id_o', 'load_result_o', 'load_valid_o', 'exception_t', 'load_exception_o', 'store_trans_id_o', 'store_result_o', 'store_valid_o', 'exception_t', 'store_exception_o', 'commit_i', 'commit_ready_o', 'commit_tran_id_i', 'enable_translation_i', 'enable_g_translation_i', 'en_ld_st_translation_i', 'en_ld_st_g_translation_i', 'acc_mmu_req_t', 'acc_mmu_req_i', 'acc_mmu_resp_t', 'acc_mmu_resp_o', 'icache_arsp_t', 'icache_areq_i', 'icache_areq_t', 'icache_areq_o', 'riscv::priv_lvl_t', 'priv_lvl_i', 'v_i', 'riscv::priv_lvl_t', 'ld_st_priv_lvl_i', 'ld_st_v_i', 'csr_hs_ld_st_inst_o', 'sum_i', 'vs_sum_i', 'mxr_i', 'vmxr_i', 'satp_ppn_i', 'asid_i', 'vsatp_ppn_i', 'vs_asid_i', 'hgatp_ppn_i', 'vmid_i', 'asid_to_be_flushed_i', 'vmid_to_be_flushed_i', 'vaddr_to_be_flushed_i', 'gpaddr_to_be_flushed_i', 'flush_tlb_i', 'flush_tlb_vvma_i', 'flush_tlb_gvma_i', 'itlb_miss_o', 'dtlb_miss_o', 'dcache_req_o_t', 'dcache_req_ports_i', 'dcache_req_i_t', 'dcache_req_ports_o', 'dcache_wbuffer_empty_i', 'dcache_wbuffer_not_ni_i', 'amo_req_t', 'amo_req_o', 'amo_resp_t', 'amo_resp_i', 'riscv::pmpcfg_t', 'pmpcfg_i', 'pmpaddr_i', 'lsu_ctrl_t', 'rvfi_lsu_ctrl_o', 'rvfi_mem_paddr_o', ')'],
+        'outputs': ['no_st_pending_o', 'amo_valid_commit_i', 'tinst_i', 'fu_data_t', 'fu_data_i', 'lsu_ready_o', 'lsu_valid_i', 'load_trans_id_o', 'load_result_o', 'load_valid_o', 'exception_t', 'load_exception_o', 'store_trans_id_o', 'store_result_o', 'store_valid_o', 'exception_t', 'store_exception_o', 'commit_i', 'commit_ready_o', 'commit_tran_id_i', 'enable_translation_i', 'enable_g_translation_i', 'en_ld_st_translation_i', 'en_ld_st_g_translation_i', 'acc_mmu_req_t', 'acc_mmu_req_i', 'acc_mmu_resp_t', 'acc_mmu_resp_o', 'icache_arsp_t', 'icache_areq_i', 'icache_areq_t', 'icache_areq_o', 'riscv::priv_lvl_t', 'priv_lvl_i', 'v_i', 'riscv::priv_lvl_t', 'ld_st_priv_lvl_i', 'ld_st_v_i', 'csr_hs_ld_st_inst_o', 'sum_i', 'vs_sum_i', 'mxr_i', 'vmxr_i', 'satp_ppn_i', 'asid_i', 'vsatp_ppn_i', 'vs_asid_i', 'hgatp_ppn_i', 'vmid_i', 'asid_to_be_flushed_i', 'vmid_to_be_flushed_i', 'vaddr_to_be_flushed_i', 'gpaddr_to_be_flushed_i', 'flush_tlb_i', 'flush_tlb_vvma_i', 'flush_tlb_gvma_i', 'itlb_miss_o', 'dtlb_miss_o', 'dcache_req_o_t', 'dcache_req_ports_i', 'dcache_req_i_t', 'dcache_req_ports_o', 'dcache_wbuffer_empty_i', 'dcache_wbuffer_not_ni_i', 'amo_req_t', 'amo_req_o', 'amo_resp_t', 'amo_resp_i', 'riscv::pmpcfg_t', 'pmpcfg_i', 'pmpaddr_i', 'lsu_ctrl_t', 'rvfi_lsu_ctrl_o', 'rvfi_mem_paddr_o', ')'],
+        'internals': []
+    },
+    'load_unit': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'valid_i', 'lsu_ctrl_t', 'lsu_ctrl_i', 'pop_ld_o', 'valid_o', 'trans_id_o', 'result_o', 'exception_t', 'ex_o', 'translation_req_o', 'vaddr_o', 'tinst_o', 'hs_ld_st_inst_o', 'hlvx_inst_o', 'paddr_i', 'exception_t', 'ex_i', 'dtlb_hit_i', 'dtlb_ppn_i', 'page_offset_o', 'page_offset_matches_i', 'store_buffer_empty_i', 'commit_tran_id_i', 'dcache_req_o_t', 'req_port_i', 'dcache_req_i_t', 'req_port_o', 'dcache_wbuffer_not_ni_i', ')'],
+        'outputs': ['pop_ld_o', 'valid_o', 'trans_id_o', 'result_o', 'exception_t', 'ex_o', 'translation_req_o', 'vaddr_o', 'tinst_o', 'hs_ld_st_inst_o', 'hlvx_inst_o', 'paddr_i', 'exception_t', 'ex_i', 'dtlb_hit_i', 'dtlb_ppn_i', 'page_offset_o', 'page_offset_matches_i', 'store_buffer_empty_i', 'commit_tran_id_i', 'dcache_req_o_t', 'req_port_i', 'dcache_req_i_t', 'req_port_o', 'dcache_wbuffer_not_ni_i', ')', 'ldbuf_r', '=', 'req_port_i.data_rvalid'],
+        'internals': []
+    },
+    'logic': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'lsu_bypass': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'lsu_ctrl_t', 'lsu_req_i', 'lsu_req_valid_i', 'pop_ld_i', 'pop_st_i', 'lsu_ctrl_t', 'lsu_ctrl_o', 'ready_o', ')'],
+        'outputs': ['lsu_ctrl_t', 'lsu_ctrl_o', 'ready_o', ')'],
+        'internals': []
+    },
+    'macro_decoder': {
+        'inputs': ['instr_i', 'clk_i', 'rst_ni', 'is_macro_instr_i', 'illegal_instr_i', 'is_compressed_i', 'issue_ack_i', 'instr_o', 'illegal_instr_o', 'is_compressed_o', 'fetch_stall_o', 'is_last_macro_instr_o', 'is_double_rd_macro_instr_o', ')'],
+        'outputs': ['instr_o', 'illegal_instr_o', 'is_compressed_o', 'fetch_stall_o', 'is_last_macro_instr_o', 'is_double_rd_macro_instr_o', ')'],
+        'internals': []
+    },
+    'miss_handler': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'flush_ack_o', 'miss_o', 'busy_i', 'miss_req_i', 'bypass_gnt_o', 'bypass_valid_o', 'bypass_data_o', 'axi_req_t', 'axi_bypass_o', 'axi_rsp_t', 'axi_bypass_i', 'miss_gnt_o', 'active_serving_o', 'critical_word_o', 'critical_word_valid_o', 'axi_req_t', 'axi_data_o', 'axi_rsp_t', 'axi_data_i', 'mshr_addr_i', 'mshr_addr_matches_o', 'mshr_index_matches_o', 'amo_req_t', 'amo_req_i', 'amo_resp_t', 'amo_resp_o', 'req_o', 'addr_o', 'cache_line_t', 'data_o', 'cl_be_t', 'be_o', 'cache_line_t', 'data_i', 'we_o', ')', 'in)', 'valid_dirty)', 'clk_i', 'rst_ni', 'req_t', 'req_i', 'rsp_t', 'rsp_o', 'req_t', 'req_o', 'rsp_t', 'rsp_i', ')'],
+        'outputs': ['flush_ack_o', 'miss_o', 'busy_i', 'miss_req_i', 'bypass_gnt_o', 'bypass_valid_o', 'bypass_data_o', 'axi_req_t', 'axi_bypass_o', 'axi_rsp_t', 'axi_bypass_i', 'miss_gnt_o', 'active_serving_o', 'critical_word_o', 'critical_word_valid_o', 'axi_req_t', 'axi_data_o', 'axi_rsp_t', 'axi_data_i', 'mshr_addr_i', 'mshr_addr_matches_o', 'mshr_index_matches_o', 'amo_req_t', 'amo_req_i', 'amo_resp_t', 'amo_resp_o', 'req_o', 'addr_o', 'cache_line_t', 'data_o', 'cl_be_t', 'be_o', 'cache_line_t', 'data_i', 'we_o', ')', 'rsp_t', 'rsp_o', 'req_t', 'req_o', 'rsp_t', 'rsp_i', ')'],
+        'internals': []
+    },
+    'mult': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'fu_data_t', 'fu_data_i', 'mult_valid_i', 'result_o', 'mult_valid_o', 'mult_ready_o', 'mult_trans_id_o', ')'],
+        'outputs': ['result_o', 'mult_valid_o', 'mult_ready_o', 'mult_trans_id_o', ')'],
+        'internals': []
+    },
+    'multiplier': {
+        'inputs': ['clk_i', 'rst_ni', 'trans_id_i', 'mult_valid_i', 'fu_op', 'operation_i', 'operand_a_i', 'operand_b_i', 'result_o', 'mult_valid_o', 'mult_trans_id_o', ')'],
+        'outputs': ['result_o', 'mult_valid_o', 'mult_trans_id_o', ')'],
+        'internals': []
+    },
+    'needs': {
+        'inputs': ['fu_op', 'op)', 'fu_op', 'op)', 'fu_op', 'op)', 'fu_op', 'op)', 'fu_op', 'op)', 'fu_op', 'op)', 's_st_enbl', 'g_st_enbl', 'is_s_1G', 'is_g_1G)', 's_st_enbl', 'g_st_enbl', 'is_s_1G', 'is_s_2M', 'is_g_1G', 'is_g_2M)', 's_st_enbl', 'is_1G', 'is_2M', 'vaddr', 'riscv::pte_t', 'pte)', 's_st_enbl', 'is_1G', 'is_2M', 'vpn', 'riscv::pte_t', 'pte)'],
+        'outputs': [],
+        'internals': []
+    },
+    'perf_counters': {
+        'inputs': ['clk_i', 'rst_ni', 'debug_mode_i', 'addr_i', 'we_i', 'data_i', 'data_o', 'scoreboard_entry_t', 'commit_instr_i', 'commit_ack_i', 'l1_icache_miss_i', 'l1_dcache_miss_i', 'itlb_miss_i', 'dtlb_miss_i', 'sb_full_i', 'if_empty_i', 'exception_t', 'ex_i', 'eret_i', 'bp_resolve_t', 'resolved_branch_i', 'exception_t', 'branch_exceptions_i', 'icache_dreq_t', 'l1_icache_access_i', 'dcache_req_i_t', 'l1_dcache_access_i', 'i_tlb_flush_i', 'stall_issue_i', 'mcountinhibit_i', ')'],
+        'outputs': ['data_o', 'scoreboard_entry_t', 'commit_instr_i', 'commit_ack_i', 'l1_icache_miss_i', 'l1_dcache_miss_i', 'itlb_miss_i', 'dtlb_miss_i', 'sb_full_i', 'if_empty_i', 'exception_t', 'ex_i', 'eret_i', 'bp_resolve_t', 'resolved_branch_i', 'exception_t', 'branch_exceptions_i', 'icache_dreq_t', 'l1_icache_access_i', 'dcache_req_i_t', 'l1_dcache_access_i', 'i_tlb_flush_i', 'stall_issue_i', 'mcountinhibit_i', ')'],
+        'internals': []
+    },
+    'pmp': {
+        'inputs': ['addr_i', 'riscv::pmp_access_t', 'access_type_i', 'riscv::priv_lvl_t', 'priv_lvl_i', 'conf_addr_i', 'riscv::pmpcfg_t', 'conf_i', 'allow_o', ')'],
+        'outputs': ['allow_o', ')'],
+        'internals': []
+    },
+    'pmp_data_if': {
+        'inputs': ['clk_i', 'rst_ni', 'icache_areq_t', 'icache_areq_i', 'icache_areq_t', 'icache_areq_o', 'icache_fetch_vaddr_i', 'lsu_valid_i', 'lsu_paddr_i', 'lsu_vaddr_i', 'exception_t', 'lsu_exception_i', 'lsu_is_store_i', 'lsu_valid_o', 'lsu_paddr_o', 'exception_t', 'lsu_exception_o', 'riscv::priv_lvl_t', 'priv_lvl_i', 'v_i', 'riscv::priv_lvl_t', 'ld_st_priv_lvl_i', 'ld_st_v_i', 'riscv::pmpcfg_t', 'pmpcfg_i', 'pmpaddr_i', ')'],
+        'outputs': ['icache_areq_t', 'icache_areq_o', 'icache_fetch_vaddr_i', 'lsu_valid_i', 'lsu_paddr_i', 'lsu_vaddr_i', 'exception_t', 'lsu_exception_i', 'lsu_is_store_i', 'lsu_valid_o', 'lsu_paddr_o', 'exception_t', 'lsu_exception_o', 'riscv::priv_lvl_t', 'priv_lvl_i', 'v_i', 'riscv::priv_lvl_t', 'ld_st_priv_lvl_i', 'ld_st_v_i', 'riscv::pmpcfg_t', 'pmpcfg_i', 'pmpaddr_i', ')'],
+        'internals': []
+    },
+    'pmp_entry': {
+        'inputs': ['addr_i', 'conf_addr_i', 'conf_addr_prev_i', 'riscv::pmp_addr_mode_t', 'conf_addr_mode_i', 'match_o', ')'],
+        'outputs': ['match_o', ')'],
+        'internals': []
+    },
+    'pmp_tb': {
+        'inputs': [],
+        'outputs': [],
+        'internals': []
+    },
+    'ras': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_bp_i', 'push_i', 'pop_i', 'data_i', 'ras_t', 'data_o', ')'],
+        'outputs': ['ras_t', 'data_o', ')'],
+        'internals': []
+    },
+    'raw_checker': {
+        'inputs': ['clk_i', 'rst_ni', 'rs_i', 'rs_fpr_i', 'rd_i', 'rd_fpr_i', 'still_issued_i', 'issue_pointer_i', 'idx_o', 'valid_o', ')'],
+        'outputs': ['idx_o', 'valid_o', ')'],
+        'internals': []
+    },
+    'scoreboard': {
+        'inputs': ['clk_i', 'rst_ni', 'sb_full_o', 'flush_unissued_instr_i', 'flush_i', 'x_transaction_accepted_i', 'x_issue_writeback_i', 'x_id_i', 'scoreboard_entry_t', 'commit_instr_o', 'commit_drop_o', 'commit_ack_i', 'scoreboard_entry_t', 'decoded_instr_i', 'orig_instr_i', 'decoded_instr_valid_i', 'decoded_instr_ack_o', 'scoreboard_entry_t', 'issue_instr_o', 'orig_instr_o', 'issue_instr_valid_o', 'issue_ack_i', 'forwarding_t', 'fwd_o', 'bp_resolve_t', 'resolved_branch_i', 'trans_id_i', 'wbdata_i', 'exception_t', 'ex_i', 'wt_valid_i', 'x_we_i', 'x_rd_i', 'rvfi_issue_pointer_o', 'rvfi_commit_pointer_o', ')'],
+        'outputs': ['sb_full_o', 'flush_unissued_instr_i', 'flush_i', 'x_transaction_accepted_i', 'x_issue_writeback_i', 'x_id_i', 'scoreboard_entry_t', 'commit_instr_o', 'commit_drop_o', 'commit_ack_i', 'scoreboard_entry_t', 'decoded_instr_i', 'orig_instr_i', 'decoded_instr_valid_i', 'decoded_instr_ack_o', 'scoreboard_entry_t', 'issue_instr_o', 'orig_instr_o', 'issue_instr_valid_o', 'issue_ack_i', 'forwarding_t', 'fwd_o', 'bp_resolve_t', 'resolved_branch_i', 'trans_id_i', 'wbdata_i', 'exception_t', 'ex_i', 'wt_valid_i', 'x_we_i', 'x_rd_i', 'rvfi_issue_pointer_o', 'rvfi_commit_pointer_o', ')'],
+        'internals': []
+    },
+    'serdiv': {
+        'inputs': ['clk_i', 'rst_ni', 'id_i', 'op_a_i', 'op_b_i', 'opcode_i', 'in_vld_i', 'in_rdy_o', 'flush_i', 'out_vld_o', 'out_rdy_i', 'id_o', 'res_o', ')', '=', '&', 'op_a_sign)', '?', "1'b1}", ':', 'op_a_i', '=', '&', 'op_b_sign)', '?', '~op_b_i', ':', 'op_b_i'],
+        'outputs': ['in_rdy_o', 'flush_i', 'out_vld_o', 'out_rdy_i', 'id_o', 'res_o', ')'],
+        'internals': []
+    },
+    'std_cache_subsystem': {
+        'inputs': ['clk_i', 'rst_ni', 'riscv::priv_lvl_t', 'priv_lvl_i', 'icache_en_i', 'icache_flush_i', 'icache_miss_o', 'icache_areq_t', 'icache_areq_i', 'icache_arsp_t', 'icache_areq_o', 'icache_dreq_t', 'icache_dreq_i', 'icache_drsp_t', 'icache_dreq_o', 'amo_req_t', 'amo_req_i', 'amo_resp_t', 'amo_resp_o', 'dcache_enable_i', 'dcache_flush_i', 'dcache_flush_ack_o', 'dcache_miss_o', 'wbuffer_empty_o', 'dcache_req_i_t', 'dcache_req_ports_i', 'dcache_req_o_t', 'dcache_req_ports_o', 'axi_req_t', 'axi_req_o', 'axi_rsp_t', 'axi_resp_i', ')'],
+        'outputs': ['icache_miss_o', 'icache_areq_t', 'icache_areq_i', 'icache_arsp_t', 'icache_areq_o', 'icache_dreq_t', 'icache_dreq_i', 'icache_drsp_t', 'icache_dreq_o', 'amo_req_t', 'amo_req_i', 'amo_resp_t', 'amo_resp_o', 'dcache_enable_i', 'dcache_flush_i', 'dcache_flush_ack_o', 'dcache_miss_o', 'wbuffer_empty_o', 'dcache_req_i_t', 'dcache_req_ports_i', 'dcache_req_o_t', 'dcache_req_ports_o', 'axi_req_t', 'axi_req_o', 'axi_rsp_t', 'axi_resp_i', ')'],
+        'internals': []
+    },
+    'std_nbdcache': {
+        'inputs': ['clk_i', 'rst_ni', 'enable_i', 'flush_i', 'flush_ack_o', 'miss_o', 'amo_req_t', 'amo_req_i', 'amo_resp_t', 'amo_resp_o', 'dcache_req_i_t', 'req_ports_i', 'dcache_req_o_t', 'req_ports_o', 'axi_req_t', 'axi_data_o', 'axi_rsp_t', 'axi_data_i', 'axi_req_t', 'axi_bypass_o', 'axi_rsp_t', 'axi_bypass_i', ')'],
+        'outputs': ['flush_ack_o', 'miss_o', 'amo_req_t', 'amo_req_i', 'amo_resp_t', 'amo_resp_o', 'dcache_req_i_t', 'req_ports_i', 'dcache_req_o_t', 'req_ports_o', 'axi_req_t', 'axi_data_o', 'axi_rsp_t', 'axi_data_i', 'axi_req_t', 'axi_bypass_o', 'axi_rsp_t', 'axi_bypass_i', ')'],
+        'internals': []
+    },
+    'store_buffer': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'stall_st_pending_i', 'no_st_pending_o', 'store_buffer_empty_o', 'page_offset_i', 'page_offset_matches_o', 'commit_i', 'commit_ready_o', 'ready_o', 'valid_i', 'valid_without_flush_i', 'paddr_i', 'rvfi_mem_paddr_o', 'data_i', 'be_i', 'data_size_i', 'dcache_req_o_t', 'req_port_i', 'dcache_req_i_t', 'req_port_o', ')'],
+        'outputs': ['no_st_pending_o', 'store_buffer_empty_o', 'page_offset_i', 'page_offset_matches_o', 'commit_i', 'commit_ready_o', 'ready_o', 'valid_i', 'valid_without_flush_i', 'paddr_i', 'rvfi_mem_paddr_o', 'data_i', 'be_i', 'data_size_i', 'dcache_req_o_t', 'req_port_i', 'dcache_req_i_t', 'req_port_o', ')'],
+        'internals': []
+    },
+    'store_unit': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'stall_st_pending_i', 'no_st_pending_o', 'store_buffer_empty_o', 'valid_i', 'lsu_ctrl_t', 'lsu_ctrl_i', 'pop_st_o', 'commit_i', 'commit_ready_o', 'amo_valid_commit_i', 'valid_o', 'trans_id_o', 'result_o', 'exception_t', 'ex_o', 'translation_req_o', 'vaddr_o', 'rvfi_mem_paddr_o', 'tinst_o', 'hs_ld_st_inst_o', 'hlvx_inst_o', 'paddr_i', 'exception_t', 'ex_i', 'dtlb_hit_i', 'page_offset_i', 'page_offset_matches_o', 'amo_req_t', 'amo_req_o', 'amo_resp_t', 'amo_resp_i', 'dcache_req_o_t', 'req_port_i', 'dcache_req_i_t', 'req_port_o', ')'],
+        'outputs': ['no_st_pending_o', 'store_buffer_empty_o', 'valid_i', 'lsu_ctrl_t', 'lsu_ctrl_i', 'pop_st_o', 'commit_i', 'commit_ready_o', 'amo_valid_commit_i', 'valid_o', 'trans_id_o', 'result_o', 'exception_t', 'ex_o', 'translation_req_o', 'vaddr_o', 'rvfi_mem_paddr_o', 'tinst_o', 'hs_ld_st_inst_o', 'hlvx_inst_o', 'paddr_i', 'exception_t', 'ex_i', 'dtlb_hit_i', 'page_offset_i', 'page_offset_matches_o', 'amo_req_t', 'amo_req_o', 'amo_resp_t', 'amo_resp_i', 'dcache_req_o_t', 'req_port_i', 'dcache_req_i_t', 'req_port_o', ')'],
+        'internals': []
+    },
+    'tag_cmp': {
+        'inputs': ['clk_i', 'rst_ni', 'req_i', 'gnt_o', 'addr_i', 'l_data_t', 'wdata_i', 'we_i', 'l_be_t', 'be_i', 'l_data_t', 'rdata_o', 'tag_i', 'hit_way_o', 'req_o', 'addr_o', 'l_data_t', 'wdata_o', 'we_o', 'l_be_t', 'be_o', 'l_data_t', 'rdata_i', ')'],
+        'outputs': ['gnt_o', 'addr_i', 'l_data_t', 'wdata_i', 'we_i', 'l_be_t', 'be_i', 'l_data_t', 'rdata_o', 'tag_i', 'hit_way_o', 'req_o', 'addr_o', 'l_data_t', 'wdata_o', 'we_o', 'l_be_t', 'be_o', 'l_data_t', 'rdata_i', ')'],
+        'internals': []
+    },
+    'takes': {
+        'inputs': ['clk_i', 'rst_ni', 'flush_i', 'valid_i', 'serving_unaligned_o', 'address_i', 'data_i', 'valid_o', 'addr_o', 'instr_o', ')'],
+        'outputs': ['serving_unaligned_o', 'address_i', 'data_i', 'valid_o', 'addr_o', 'instr_o', ')'],
+        'internals': []
+    },
+    'to': {
+        'inputs': ['clk_i', 'rst_ni', 'icache_data_req_i', 'icache_data_ack_o', 'icache_req_t', 'icache_data_i', 'icache_rtrn_vld_o', 'icache_rtrn_t', 'icache_rtrn_o', 'dcache_data_req_i', 'dcache_data_ack_o', 'dcache_req_t', 'dcache_data_i', 'dcache_rtrn_vld_o', 'dcache_rtrn_t', 'dcache_rtrn_o', 'l15_req_t', 'l15_req_o', 'l15_rtrn_t', 'l15_rtrn_i', ')'],
+        'outputs': ['icache_data_ack_o', 'icache_req_t', 'icache_data_i', 'icache_rtrn_vld_o', 'icache_rtrn_t', 'icache_rtrn_o', 'dcache_data_req_i', 'dcache_data_ack_o', 'dcache_req_t', 'dcache_data_i', 'dcache_rtrn_vld_o', 'dcache_rtrn_t', 'dcache_rtrn_o', 'l15_req_t', 'l15_req_o', 'l15_rtrn_t', 'l15_rtrn_i', ')'],
+        'internals': []
+    },
+    'trigger_module': {
+        'inputs': ['clk_i', 'rst_ni', 'scoreboard_entry_t', 'commit_instr_i', 'commit_ack_i', 'exception_t', 'ex_i', 'riscv::priv_lvl_t', 'priv_lvl_i', 'debug_mode_i', 'mret_i', 'sret_i', 'vaddr_from_lsu_i', 'orig_instr_i', 'store_result_i', 'scontext_i', 'tdata1_i', 'tdata2_i', 'tdata3_i', 'tselect_i', 'tselect_we', 'tdata1_we', 'tdata2_we', 'tdata3_we', 'tselect_o', 'tdata1_o', 'tdata2_o', 'tdata3_o', 'flush_o', 'break_from_trigger_o', 'debug_from_trigger_o', 'debug_from_mcontrol_o', ')'],
+        'outputs': ['tselect_o', 'tdata1_o', 'tdata2_o', 'tdata3_o', 'flush_o', 'break_from_trigger_o', 'debug_from_trigger_o', 'debug_from_mcontrol_o', ')'],
+        'internals': []
+    },
+    'wt_cache_subsystem': {
+        'inputs': ['clk_i', 'rst_ni', 'icache_en_i', 'icache_flush_i', 'icache_miss_o', 'icache_areq_t', 'icache_areq_i', 'icache_arsp_t', 'icache_areq_o', 'icache_dreq_t', 'icache_dreq_i', 'icache_drsp_t', 'icache_dreq_o', 'dcache_enable_i', 'dcache_flush_i', 'dcache_flush_ack_o', 'dcache_miss_o', 'miss_vld_bits_o', 'amo_req_t', 'dcache_amo_req_i', 'amo_resp_t', 'dcache_amo_resp_o', 'dcache_req_i_t', 'dcache_req_ports_i', 'dcache_req_o_t', 'dcache_req_ports_o', 'wbuffer_empty_o', 'wbuffer_not_ni_o', 'noc_req_t', 'noc_req_o', 'noc_resp_t', 'noc_resp_i', 'inval_addr_i', 'inval_valid_i', 'inval_ready_o', ')'],
+        'outputs': ['icache_miss_o', 'icache_areq_t', 'icache_areq_i', 'icache_arsp_t', 'icache_areq_o', 'icache_dreq_t', 'icache_dreq_i', 'icache_drsp_t', 'icache_dreq_o', 'dcache_enable_i', 'dcache_flush_i', 'dcache_flush_ack_o', 'dcache_miss_o', 'miss_vld_bits_o', 'amo_req_t', 'dcache_amo_req_i', 'amo_resp_t', 'dcache_amo_resp_o', 'dcache_req_i_t', 'dcache_req_ports_i', 'dcache_req_o_t', 'dcache_req_ports_o', 'wbuffer_empty_o', 'wbuffer_not_ni_o', 'noc_req_t', 'noc_req_o', 'noc_resp_t', 'noc_resp_i', 'inval_addr_i', 'inval_valid_i', 'inval_ready_o', ')'],
+        'internals': []
+    },
+    'wt_dcache': {
+        'inputs': ['clk_i', 'rst_ni', 'enable_i', 'flush_i', 'flush_ack_o', 'miss_o', 'wbuffer_empty_o', 'wbuffer_not_ni_o', 'amo_req_t', 'amo_req_i', 'amo_resp_t', 'amo_resp_o', 'dcache_req_i_t', 'req_ports_i', 'dcache_req_o_t', 'req_ports_o', 'miss_vld_bits_o', 'mem_rtrn_vld_i', 'dcache_rtrn_t', 'mem_rtrn_i', 'mem_data_req_o', 'mem_data_ack_i', 'dcache_req_t', 'mem_data_o', ')'],
+        'outputs': ['flush_ack_o', 'miss_o', 'wbuffer_empty_o', 'wbuffer_not_ni_o', 'amo_req_t', 'amo_req_i', 'amo_resp_t', 'amo_resp_o', 'dcache_req_i_t', 'req_ports_i', 'dcache_req_o_t', 'req_ports_o', 'miss_vld_bits_o', 'mem_rtrn_vld_i', 'dcache_rtrn_t', 'mem_rtrn_i', 'mem_data_req_o', 'mem_data_ack_i', 'dcache_req_t', 'mem_data_o', ')'],
+        'internals': []
+    },
+    'wt_dcache_ctrl': {
+        'inputs': ['clk_i', 'rst_ni', 'cache_en_i', 'dcache_req_i_t', 'req_port_i', 'dcache_req_o_t', 'req_port_o', 'miss_req_o', 'miss_ack_i', 'miss_we_o', 'miss_wdata_o', 'miss_wuser_o', 'miss_vld_bits_o', 'miss_paddr_o', 'miss_nc_o', 'miss_size_o', 'miss_id_o', 'miss_replay_i', 'miss_rtrn_vld_i', 'wr_cl_vld_i', 'rd_tag_o', 'rd_idx_o', 'rd_off_o', 'rd_req_o', 'rd_tag_only_o', 'rd_ack_i', 'rd_data_i', 'rd_user_i', 'rd_vld_bits_i', 'rd_hit_oh_i', ')'],
+        'outputs': ['dcache_req_o_t', 'req_port_o', 'miss_req_o', 'miss_ack_i', 'miss_we_o', 'miss_wdata_o', 'miss_wuser_o', 'miss_vld_bits_o', 'miss_paddr_o', 'miss_nc_o', 'miss_size_o', 'miss_id_o', 'miss_replay_i', 'miss_rtrn_vld_i', 'wr_cl_vld_i', 'rd_tag_o', 'rd_idx_o', 'rd_off_o', 'rd_req_o', 'rd_tag_only_o', 'rd_ack_i', 'rd_data_i', 'rd_user_i', 'rd_vld_bits_i', 'rd_hit_oh_i', ')'],
+        'internals': []
+    },
+    'wt_dcache_mem': {
+        'inputs': ['clk_i', 'rst_ni', 'rd_tag_i', 'rd_idx_i', 'rd_off_i', 'rd_req_i', 'rd_tag_only_i', 'rd_prio_i', 'rd_ack_o', 'rd_vld_bits_o', 'rd_hit_oh_o', 'rd_data_o', 'rd_user_o', 'wr_cl_vld_i', 'wr_cl_nc_i', 'wr_cl_we_i', 'wr_cl_tag_i', 'wr_cl_idx_i', 'wr_cl_off_i', 'wr_cl_data_i', 'wr_cl_user_i', 'wr_cl_data_be_i', 'wr_vld_bits_i', 'wr_req_i', 'wr_ack_o', 'wr_idx_i', 'wr_off_i', 'wr_data_i', 'wr_user_i', 'wr_data_be_i', 'wbuffer_t', 'wbuffer_data_i', ')', 'in)'],
+        'outputs': ['rd_ack_o', 'rd_vld_bits_o', 'rd_hit_oh_o', 'rd_data_o', 'rd_user_o', 'wr_cl_vld_i', 'wr_cl_nc_i', 'wr_cl_we_i', 'wr_cl_tag_i', 'wr_cl_idx_i', 'wr_cl_off_i', 'wr_cl_data_i', 'wr_cl_user_i', 'wr_cl_data_be_i', 'wr_vld_bits_i', 'wr_req_i', 'wr_ack_o', 'wr_idx_i', 'wr_off_i', 'wr_data_i', 'wr_user_i', 'wr_data_be_i', 'wbuffer_t', 'wbuffer_data_i', ')'],
+        'internals': []
+    },
+    'wt_dcache_missunit': {
+        'inputs': ['clk_i', 'rst_ni', 'enable_i', 'flush_i', 'flush_ack_o', 'miss_o', 'wbuffer_empty_i', 'cache_en_o', 'amo_req_t', 'amo_req_i', 'amo_resp_t', 'amo_resp_o', 'miss_req_i', 'miss_ack_o', 'miss_nc_i', 'miss_we_i', 'miss_wdata_i', 'miss_wuser_i', 'miss_paddr_i', 'miss_vld_bits_i', 'miss_size_i', 'miss_id_i', 'miss_replay_o', 'miss_rtrn_vld_o', 'miss_rtrn_id_o', 'tx_paddr_i', 'tx_vld_i', 'wr_cl_vld_o', 'wr_cl_nc_o', 'wr_cl_we_o', 'wr_cl_tag_o', 'wr_cl_idx_o', 'wr_cl_off_o', 'wr_cl_data_o', 'wr_cl_user_o', 'wr_cl_data_be_o', 'wr_vld_bits_o', 'mem_rtrn_vld_i', 'dcache_rtrn_t', 'mem_rtrn_i', 'mem_data_req_o', 'mem_data_ack_i', 'dcache_req_t', 'mem_data_o', ')', 'in)', 'paddr', 'size)'],
+        'outputs': ['flush_ack_o', 'miss_o', 'wbuffer_empty_i', 'cache_en_o', 'amo_req_t', 'amo_req_i', 'amo_resp_t', 'amo_resp_o', 'miss_req_i', 'miss_ack_o', 'miss_nc_i', 'miss_we_i', 'miss_wdata_i', 'miss_wuser_i', 'miss_paddr_i', 'miss_vld_bits_i', 'miss_size_i', 'miss_id_i', 'miss_replay_o', 'miss_rtrn_vld_o', 'miss_rtrn_id_o', 'tx_paddr_i', 'tx_vld_i', 'wr_cl_vld_o', 'wr_cl_nc_o', 'wr_cl_we_o', 'wr_cl_tag_o', 'wr_cl_idx_o', 'wr_cl_off_o', 'wr_cl_data_o', 'wr_cl_user_o', 'wr_cl_data_be_o', 'wr_vld_bits_o', 'mem_rtrn_vld_i', 'dcache_rtrn_t', 'mem_rtrn_i', 'mem_data_req_o', 'mem_data_ack_i', 'dcache_req_t', 'mem_data_o', ')'],
+        'internals': []
+    },
+    'wt_dcache_wbuffer': {
+        'inputs': ['clk_i', 'rst_ni', 'cache_en_i', 'empty_o', 'not_ni_o', 'dcache_req_i_t', 'req_port_i', 'dcache_req_o_t', 'req_port_o', 'miss_ack_i', 'miss_paddr_o', 'miss_req_o', 'miss_we_o', 'miss_wdata_o', 'miss_wuser_o', 'miss_vld_bits_o', 'miss_nc_o', 'miss_size_o', 'miss_id_o', 'miss_rtrn_vld_i', 'miss_rtrn_id_i', 'rd_tag_o', 'rd_idx_o', 'rd_off_o', 'rd_req_o', 'rd_tag_only_o', 'rd_ack_i', 'rd_data_i', 'rd_vld_bits_i', 'rd_hit_oh_i', 'wr_cl_vld_i', 'wr_cl_idx_i', 'wr_req_o', 'wr_ack_i', 'wr_idx_o', 'wr_off_o', 'wr_data_o', 'wr_data_be_o', 'wr_user_o', 'wbuffer_t', 'wbuffer_data_o', 'tx_paddr_o', 'tx_vld_o', ')', 'offset', 'size)', 'offset', 'size)', 'data', 'offset', 'size)', 'data', 'offset', 'size)'],
+        'outputs': ['empty_o', 'not_ni_o', 'dcache_req_i_t', 'req_port_i', 'dcache_req_o_t', 'req_port_o', 'miss_ack_i', 'miss_paddr_o', 'miss_req_o', 'miss_we_o', 'miss_wdata_o', 'miss_wuser_o', 'miss_vld_bits_o', 'miss_nc_o', 'miss_size_o', 'miss_id_o', 'miss_rtrn_vld_i', 'miss_rtrn_id_i', 'rd_tag_o', 'rd_idx_o', 'rd_off_o', 'rd_req_o', 'rd_tag_only_o', 'rd_ack_i', 'rd_data_i', 'rd_vld_bits_i', 'rd_hit_oh_i', 'wr_cl_vld_i', 'wr_cl_idx_i', 'wr_req_o', 'wr_ack_i', 'wr_idx_o', 'wr_off_o', 'wr_data_o', 'wr_data_be_o', 'wr_user_o', 'wbuffer_t', 'wbuffer_data_o', 'tx_paddr_o', 'tx_vld_o', ')'],
+        'internals': []
+    },
+    'zcmt_decoder': {
+        'inputs': ['clk_i', 'rst_ni', 'instr_i', 'pc_i', 'is_zcmt_instr_i', 'illegal_instr_i', 'is_compressed_i', 'jvt_t', 'jvt_i', 'dcache_req_o_t', 'req_port_i', 'instr_o', 'illegal_instr_o', 'is_compressed_o', 'fetch_stall_o', 'dcache_req_i_t', 'req_port_o', 'jump_address_o', ')'],
+        'outputs': ['instr_o', 'illegal_instr_o', 'is_compressed_o', 'fetch_stall_o', 'dcache_req_i_t', 'req_port_o', 'jump_address_o', ')'],
+        'internals': []
+    },
+},

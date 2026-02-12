@@ -3,7 +3,7 @@
 **Module:** TestICacheTop
 **File:** TestICacheTop.sv
 **Type:** Sequential
-**Total Candidates:** 3
+**Total Candidates:** 2
 
 ---
 
@@ -11,49 +11,55 @@
 
 ### T1: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
-**Confidence:** 0.60
+**Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (0):**
+**Trigger Signals (20):**
+- AddrPath
+- icNextReadAddrIn
+- AddrPath
+- icFillAddr
+- LineDataPath
+- ... and 15 more
 
-**Payload Signals (1):**
+**Payload Signals (10):**
 - rstOut
+- LineDataPath
+- icFillData
+- DataPath
+- icReadDataOut
+- ... and 5 more
 
 **Generated File:** T1_TestICacheTop_Integrity.sv
 
 ---
 
-### T2: Availability - Performance Degradation
+### T2: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Degrades performance through artificial delays
-
-**Trigger Signals (0):**
-
-**Payload Signals (1):**
-- icFillerBusy
-
-**Generated File:** T2_TestICacheTop_Availability.sv
-
----
-
-### T3: Covert - Covert Channel
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (0):**
+**Trigger Signals (8):**
+- LineDataPath
+- icFillData
+- DataPath
+- icReadDataOut
+- LineDataPath
+- ... and 3 more
 
-**Payload Signals (1):**
-- icFillerBusy
+**Payload Signals (10):**
+- rstOut
+- LineDataPath
+- icFillData
+- DataPath
+- icReadDataOut
+- ... and 5 more
 
-**Generated File:** T3_TestICacheTop_Covert.sv
+**Generated File:** T2_TestICacheTop_Covert.sv
 
 ---
 

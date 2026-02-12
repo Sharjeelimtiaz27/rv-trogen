@@ -3,7 +3,7 @@
 **Module:** logic
 **File:** RecoveryManagerIF.sv
 **Type:** Sequential
-**Total Candidates:** 5
+**Total Candidates:** 3
 
 ---
 
@@ -11,23 +11,23 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
 **Trigger Signals (5):**
-- unableToStartRecovery
-- recoverFromRename
-- renameLogicRecoveryRMT
-- flushIQ_Entry
+- storeQueueRecoveryTailPtr
+- storeQueueRecoveryTailPtr
+- storeQueueHeadPtr
+- storeQueueRecoveryTailPtr
 - storeQueueHeadPtr
 
 **Payload Signals (5):**
-- unableToStartRecovery
-- recoverFromRename
-- renameLogicRecoveryRMT
-- flushIQ_Entry
+- storeQueueRecoveryTailPtr
+- storeQueueRecoveryTailPtr
+- storeQueueHeadPtr
+- storeQueueRecoveryTailPtr
 - storeQueueHeadPtr
 
 **Generated File:** T1_logic_DoS.sv
@@ -36,71 +36,46 @@
 
 ### T2: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (3):**
-- selected
+**Trigger Signals (18):**
 - replayQueueFlushedOpExist
 - wakeupPipelineRegFlushedOpExist
+- faultingDataAddr
+- recoveryOpIndex
+- selected
+- ... and 13 more
 
-**Payload Signals (1):**
-- storeQueueHeadPtr
+**Payload Signals (3):**
+- faultingDataAddr
+- faultingDataAddr
+- faultingDataAddr
 
 **Generated File:** T2_logic_Integrity.sv
 
 ---
 
-### T3: Leak - Information Leakage
+### T3: Covert - Covert Channel
 
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (0):**
-
-**Payload Signals (1):**
-- wakeupPipelineRegFlushedOpExist
-
-**Generated File:** T3_logic_Leak.sv
-
----
-
-### T4: Availability - Performance Degradation
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Degrades performance through artificial delays
-
-**Trigger Signals (4):**
-- unableToStartRecovery
-- replayQueueFlushedOpExist
-- wakeupPipelineRegFlushedOpExist
-- storeQueueHeadPtr
-
-**Payload Signals (0):**
-
-**Generated File:** T4_logic_Availability.sv
-
----
-
-### T5: Covert - Covert Channel
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
 **Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (1):**
-- loadQueueHeadPtr
+**Trigger Signals (3):**
+- faultingDataAddr
+- faultingDataAddr
+- faultingDataAddr
 
-**Payload Signals (0):**
+**Payload Signals (3):**
+- faultingDataAddr
+- faultingDataAddr
+- faultingDataAddr
 
-**Generated File:** T5_logic_Covert.sv
+**Generated File:** T3_logic_Covert.sv
 
 ---
 

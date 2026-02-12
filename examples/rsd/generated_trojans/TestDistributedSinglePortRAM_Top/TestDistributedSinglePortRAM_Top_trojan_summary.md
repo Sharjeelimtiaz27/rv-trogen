@@ -9,19 +9,22 @@
 
 ## Generated Trojans
 
-### T1: Privilege - Privilege Escalation
+### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (1):**
+**Trigger Signals (2):**
+- we
 - we
 
-**Payload Signals (0):**
+**Payload Signals (2):**
+- we
+- we
 
-**Generated File:** T1_TestDistributedSinglePortRAM_Top_Privilege.sv
+**Generated File:** T1_TestDistributedSinglePortRAM_Top_DoS.sv
 
 ---
 

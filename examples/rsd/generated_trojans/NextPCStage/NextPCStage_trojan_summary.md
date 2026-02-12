@@ -3,77 +3,60 @@
 **Module:** NextPCStage
 **File:** NextPCStage.sv
 **Type:** Sequential
-**Total Candidates:** 4
+**Total Candidates:** 3
 
 ---
 
 ## Generated Trojans
 
-### T1: Integrity - Integrity Violation
+### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
-**Description:** Corrupts computation results or data
+**Description:** Disables functionality by forcing control signals to 0
 
 **Trigger Signals (1):**
-- address
+- numValidInsns
 
 **Payload Signals (1):**
-- writePC_FromOuter
+- numValidInsns
 
-**Generated File:** T1_NextPCStage_Integrity.sv
+**Generated File:** T1_NextPCStage_DoS.sv
 
 ---
 
 ### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** RSA-T600
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** Critical
-**Confidence:** 0.60
+**Confidence:** 1.00
 **Description:** Leaks sensitive data to attacker-accessible location
 
-**Trigger Signals (0):**
+**Trigger Signals (1):**
+- writePC_FromOuter
 
-**Payload Signals (2):**
-- address
-- regStall
+**Payload Signals (1):**
+- writePC_FromOuter
 
 **Generated File:** T2_NextPCStage_Leak.sv
 
 ---
 
-### T3: Privilege - Privilege Escalation
+### T3: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom RISC-V
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (2):**
-- address
-- writePC_FromOuter
-
-**Payload Signals (0):**
-
-**Generated File:** T3_NextPCStage_Privilege.sv
-
----
-
-### T4: Availability - Performance Degradation
-
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
-**Confidence:** 0.60
+**Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (0):**
+**Trigger Signals (1):**
+- numValidInsns
 
-**Payload Signals (2):**
-- stall
-- regStall
+**Payload Signals (1):**
+- numValidInsns
 
-**Generated File:** T4_NextPCStage_Availability.sv
+**Generated File:** T3_NextPCStage_Availability.sv
 
 ---
 

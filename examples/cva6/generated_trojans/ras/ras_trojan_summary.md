@@ -11,33 +11,44 @@
 
 ### T1: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
-**Confidence:** 0.60
+**Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (1):**
+**Trigger Signals (4):**
 - pop_i
+- data_i
+- data_o
+- data_o
 
-**Payload Signals (0):**
+**Payload Signals (3):**
+- data_i
+- data_o
+- data_o
 
 **Generated File:** T1_ras_Integrity.sv
 
 ---
 
-### T2: Availability - Performance Degradation
+### T2: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Degrades performance through artificial delays
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (1):**
-- pop_i
+**Trigger Signals (3):**
+- data_i
+- data_o
+- data_o
 
-**Payload Signals (0):**
+**Payload Signals (3):**
+- data_i
+- data_o
+- data_o
 
-**Generated File:** T2_ras_Availability.sv
+**Generated File:** T2_ras_Covert.sv
 
 ---
 

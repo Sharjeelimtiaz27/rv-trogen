@@ -3,7 +3,7 @@
 **Module:** FP32DivSqrter
 **File:** FP32DivSqrter.sv
 **Type:** Sequential
-**Total Candidates:** 4
+**Total Candidates:** 3
 
 ---
 
@@ -11,72 +11,72 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (2):**
+**Trigger Signals (1):**
 - req
-- dividend_normalize
 
-**Payload Signals (2):**
+**Payload Signals (1):**
 - req
-- dividend_normalize
 
 **Generated File:** T1_FP32DivSqrter_DoS.sv
 
 ---
 
-### T2: Leak - Information Leakage
+### T2: Integrity - Integrity Violation
 
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (0):**
-
-**Payload Signals (2):**
-- regCounter
-- regResult
-
-**Generated File:** T2_FP32DivSqrter_Leak.sv
-
----
-
-### T3: Integrity - Integrity Violation
-
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
-**Confidence:** 0.60
+**Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (0):**
+**Trigger Signals (6):**
+- regData.v_lhs_mant
+- regData.v_rhs_mant
+- regData.is_divide
+- regData.res_is_zero
+- regData.rem
+- ... and 1 more
 
-**Payload Signals (4):**
+**Payload Signals (10):**
 - result
-- regResult
+- result
 - result_sign
-- result_expo
+- regData.v_lhs_mant
+- regData.v_rhs_mant
+- ... and 5 more
 
-**Generated File:** T3_FP32DivSqrter_Integrity.sv
+**Generated File:** T2_FP32DivSqrter_Integrity.sv
 
 ---
 
-### T4: Availability - Performance Degradation
+### T3: Covert - Covert Channel
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Degrades performance through artificial delays
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Creates hidden communication channel through timing
 
-**Trigger Signals (1):**
-- req
+**Trigger Signals (6):**
+- regData.v_lhs_mant
+- regData.v_rhs_mant
+- regData.is_divide
+- regData.res_is_zero
+- regData.rem
+- ... and 1 more
 
-**Payload Signals (0):**
+**Payload Signals (10):**
+- result
+- result
+- result_sign
+- regData.v_lhs_mant
+- regData.v_rhs_mant
+- ... and 5 more
 
-**Generated File:** T4_FP32DivSqrter_Availability.sv
+**Generated File:** T3_FP32DivSqrter_Covert.sv
 
 ---
 

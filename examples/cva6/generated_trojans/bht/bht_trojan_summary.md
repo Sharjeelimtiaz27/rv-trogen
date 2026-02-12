@@ -3,7 +3,7 @@
 **Module:** bht
 **File:** bht.sv
 **Type:** Sequential
-**Total Candidates:** 5
+**Total Candidates:** 6
 
 ---
 
@@ -11,86 +11,120 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
 **Trigger Signals (2):**
 - valid
-- bht_update_taken
+- bht_updated_valid
 
 **Payload Signals (2):**
 - valid
-- bht_update_taken
+- bht_updated_valid
 
 **Generated File:** T1_bht_DoS.sv
 
 ---
 
-### T2: Privilege - Privilege Escalation
+### T2: Leak - Information Leakage
 
-**Trust-Hub Source:** Custom RISC-V
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** Critical
 **Confidence:** 1.00
-**Description:** Escalates privilege level to machine mode
-
-**Trigger Signals (1):**
-- debug_mode_i
-
-**Payload Signals (1):**
-- debug_mode_i
-
-**Generated File:** T2_bht_Privilege.sv
-
----
-
-### T3: Availability - Performance Degradation
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 1.00
-**Description:** Degrades performance through artificial delays
-
-**Trigger Signals (1):**
-- valid
-
-**Payload Signals (1):**
-- valid
-
-**Generated File:** T3_bht_Availability.sv
-
----
-
-### T4: Leak - Information Leakage
-
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 0.60
 **Description:** Leaks sensitive data to attacker-accessible location
 
 **Trigger Signals (1):**
 - debug_mode_i
 
-**Payload Signals (0):**
+**Payload Signals (4):**
+- bht_ram_read_address_0
+- bht_ram_read_address_1
+- bht_ram_rdata_0
+- bht_ram_rdata_1
 
-**Generated File:** T4_bht_Leak.sv
+**Generated File:** T2_bht_Leak.sv
 
 ---
 
-### T5: Covert - Covert Channel
+### T3: Privilege - Privilege Escalation
 
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Creates hidden communication channel through timing
+**Trust-Hub Status:** Not applicable (processor-specific)
+**Severity:** Critical
+**Confidence:** 1.00
+**Description:** Escalates privilege level to machine mode
 
-**Trigger Signals (0):**
+**Trigger Signals (3):**
+- debug_mode_i
+- bht_ram_read_address_0
+- bht_ram_read_address_1
 
 **Payload Signals (1):**
 - debug_mode_i
 
-**Generated File:** T5_bht_Covert.sv
+**Generated File:** T3_bht_Privilege.sv
+
+---
+
+### T4: Integrity - Integrity Violation
+
+**Trust-Hub Status:** Verified RTL Benchmarks
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Corrupts computation results or data
+
+**Trigger Signals (4):**
+- bht_ram_read_address_0
+- bht_ram_read_address_1
+- bht_ram_rdata_0
+- bht_ram_rdata_1
+
+**Payload Signals (2):**
+- bht_ram_rdata_0
+- bht_ram_rdata_1
+
+**Generated File:** T4_bht_Integrity.sv
+
+---
+
+### T5: Availability - Performance Degradation
+
+**Trust-Hub Status:** Category exists (gate-level only)
+**Severity:** Medium
+**Confidence:** 1.00
+**Description:** Degrades performance through artificial delays
+
+**Trigger Signals (2):**
+- valid
+- bht_updated_valid
+
+**Payload Signals (2):**
+- valid
+- bht_updated_valid
+
+**Generated File:** T5_bht_Availability.sv
+
+---
+
+### T6: Covert - Covert Channel
+
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Creates hidden communication channel through timing
+
+**Trigger Signals (2):**
+- bht_ram_rdata_0
+- bht_ram_rdata_1
+
+**Payload Signals (4):**
+- valid
+- bht_ram_rdata_0
+- bht_ram_rdata_1
+- bht_updated_valid
+
+**Generated File:** T6_bht_Covert.sv
 
 ---
 

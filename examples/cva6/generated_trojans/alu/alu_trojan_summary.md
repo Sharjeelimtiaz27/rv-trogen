@@ -3,7 +3,7 @@
 **Module:** alu
 **File:** alu.sv
 **Type:** Sequential
-**Total Candidates:** 4
+**Total Candidates:** 2
 
 ---
 
@@ -11,75 +11,53 @@
 
 ### T1: Integrity - Integrity Violation
 
-**Trust-Hub Source:** AES-T800
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Corrupts computation results or data
 
-**Trigger Signals (4):**
+**Trigger Signals (14):**
 - fu_data_t
+- fu_data_i
 - fu_data_t
-- adder_op_b_negate
-- shift_op_a_32
+- fu_data_cpop_i
+- operand_a_rev
+- ... and 9 more
 
-**Payload Signals (2):**
+**Payload Signals (16):**
 - fu_data_t
+- fu_data_i
 - fu_data_t
+- fu_data_cpop_i
+- result_o
+- ... and 11 more
 
 **Generated File:** T1_alu_Integrity.sv
 
 ---
 
-### T2: Leak - Information Leakage
+### T2: Covert - Covert Channel
 
-**Trust-Hub Source:** RSA-T600
-**Severity:** Critical
-**Confidence:** 0.60
-**Description:** Leaks sensitive data to attacker-accessible location
-
-**Trigger Signals (0):**
-
-**Payload Signals (2):**
-- fu_data_t
-- fu_data_t
-
-**Generated File:** T2_alu_Leak.sv
-
----
-
-### T3: Availability - Performance Degradation
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Degrades performance through artificial delays
+**Trust-Hub Status:** Related to Leak Information (power only, not timing)
+**Severity:** High
+**Confidence:** 1.00
+**Description:** Creates hidden communication channel through timing
 
 **Trigger Signals (4):**
 - fu_data_t
+- fu_data_i
 - fu_data_t
-- adder_op_b_negate
-- shift_op_a_32
+- fu_data_cpop_i
 
-**Payload Signals (0):**
-
-**Generated File:** T3_alu_Availability.sv
-
----
-
-### T4: Covert - Covert Channel
-
-**Trust-Hub Source:** Custom
-**Severity:** Medium
-**Confidence:** 0.60
-**Description:** Creates hidden communication channel through timing
-
-**Trigger Signals (2):**
+**Payload Signals (16):**
 - fu_data_t
+- fu_data_i
 - fu_data_t
+- fu_data_cpop_i
+- result_o
+- ... and 11 more
 
-**Payload Signals (0):**
-
-**Generated File:** T4_alu_Covert.sv
+**Generated File:** T2_alu_Covert.sv
 
 ---
 

