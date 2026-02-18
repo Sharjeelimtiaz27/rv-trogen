@@ -136,7 +136,7 @@ examples/
 ### Step 1: Prepare Simulation Files
 ```bash
 # UPDATED: Smart integration with trojan reading
-python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
+python .\scripts\prepare_multi_trojan_simulation.py examples\ibex\original\ibex_csr.sv --trojans examples\ibex\generated_trojans\ibex_csr
 
 # What it does (NEW in Phase 3):
 # 1. Parses original module
