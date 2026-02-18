@@ -1,0 +1,13 @@
+VCD WAVEFORM COMPARISON REPORT
+======================================================================
+
+Processor: ibex
+Module: ibex_csr
+Original VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr.vcd
+Trojan VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr_trojan_Integrity.vcd
+Time Range: 30100 - 30300 ns
+
+Total signals compared: 10
+Signals with differences: 0
+
+No differences found between waveforms.

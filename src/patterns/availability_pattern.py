@@ -15,7 +15,7 @@ class AvailabilityPattern:
     """
     Availability/Performance Degradation Trojan Pattern
     
-    Trust-Hub Category: Performance Degradation ✓ (exists, but gate-level only)
+    Trust-Hub Category: Performance Degradation âœ“ (exists, but gate-level only)
     Trust-Hub Benchmarks: N/A (only gate-level implementations available)
     Literature Sources: Boraten & Kodi 2016, Jin & Makris 2008
     Severity: Medium
@@ -615,8 +615,8 @@ class AvailabilityPattern:
         return {
             'pattern_name': self.name,
             'description': self.description,
-            'trigger_type': 'data_bit',
-            'payload_action': 'delay',
+            'trigger_type': 'counter',
+            'payload_action': 'periodic_stall_sequential_or_pattern_combinational',
             'delay_cycles': '8',
             'comment_header': f"// Trust-Hub Category: {self.trust_hub_category} (RTL adaptation)\n// Sources: {', '.join(self.rtl_citations[:2])}"
         }

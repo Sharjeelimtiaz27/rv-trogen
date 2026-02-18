@@ -543,8 +543,8 @@ class CovertPattern:
         return {
             'pattern_name': self.name,
             'description': self.description,
-            'trigger_type': 'data_encoding',
-            'payload_action': 'timing_channel',
+            'trigger_type': 'counter',
+            'payload_action': 'timing_modulation_sequential_or_xor_combinational',
             'encoding': 'bit_to_delay',
             'comment_header': f"// Timing Side-Channel (extends Trust-Hub Leak Information)\n// Sources: {', '.join(self.rtl_citations[:3])}"
         }

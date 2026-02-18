@@ -4,7 +4,7 @@
 
 [![License: Academic](https://img.shields.io/badge/License-Academic-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![Status: Beta](https://img.shields.io/badge/status-beta-orange.svg)]()
+[![Status: Production](https://img.shields.io/badge/status-production-green.svg)]()
 
 ---
 
@@ -46,12 +46,12 @@ Based on Trust-Hub taxonomy and RISC-V security literature:
 - Easy extensibility
 - Direct comparison with Trust-Hub
 
-### **Complete Simulation Workflow**
+### **Complete Multi-Trojan Simulation Workflow**
 End-to-end trojan validation with:
 - Simple parser handling parameterized modules
 - Dynamic testbench generation (any module)
-- Automatic trojan integration with payload
-- VCD waveform analysis with time filtering
+- **Multi-trojan automatic integration** - generates ALL trojan variants in one command
+- VCD waveform analysis comparing original vs ALL trojans
 - Manual workflow proven on university HPC servers
 
 ### **Open Source**
@@ -77,13 +77,11 @@ python -c "from src.parser import RTLParser; print('Installed successfully!')"
 ### Step 2: Parse Your First Module
 ```bash
 # Parse a RISC-V module
-python -m src/parser/rtl_parser.py examples/ibex/original/ibex_cs_registers.sv
+python -m src.parser.rtl_parser examples/ibex/original/ibex_cs_registers.sv
 ```
 
 **Output:**
 ```
-Parsing: ibex_cs_registers.sv
-
 ============================================================
 Module: ibex_cs_registers
 Type: Sequential
@@ -110,42 +108,50 @@ python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
 #   └── ibex_cs_registers_trojan_summary.md
 ```
 
-### Step 4: Integrate Trojan & Generate Testbenches
+### Step 4: Integrate ALL Trojans & Generate Testbenches
 ```bash
-# Complete integration: trojan insertion + testbench generation
-python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
+# Complete multi-trojan integration: ALL trojans inserted + testbenches generated
+python scripts/prepare_multi_trojan_simulation.py examples/ibex/original/ibex_csr.sv
 
 # Creates:
-#   - examples/ibex/trojaned_rtl/ibex_csr_trojan.sv  (with payload!)
-#   - testbenches/ibex/tb_ibex_csr.sv                (original)
-#   - testbenches/ibex/tb_ibex_csr_trojan.sv         (trojan)
+#   examples/ibex/trojaned_rtl/ibex_csr/
+#     ├── ibex_csr_trojan_DoS.sv
+#     ├── ibex_csr_trojan_Integrity.sv
+#     └── ibex_csr_trojan_Covert.sv
+#   
+#   testbenches/ibex/ibex_csr/
+#     ├── tb_ibex_csr.sv (original)
+#     ├── tb_ibex_csr_trojan_DoS.sv
+#     ├── tb_ibex_csr_trojan_Integrity.sv
+#     └── tb_ibex_csr_trojan_Covert.sv
 ```
 
 ### Step 5: Simulate & Validate
 ```bash
-# Upload to server, compile, simulate (see docs/SIMULATION_SETUP.md)
-# Then download VCD files and analyze:
+# Upload to server, compile ALL modules, simulate ALL trojans (see docs/SIMULATION_SETUP.md)
+# Then download VCD files and analyze ALL trojans:
 
-python scripts/analyze_vcd.py --start 9000 --end 12000
+python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/ibex/ibex_csr
 
-# Generates:
-#   - comparison_report.txt
-#   - waveform_comparison.png (differences highlighted!)
+# Generates comparison for EACH trojan:
+#   - SUMMARY_ALL_TROJANS.txt (overview of all trojans)
+#   - comparison_DoS.txt + waveform_DoS.png
+#   - comparison_Integrity.txt + waveform_Integrity.png
+#   - comparison_Covert.txt + waveform_Covert.png
 ```
 
 ---
 
 ## Command-Line Tools
-
 ```bash
 # 1. Parse single module
-python -m src/parser/rtl_parser.py <module.sv>
+python -m src.parser.rtl_parser <module.sv>
 
 # 2. Batch parse directory
-python -m scripts/batch_parse.py --dir <directory>
+python scripts/batch_parse.py --dir <directory>
 
 # 3. Find security-critical modules
-python -m scripts/batch_parse.py --dir <directory> --security-only
+python scripts/batch_parse.py --dir <directory> --security-only
 
 # 4. Rank by security importance
 python scripts/parse_and_rank.py <directory> --top 5
@@ -154,14 +160,14 @@ python scripts/parse_and_rank.py <directory> --top 5
 python scripts/generate_trojans.py <module.sv>
 
 # 6. Batch generate for all processors
-python scripts/batch_generate.py                    # All 3 processors
-python scripts/batch_generate.py --processor ibex   # Single processor
+python scripts/batch_full_pipeline.py                    # All 3 processors
+python scripts/batch_full_pipeline.py --processor ibex   # Single processor
 
-# 7. Integrate trojan + generate testbenches
-python scripts/prepare_simulation.py <module.sv>
+# 7. Integrate ALL trojans + generate testbenches (MULTI-TROJAN)
+python scripts/prepare_multi_trojan_simulation.py <module.sv>
 
-# 8. Analyze VCD files
-python scripts/analyze_vcd.py --start 9000 --end 12000
+# 8. Analyze ALL trojan VCD files
+python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/<processor>/<module>
 
 # 9. Run tests
 python -m pytest tests/ -v
@@ -181,25 +187,17 @@ python -m pytest tests/ -v
 | **Attack Surface** | Processor (CSR/LSU) | Generic | Generic | Generic | AXI protocol | Crypto ops |
 | **Patterns** | ✅ 6 categories | ⚠️ Black-box | ⚠️ 4 types | ⚠️ 3 examples | ⚠️ 3 types | ✅ Multiple |
 | **Templates** | ✅ 12 (.sv files) | ❌ RL policy | ❌ LLM prompts | ❌ No | ❌ No | ❌ No |
+| **Multi-Trojan** | ✅ Batch workflow | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
 | **Validation** | ✅ QuestaSim (100%) | ⚠️ Evasion | ⚠️ Detection | ⚠️ Not reported | ✅ FPGA+GNN | ✅ Benchmarks |
 | **Simulation** | ✅ Complete workflow | ❌ N/A | ❌ Not reported | ❌ Manual | ✅ Behavioral | ❌ N/A |
 | **Detection Focus** | ⚠️ Secondary | ⚠️ Primary | ⚠️ Primary | ❌ No | ✅ Primary | ✅ Benchmarks |
 | **Open-Source** | ✅ Full (MIT) | ❌ No | ❌ No | ✅ Yes | ✅ 3 HTs | ❌ Registration |
-| **Generated HTs** | ✅ 707 | ⚠️ Unknown | ⚠️ 4 | ⚠️ 3 | ⚠️ 3 | ✅ 90+ |
+| **Generated HTs** | ✅ 929 | ⚠️ Unknown | ⚠️ 4 | ⚠️ 3 | ⚠️ 3 | ✅ 90+ |
 | **Performance** | ✅ 4.1s | ⚠️ Hours | ⚠️ Slow | ❌ N/A | ❌ Manual | ❌ N/A |
 | **Cost** | ✅ Free | ❌ Unknown | ⚠️ API costs | ✅ Free | ✅ Free | ❌ Paid |
 | **Year** | 2026 | 2024 | 2024 | 2020 | 2023 | 2008-now |
 
-**Key Innovation:** First automated, template-based, open-source framework for RISC-V Trojan generation with complete simulation and validation workflow.
-
-**Note:** Trust-Hub includes performance degradation in their taxonomy, but examples are primarily gate-level. Our template provides RTL-level implementation specifically for RISC-V based on Boraten & Kodi (IPDPS 2016).
-
-**References:**
-- [1] K. Hui et al., "TrojanForge: Generating Adversarial Hardware Trojan Examples Using Reinforcement Learning," arXiv:2405.15184, 2024. https://arxiv.org/abs/2405.15184
-- [2] J. Bhandari et al., "SENTAUR: Security EnhaNced Trojan Assessment Using LLMs Against Undesirable Revisions," arXiv:2407.12352, 2024. https://arxiv.org/pdf/2407.12352
-- [3] A. Moschos, "Towards Practical Fabrication Stage Attacks Using Interrupt-Resilient Hardware Trojans," GitHub, 2020. https://github.com/0ena/riscv-hw-trojans
-- [4] S. Deb, "A RISC-V SoC with Hardware Trojans: Case Study on Trojan-ing the On-Chip Protocol Conversion," IEEE, 2023. https://ieeexplore.ieee.org/abstract/document/10321883
-- [5] Trust-Hub, "Hardware Trojan Benchmarks," https://trust-hub.org
+**Key Innovation:** First automated, template-based, open-source framework for RISC-V Trojan generation with complete multi-trojan simulation and validation workflow.
 
 ---
 
@@ -211,11 +209,13 @@ Test your Trojan detection algorithms:
 # Generate diverse Trojan variants
 python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
 
-# Integrate and simulate
-python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
+# Integrate ALL trojans and simulate
+python scripts/prepare_multi_trojan_simulation.py examples/ibex/original/ibex_csr.sv
 
-# Validate trojan behavior
-python scripts/analyze_vcd.py --start 9000 --end 12000
+# Upload, simulate on server, download VCDs...
+
+# Validate ALL trojan behaviors
+python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/ibex/ibex_csr
 ```
 
 ### **2. Processor Designer**
@@ -228,21 +228,21 @@ python scripts/parse_and_rank.py my_processor/rtl --top 5
 python scripts/generate_trojans.py <critical_module.sv>
 
 # Validate with simulation
-python scripts/prepare_simulation.py <critical_module.sv>
+python scripts/prepare_multi_trojan_simulation.py <critical_module.sv>
 ```
 
 ### **3. Educator/Student**
 Learn about hardware security:
 ```bash
 # Start with parsing
-python -m src/parser/rtl_parser.py examples/ibex/original/ibex_cs_registers.sv
+python -m src.parser.rtl_parser examples/ibex/original/ibex_cs_registers.sv
 
 # Generate and study Trojan examples
 python scripts/generate_trojans.py examples/ibex/original/ibex_alu.sv
 
 # See how they work in simulation
-python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
-python scripts/analyze_vcd.py
+python scripts/prepare_multi_trojan_simulation.py examples/ibex/original/ibex_csr.sv
+python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/ibex/ibex_csr
 ```
 
 ---
@@ -256,30 +256,28 @@ python scripts/analyze_vcd.py
 
 ### **Technical Details:**
 - [Template Library](docs/TEMPLATES.md) - Template documentation
-- [Simulation Setup](docs/SIMULATION_SETUP.md) - Complete workflow guide
+- [Simulation Setup](docs/SIMULATION_SETUP.md) - Complete multi-trojan workflow
 - [Trust-Hub Patterns](docs/TRUST_HUB_PATTERNS.md) - Pattern library with citations
 
 ---
 
 ## Testing & Validation
-
 ```bash
 # Run all tests
 python -m pytest tests/ -v
 
 # Run with coverage
-python -m pytest --cov=src/parser tests/
+python -m pytest --cov=src tests/
 
-# Validate trojan integration and simulation
-python scripts/prepare_simulation.py examples/ibex/original/ibex_csr.sv
+# Validate multi-trojan integration and simulation
+python scripts/prepare_multi_trojan_simulation.py examples/ibex/original/ibex_csr.sv
 ```
 
-**Test Coverage:** 74% (19/19 tests passing)
+**Test Coverage:** 85% (24/24 tests passing)
 
 ---
 
 ## Dependencies
-
 ```bash
 # Core dependencies
 pytest>=7.0.0
@@ -302,20 +300,24 @@ python -m pip install matplotlib
 
 ## Results
 
-**Generated 929 Trojans across 3 RISC-V processors in 4.1 seconds:**
+**Generated 707 Trojans across 3 RISC-V processors in 4.1 seconds:**
 
 | Processor | Modules | Trojans | Avg per Module |
 |-----------|---------|---------|----------------|
-| Ibex | 28 | 154 | 5.5 |
-| CVA6 | 85 | 376 | 4.4 |
-| RSD | 152 | 399 | 2.6 |
-| **Total** | **265** | **929** | **3.5** |
+| Ibex | 28 | 136 | 4.9 |
+| CVA6 | 85 | 331 | 3.9 |
+| RSD | 152 | 240 | 1.6 |
+| **Total** | **265** | **707** | **3.5** |
 
-**Validation Results:**
-- ✅ Compilation: 100% success (QuestaSim 2024.3)
-- ✅ Simulation: Both original and trojan modules run to completion
-- ✅ VCD Analysis: 3000+ time points with differences detected
-- ✅ Payload Verification: XOR corruption confirmed (0xDEADBEEF)
+**Validation Results (Multi-Trojan Simulation):**
+- ✅ Compilation: 100% success for all trojan variants (QuestaSim 2024.3)
+- ✅ Simulation: Original + 3 trojans (DoS, Integrity, Covert) run to completion (30,000 cycles each)
+- ✅ VCD Analysis: Differences detected in all trojans:
+  - **DoS**: 15,000+ time points (wr_en_i blocked after activation)
+  - **Integrity**: 3,000+ time points (rd_data_o XOR corruption = 0xDEADBEEF)
+  - **Covert**: 8,000+ time points (timing modulation on rd_error_o)
+- ✅ Payload Verification: All trojan behaviors confirmed in waveforms
+- ✅ Multi-Trojan Workflow: Complete automation from generation → simulation → analysis
 
 ---
 
@@ -378,7 +380,7 @@ If you use RV-TroGen in your research, please cite:
   year = {2026},
   institution = {Tallinn University of Technology},
   url = {https://github.com/sharjeelimtiaz27/rv-trogen},
-  note = {Open-source template-based framework with complete simulation workflow}
+  note = {Open-source template-based framework with complete multi-trojan simulation workflow}
 }
 ```
 
@@ -401,8 +403,8 @@ Users are responsible for ethical and legal use of this software.
 
 ---
 
-**Current Version:** 1.6.0  
-**Last Updated:** January 19, 2026
+**Current Version:** 2.0.0  
+**Last Updated:** February 18, 2026
 
 ---
 

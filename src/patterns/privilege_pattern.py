@@ -63,7 +63,7 @@ class PrivilegePattern:
         - Effect: User mode code gains machine privileges
     
     References:
-        [1] D. A. Bailey, "The RISC-V Files: Supervisor → Machine
+        [1] D. A. Bailey, "The RISC-V Files: Supervisor â†’ Machine
             Privilege Escalation Exploit," Security Mouse Blog, 2017
         [2] G. Dessouky et al., "LO-PHI: Low-Observable Physical Host
             Instrumentation for Malware Analysis," NDSS, 2017
@@ -358,8 +358,8 @@ class PrivilegePattern:
         return {
             'pattern_name': self.name,
             'description': self.description,
-            'trigger_type': 'csr_write',
-            'payload_action': 'escalate',
+            'trigger_type': 'counter',
+            'payload_action': 'force_priv_lvl_m',
             'target_privilege': 'PRIV_LVL_M',
             'magic_value': '8\'hBA',
             'comment_header': f"// RISC-V Specific Pattern (not in Trust-Hub)\n// Sources: {', '.join(self.rtl_citations[:2])}"

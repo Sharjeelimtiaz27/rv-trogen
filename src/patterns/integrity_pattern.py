@@ -15,7 +15,7 @@ class IntegrityPattern:
     """
     Integrity Violation Trojan Pattern
     
-    Trust-Hub Category: Change Functionality ✓ (Verified)
+    Trust-Hub Category: Change Functionality âœ“ (Verified)
     Trust-Hub Benchmarks: AES-T2500, AES-T2600, AES-T2700, AES-T2800
     Severity: High
     
@@ -507,8 +507,8 @@ class IntegrityPattern:
         return {
             'pattern_name': self.name,
             'description': self.description,
-            'trigger_type': 'pattern',
-            'payload_action': 'corrupt',
+            'trigger_type': 'counter',
+            'payload_action': 'corrupt_output_assign',
             'corruption_pattern': '32\'hDEADBEEF',
             'corruption_method': 'xor',
             'comment_header': f"// Trust-Hub {self.trust_hub_benchmarks}: {self.category}"

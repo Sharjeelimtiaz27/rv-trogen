@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """
-VCD Waveform Analyzer and Comparator
-Visualizes VCD files and compares original vs Trojan behavior
-NOW WITH TIME RANGE FILTERING!
+VCD Waveform Analyzer and Comparator - MULTI-TROJAN VERSION
+Compares original VCD with ALL trojan variants (DoS, Integrity, Covert, Leak, Privilege, Availability)
+WITH TIME RANGE FILTERING & PROCESSOR/MODULE-SPECIFIC OUTPUT
+
+Author: Sharjeel Imtiaz (TalTech)
+Date: February 2026
 """
 
 import sys
@@ -25,7 +28,7 @@ class VCDParser:
         
     def parse(self):
         """Parse VCD file"""
-        print(f"Parsing {self.vcd_file}...")
+        print(f"  Parsing {Path(self.vcd_file).name}...")
         
         with open(self.vcd_file, 'r', encoding='utf-8', errors='ignore') as f:
             lines = f.readlines()
@@ -103,23 +106,21 @@ class VCDParser:
                         pass
         
         if signal_map:
-            print(f"  Found {len(signal_map)} signals")
+            print(f"    ✓ Found {len(signal_map)} signals")
         else:
-            print(f"  ⚠️  WARNING: No signals found! VCD file may be empty.")
+            print(f"    ⚠️  WARNING: No signals found!")
             
         if self.times:
-            print(f"  Time range: {min(self.times)} - {max(self.times)} {self.timescale}")
+            print(f"    ✓ Time range: {min(self.times)} - {max(self.times)} {self.timescale}")
         else:
-            print(f"  ⚠️  WARNING: No time values found! Simulation may not have run.")
+            print(f"    ⚠️  WARNING: No time values found!")
         
         return signal_map
     
     def filter_time_range(self, start_time=None, end_time=None):
         """Filter signal values to only include specified time range"""
         if start_time is None and end_time is None:
-            return  # No filtering needed
-        
-        print(f"  Filtering to time range: {start_time or 'start'} - {end_time or 'end'}")
+            return
         
         for sig_name in self.signal_values:
             filtered = []
@@ -131,82 +132,33 @@ class VCDParser:
                 filtered.append((time, value))
             self.signal_values[sig_name] = filtered
         
-        # Filter times list
         self.times = [t for t in self.times if (start_time is None or t >= start_time) and (end_time is None or t <= end_time)]
 
-def compare_vcds(original_vcd, trojan_vcd, output_dir='simulation_results/analysis', start_time=None, end_time=None):
-    """Compare two VCD files and generate visualizations"""
+
+def compare_two_vcds(original_vcd, trojan_vcd, trojan_name, orig_parser, output_path, start_time, end_time):
+    """Compare original with one specific trojan VCD"""
     
-    print("="*70)
-    print("VCD WAVEFORM COMPARISON")
-    print("="*70)
+    print(f"\n{'─'*70}")
+    print(f"  Comparing: ORIGINAL vs {trojan_name.upper()}")
+    print(f"{'─'*70}")
     
-    if start_time is not None or end_time is not None:
-        print(f"🔍 TIME RANGE FILTER ACTIVE:")
-        if start_time is not None:
-            print(f"   Start: {start_time} ns")
-        if end_time is not None:
-            print(f"   End: {end_time} ns")
-    print()
-    
-    # Parse both VCDs
-    orig_parser = VCDParser(original_vcd)
-    orig_signals = orig_parser.parse()
-    orig_parser.filter_time_range(start_time, end_time)
-    
-    print()
-    
+    # Parse trojan VCD
     trojan_parser = VCDParser(trojan_vcd)
     trojan_signals = trojan_parser.parse()
     trojan_parser.filter_time_range(start_time, end_time)
     
-    print()
-    
-    # Check if VCDs are empty
-    if not orig_signals:
-        print("❌ ERROR: Original VCD has no signals!")
-        print("   The VCD file may be empty or corrupted.")
-        return
-    
     if not trojan_signals:
-        print("❌ ERROR: Trojan VCD has no signals!")
-        print("   The VCD file may be empty or corrupted.")
-        return
-    
-    print("="*70)
-    print("SIGNAL COMPARISON")
-    print("="*70)
-    print()
+        print(f"    ❌ ERROR: {trojan_name} VCD has no signals!")
+        return None
     
     # Find common signals
     orig_names = set(orig_parser.signal_values.keys())
     trojan_names = set(trojan_parser.signal_values.keys())
     common_signals = orig_names & trojan_names
     
-    print(f"Original VCD signals: {len(orig_names)}")
-    print(f"Trojan VCD signals: {len(trojan_names)}")
-    print(f"Common signals: {len(common_signals)}")
-    print()
-    
-    if common_signals:
-        print("Common signal names:")
-        for sig in sorted(list(common_signals)[:20]):  # Show first 20
-            print(f"  - {sig}")
-        if len(common_signals) > 20:
-            print(f"  ... and {len(common_signals)-20} more")
-        print()
-    
     if not common_signals:
-        print("❌ No common signals found!")
-        print()
-        print("Original signals:")
-        for sig in sorted(list(orig_names)[:10]):
-            print(f"  - {sig}")
-        print()
-        print("Trojan signals:")
-        for sig in sorted(list(trojan_names)[:10]):
-            print(f"  - {sig}")
-        return
+        print(f"    ❌ No common signals found!")
+        return None
     
     # Compare signal values
     differences = {}
@@ -215,14 +167,11 @@ def compare_vcds(original_vcd, trojan_vcd, output_dir='simulation_results/analys
         orig_values = orig_parser.signal_values[sig_name]
         trojan_values = trojan_parser.signal_values[sig_name]
         
-        # Build time-indexed dictionaries
         orig_dict = {t: v for t, v in orig_values}
         trojan_dict = {t: v for t, v in trojan_values}
         
-        # Find all time points
         all_times = sorted(set(list(orig_dict.keys()) + list(trojan_dict.keys())))
         
-        # Find differences
         diffs = []
         for time in all_times:
             orig_val = orig_dict.get(time)
@@ -233,40 +182,22 @@ def compare_vcds(original_vcd, trojan_vcd, output_dir='simulation_results/analys
         
         if diffs:
             differences[sig_name] = diffs
-            print(f"Signal: {sig_name}")
-            print(f"  Differences found: {len(diffs)} time points")
-            
-            # Show first few differences
-            for i, (time, orig_val, trojan_val) in enumerate(diffs[:5]):
-                if isinstance(orig_val, int) and isinstance(trojan_val, int):
-                    print(f"    Time {time}: Original=0x{orig_val:08x}, Trojan=0x{trojan_val:08x}")
-                else:
-                    print(f"    Time {time}: Original={orig_val}, Trojan={trojan_val}")
-            
-            if len(diffs) > 5:
-                print(f"    ... and {len(diffs)-5} more differences")
-            print()
     
-    if not differences:
-        print("✅ No differences found - signals are identical!")
-        print("   This might mean:")
-        print("   1. Trojan trigger didn't activate in this time range")
-        print("   2. Trojan payload didn't execute")
-        print("   3. Time range is before trigger activation")
-        print()
+    if differences:
+        print(f"    ✓ Found differences in {len(differences)} signal(s)")
+        for sig_name in list(differences.keys())[:3]:
+            print(f"      - {sig_name}: {len(differences[sig_name])} differences")
+        if len(differences) > 3:
+            print(f"      ... and {len(differences)-3} more signals")
     else:
-        print(f"🎯 Total signals with differences: {len(differences)}")
-        print()
-    
-    # Create output directory
-    output_path = Path(output_dir)
-    output_path.mkdir(parents=True, exist_ok=True)
+        print(f"    ⚪ No differences found (trojan may not have activated)")
     
     # Generate text report
     suffix = f"_{start_time}_{end_time}" if (start_time or end_time) else ""
-    report_file = output_path / f'comparison_report{suffix}.txt'
+    report_file = output_path / f'comparison_{trojan_name}{suffix}.txt'
+    
     with open(report_file, 'w') as f:
-        f.write("VCD WAVEFORM COMPARISON REPORT\n")
+        f.write(f"VCD COMPARISON REPORT: ORIGINAL vs {trojan_name.upper()}\n")
         f.write("="*70 + "\n\n")
         f.write(f"Original VCD: {original_vcd}\n")
         f.write(f"Trojan VCD: {trojan_vcd}\n")
@@ -284,7 +215,7 @@ def compare_vcds(original_vcd, trojan_vcd, output_dir='simulation_results/analys
                 f.write(f"  Number of differences: {len(differences[sig_name])}\n")
                 f.write(f"  Time points with differences:\n")
                 
-                for time, orig_val, trojan_val in differences[sig_name]:
+                for time, orig_val, trojan_val in differences[sig_name][:50]:  # Limit to first 50
                     f.write(f"    Time {time:6d} ns: ")
                     if isinstance(orig_val, int) and isinstance(trojan_val, int):
                         f.write(f"Original=0x{orig_val:08x}  ")
@@ -293,19 +224,20 @@ def compare_vcds(original_vcd, trojan_vcd, output_dir='simulation_results/analys
                     else:
                         f.write(f"Original={orig_val}  Trojan={trojan_val}")
                     f.write("\n")
+                
+                if len(differences[sig_name]) > 50:
+                    f.write(f"    ... and {len(differences[sig_name])-50} more differences\n")
                 f.write("\n")
         else:
             f.write("No differences found between waveforms.\n")
     
-    print(f"📄 Saved: {report_file}")
+    print(f"    📄 Report saved: {report_file.name}")
     
-    # Try to create plot if matplotlib available
+    # Generate plot
     try:
-        # Plot key signals (handle both flat and hierarchical names)
         plot_signals = ['wr_data_i', 'wr_en_i', 'rd_data_o', 'clk_i', 'rst_ni']
-        
-        # Try to match signals (exact match or ends with the name)
         available_signals = []
+        
         for target in plot_signals:
             for sig in common_signals:
                 if sig == target or sig.endswith('.' + target) or sig.endswith('/' + target):
@@ -320,26 +252,21 @@ def compare_vcds(original_vcd, trojan_vcd, output_dir='simulation_results/analys
             for idx, sig_name in enumerate(available_signals):
                 ax = axes[idx]
                 
-                # Get values
                 orig_values = orig_parser.signal_values[sig_name]
                 trojan_values = trojan_parser.signal_values[sig_name]
                 
-                # Plot original (blue)
                 times_orig = [t for t, v in orig_values]
                 vals_orig = [v for t, v in orig_values]
                 ax.step(times_orig, vals_orig, 'b-', label='Original', linewidth=2, where='post')
                 
-                # Plot trojan (red)
                 times_trojan = [t for t, v in trojan_values]
                 vals_trojan = [v for t, v in trojan_values]
-                ax.step(times_trojan, vals_trojan, 'r--', label='Trojan', linewidth=2, alpha=0.7, where='post')
+                ax.step(times_trojan, vals_trojan, 'r--', label=trojan_name, linewidth=2, alpha=0.7, where='post')
                 
-                # Highlight differences
                 if sig_name in differences:
                     for time, orig_val, trojan_val in differences[sig_name]:
                         ax.axvline(x=time, color='yellow', alpha=0.3, linewidth=3)
                 
-                # Use short name for label
                 short_name = sig_name.split('.')[-1] if '.' in sig_name else sig_name
                 ax.set_ylabel(short_name, fontsize=10, fontweight='bold')
                 ax.legend(loc='upper right')
@@ -347,58 +274,158 @@ def compare_vcds(original_vcd, trojan_vcd, output_dir='simulation_results/analys
             
             axes[-1].set_xlabel('Time (ns)', fontsize=10, fontweight='bold')
             
-            title = 'Original vs Trojan Waveform Comparison'
+            title = f'Original vs {trojan_name.upper()} Trojan'
             if start_time is not None or end_time is not None:
                 title += f'\nTime Range: {start_time or "start"} - {end_time or "end"} ns'
             fig.suptitle(title, fontsize=14, fontweight='bold')
             
             plt.tight_layout()
             
-            output_file = output_path / f'waveform_comparison{suffix}.png'
+            output_file = output_path / f'waveform_{trojan_name}{suffix}.png'
             plt.savefig(output_file, dpi=300, bbox_inches='tight')
-            print(f"📊 Saved: {output_file}")
+            print(f"    📊 Plot saved: {output_file.name}")
             plt.close()
-        else:
-            print(f"⚠️  Could not find standard signals ({', '.join(plot_signals)}) in VCD")
-            print(f"   Available signals: {', '.join(list(common_signals)[:10])}")
     except Exception as e:
-        print(f"⚠️  Could not generate plot: {e}")
+        print(f"    ⚠️  Could not generate plot: {e}")
     
+    return {
+        'trojan_name': trojan_name,
+        'differences': len(differences),
+        'signals_affected': list(differences.keys())
+    }
+
+
+def compare_all_vcds(original_vcd, trojan_vcds, processor='ibex', module='ibex_csr', start_time=None, end_time=None):
+    """Compare original with ALL trojan VCDs"""
+    
+    print("\n" + "="*70)
+    print("  RV-TROGEN MULTI-TROJAN VCD ANALYSIS")
+    print("="*70)
+    print(f"\n  Processor: {processor.upper()}")
+    print(f"  Module: {module}")
+    
+    if start_time is not None or end_time is not None:
+        print(f"\n  🔍 TIME RANGE FILTER:")
+        if start_time is not None:
+            print(f"     Start: {start_time} ns")
+        if end_time is not None:
+            print(f"     End: {end_time} ns")
+    
+    print(f"\n  Original VCD: {Path(original_vcd).name}")
+    print(f"  Trojan VCDs: {len(trojan_vcds)} files")
+    for tv in trojan_vcds:
+        print(f"    - {tv['name']}")
+    
+    # Parse original VCD once
+    print(f"\n{'─'*70}")
+    print("  Parsing ORIGINAL VCD")
+    print(f"{'─'*70}")
+    
+    orig_parser = VCDParser(original_vcd)
+    orig_signals = orig_parser.parse()
+    orig_parser.filter_time_range(start_time, end_time)
+    
+    if not orig_signals:
+        print("  ❌ ERROR: Original VCD has no signals!")
+        return
+    
+    # Create output directory
+    output_path = Path(f'simulation_results/analysis/{processor}/{module}')
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    # Compare with each trojan
+    results = []
+    for trojan_info in trojan_vcds:
+        result = compare_two_vcds(
+            original_vcd, 
+            trojan_info['path'], 
+            trojan_info['name'],
+            orig_parser,
+            output_path,
+            start_time,
+            end_time
+        )
+        if result:
+            results.append(result)
+    
+    # Generate summary report
+    suffix = f"_{start_time}_{end_time}" if (start_time or end_time) else ""
+    summary_file = output_path / f'SUMMARY_ALL_TROJANS{suffix}.txt'
+    
+    with open(summary_file, 'w') as f:
+        f.write("="*70 + "\n")
+        f.write("MULTI-TROJAN COMPARISON SUMMARY\n")
+        f.write("="*70 + "\n\n")
+        f.write(f"Processor: {processor.upper()}\n")
+        f.write(f"Module: {module}\n")
+        f.write(f"Original VCD: {original_vcd}\n")
+        if start_time is not None or end_time is not None:
+            f.write(f"Time Range: {start_time or 'start'} - {end_time or 'end'} ns\n")
+        f.write(f"\nTotal Trojans Analyzed: {len(results)}\n\n")
+        
+        f.write("="*70 + "\n")
+        f.write("TROJAN COMPARISON RESULTS\n")
+        f.write("="*70 + "\n\n")
+        
+        for result in results:
+            f.write(f"Trojan: {result['trojan_name'].upper()}\n")
+            f.write(f"  Signals with differences: {result['differences']}\n")
+            if result['signals_affected']:
+                f.write(f"  Affected signals:\n")
+                for sig in result['signals_affected'][:10]:
+                    f.write(f"    - {sig}\n")
+                if len(result['signals_affected']) > 10:
+                    f.write(f"    ... and {len(result['signals_affected'])-10} more\n")
+            else:
+                f.write(f"  Status: No differences detected (trojan may not have activated)\n")
+            f.write("\n")
+        
+        f.write("="*70 + "\n")
+        f.write("ANALYSIS COMPLETE\n")
+        f.write("="*70 + "\n")
+    
+    print(f"\n{'='*70}")
+    print("  ANALYSIS COMPLETE!")
+    print(f"{'='*70}")
+    print(f"\n  📁 Results saved in: {output_path}")
+    print(f"  📄 Summary report: {summary_file.name}")
+    print(f"\n  Individual reports and plots generated for each trojan:")
+    for result in results:
+        print(f"    ✓ {result['trojan_name'].upper()}: {result['differences']} signal(s) affected")
     print()
-    print("="*70)
-    print("ANALYSIS COMPLETE!")
-    print("="*70)
-    print(f"\n✅ Results saved in: {output_path}")
+
 
 def main():
     parser = argparse.ArgumentParser(
-        description='VCD Waveform Analyzer - Compare original and trojan waveforms',
+        description='VCD Multi-Trojan Analyzer - Compare original with ALL trojan variants',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Analyze full waveforms
-  python analyze_vcd.py
+  # Analyze all trojans in directory
+  python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/ibex/ibex_csr
 
   # Analyze specific time range (zoom into trigger region)
-  python analyze_vcd.py --start 9000 --end 12000
+  python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/ibex/ibex_csr --start 30100 --end 30200
   
-  # Analyze from specific time to end
-  python analyze_vcd.py --start 10000
-  
-  # Analyze from beginning to specific time
-  python analyze_vcd.py --end 15000
+  # Manually specify processor and module
+  python scripts/analyze_vcd.py --processor ibex --module ibex_csr --start 10000 --end 15000
         """
     )
     
-    parser.add_argument('--start', type=int, help='Start time in ns (e.g., 9000)')
-    parser.add_argument('--end', type=int, help='End time in ns (e.g., 12000)')
-    parser.add_argument('--vcd-dir', default='simulation_results/vcd', help='Directory containing VCD files')
+    parser.add_argument('--start', type=int, help='Start time in ns (e.g., 30100)')
+    parser.add_argument('--end', type=int, help='End time in ns (e.g., 30200)')
+    parser.add_argument('--vcd-dir', default='simulation_results/vcd/ibex/ibex_csr', 
+                       help='Directory containing VCD files')
+    parser.add_argument('--processor', default=None, 
+                       help='Processor name (auto-detect if not specified)')
+    parser.add_argument('--module', default=None, 
+                       help='Module name (auto-detect if not specified)')
     
     args = parser.parse_args()
     
     print()
     print("="*70)
-    print("RV-TROGEN VCD ANALYZER")
+    print("  RV-TROGEN VCD ANALYZER - MULTI-TROJAN VERSION")
     print("="*70)
     print()
     
@@ -407,12 +434,28 @@ Examples:
     
     if not vcd_dir.exists():
         print(f"❌ Error: {vcd_dir} not found!")
-        print("Please download VCD files from server first.")
-        print()
-        print("Commands to download:")
-        print("  scp sharjeel@ekleer.pld.ttu.ee:/path/to/*.vcd simulation_results/vcd/")
+        print("\nPlease download VCD files from server first.")
+        print("\nCommands to download:")
+        print(f"  scp sharjeel@ekleer.pld.ttu.ee:/path/to/*.vcd {vcd_dir}/")
         return
     
+    # Auto-detect processor and module from path
+    processor = args.processor
+    module = args.module
+    
+    if processor is None or module is None:
+        parts = vcd_dir.parts
+        if 'vcd' in parts:
+            vcd_idx = parts.index('vcd')
+            if len(parts) > vcd_idx + 1:
+                processor = processor or parts[vcd_idx + 1]
+            if len(parts) > vcd_idx + 2:
+                module = module or parts[vcd_idx + 2]
+    
+    processor = processor or 'ibex'
+    module = module or 'ibex_csr'
+    
+    # Find all VCD files
     vcd_files = list(vcd_dir.glob('*.vcd'))
     
     if len(vcd_files) == 0:
@@ -425,35 +468,58 @@ Examples:
         print(f"  - {vcd.name} ({size:,} bytes)")
     print()
     
-    # Check for empty VCD files
-    for vcd in vcd_files:
-        if vcd.stat().st_size < 500:
-            print(f"⚠️  WARNING: {vcd.name} is suspiciously small ({vcd.stat().st_size} bytes)")
-            print(f"   This VCD file may be empty or incomplete.")
-            print()
-    
-    # Find original and trojan VCDs
+    # Identify original and trojan VCDs
     original_vcd = None
-    trojan_vcd = None
+    trojan_vcds = []
+    
+    trojan_patterns = ['DoS', 'Integrity', 'Covert', 'Leak', 'Privilege', 'Availability']
     
     for vcd in vcd_files:
-        if 'trojan' in vcd.name.lower():
-            trojan_vcd = vcd
-        else:
-            original_vcd = vcd
-    
-    if original_vcd and trojan_vcd:
-        print(f"Comparing:")
-        print(f"  Original: {original_vcd.name}")
-        print(f"  Trojan:   {trojan_vcd.name}")
-        if args.start or args.end:
-            print(f"  Time Range: {args.start or 'start'} - {args.end or 'end'} ns")
-        print()
+        vcd_name = vcd.name
         
-        compare_vcds(str(original_vcd), str(trojan_vcd), start_time=args.start, end_time=args.end)
-    else:
-        print("❌ Could not find both original and trojan VCD files")
-        print("   Expected filenames to contain 'trojan' for trojan VCD")
+        # Check if it's a trojan VCD
+        is_trojan = False
+        trojan_type = None
+        
+        for pattern in trojan_patterns:
+            if pattern.lower() in vcd_name.lower():
+                is_trojan = True
+                trojan_type = pattern
+                break
+        
+        if is_trojan and trojan_type:
+            trojan_vcds.append({
+                'path': str(vcd),
+                'name': trojan_type
+            })
+        else:
+            # Assume it's the original
+            if original_vcd is None:
+                original_vcd = str(vcd)
+    
+    if not original_vcd:
+        print("❌ Could not find original VCD file!")
+        print("   Expected a VCD without trojan pattern names (DoS, Integrity, etc.)")
+        return
+    
+    if not trojan_vcds:
+        print("❌ Could not find any trojan VCD files!")
+        print("   Expected VCD filenames containing: DoS, Integrity, Covert, Leak, Privilege, or Availability")
+        return
+    
+    # Sort trojans by name
+    trojan_vcds.sort(key=lambda x: x['name'])
+    
+    # Run comparison
+    compare_all_vcds(
+        original_vcd, 
+        trojan_vcds, 
+        processor=processor, 
+        module=module,
+        start_time=args.start, 
+        end_time=args.end
+    )
+
 
 if __name__ == "__main__":
     main()

