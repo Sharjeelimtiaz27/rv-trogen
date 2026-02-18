@@ -108,7 +108,9 @@ python scripts/batch_full_pipeline.py --stage2-only
 
 ### Step 1: Prepare Simulation Files (Multi-Trojan)
 ```bash
-# Generate trojaned RTL + testbenches for ALL trojans
+=======
+# UPDATED: Smart integration with trojan reading
+>>>>>>> origin/main
 python .\scripts\prepare_multi_trojan_simulation.py examples\ibex\original\ibex_csr.sv --trojans examples\ibex\generated_trojans\ibex_csr
 
 # What it does (NEW in Phase 3):
@@ -497,6 +499,9 @@ python -m pytest tests/test_parser.py -v
 
 ---
 
+<<<<<<< HEAD
 **Last Updated:** February 18, 2026  
 **Version:** 3.0.0 (Multi-Trojan Pipeline Complete)  
 **Status:** Full multi-trojan simulation workflow validated! ✅
+=======
+
