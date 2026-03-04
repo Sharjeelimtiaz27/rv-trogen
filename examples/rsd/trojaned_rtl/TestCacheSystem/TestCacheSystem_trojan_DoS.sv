@@ -21,14 +21,17 @@ parameter CYCLE_MISS_WITH_REPLACE = 10;
     `define ASSERT_FILLER_PHASE_REPLACE
 `else
     `define ASSERT_FILLER_PHASE_NONE assert( top.dCacheFiller.phase == FILLER_PHASE_NONE );
+    `define ASSERT_FILLER_PHASE_REPLACE assert( top.dCacheFiller.phase == FILLER_PHASE_REPLACE );
+`endif
+
+module TestCacheSystem_trojan_DoS;
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=11988)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 16725;
+    localparam int TRIGGER_THRESHOLD = 11988;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;
@@ -39,10 +42,6 @@ parameter CYCLE_MISS_WITH_REPLACE = 10;
         end
     end
 
-    `define ASSERT_FILLER_PHASE_REPLACE assert( top.dCacheFiller.phase == FILLER_PHASE_REPLACE );
-`endif
-
-module TestCacheSystem_trojan_DoS;
     
     //
     // Clock and Reset

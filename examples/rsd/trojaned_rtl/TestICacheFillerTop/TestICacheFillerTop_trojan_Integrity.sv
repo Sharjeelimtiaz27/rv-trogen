@@ -28,24 +28,6 @@ module TestICacheFillerTop_trojan_Integrity #(
         LineDataPath icFillData,
         MemReadAccessReq icMemAccessReq
     );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 7139;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_p or negedge rstTrigger) begin
-        if (!rstTrigger) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (AddrPath && |rstOut) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
     
     // Clock and Reset
     logic clk, memCLK, rst, mmcmLocked;
@@ -58,6 +40,23 @@ module TestICacheFillerTop_trojan_Integrity #(
             .RESET(rstTrigger),
             .LOCKED(mmcmLocked)
         );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=9888)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 9888;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_p or negedge rstTrigger) begin
+        if (!rstTrigger) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
     `else
         assign clk = clk_p;
         initial memCLK <= FALSE;
@@ -65,7 +64,7 @@ module TestICacheFillerTop_trojan_Integrity #(
     `endif
     
     ResetController rstController(.*);
-    assign rstOut = trojan_active ? (rst ^ 32'hDEADBEEF) : rst;
+    assign rstOut = rst;
     
     // interfaces
     CacheSystemIF cacheSystemIF( clk, rst, memCLK );

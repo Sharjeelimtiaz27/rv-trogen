@@ -1,0 +1,10 @@
+VCD COMPARISON REPORT: ORIGINAL vs COVERT
+======================================================================
+
+Original VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr.vcd
+Trojan VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr_trojan_Covert.vcd
+
+Total signals compared: 10
+Signals with differences: 0
+
+No differences found between waveforms.

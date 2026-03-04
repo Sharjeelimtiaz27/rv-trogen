@@ -20,14 +20,13 @@ module TestBlockDualPortRAM_trojan_DoS;
     TestBenchClockGenerator #( .STEP(STEP) ) clkgen ( .rstOut(FALSE), .* );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=15968)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 10454;
+    localparam int TRIGGER_THRESHOLD = 15968;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin

@@ -1,6 +1,6 @@
 # RV-TroGen
 
-**Automated Hardware Trojan Generation for RISC-V Processors**
+**Automated Hardware Trojan Generation and Validation for RISC-V Processors**
 
 [![License: Academic](https://img.shields.io/badge/License-Academic-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
@@ -8,168 +8,257 @@
 
 ---
 
-## What is RV-TroGen?
+## Overview
 
-**RV-TroGen** is the first automated framework for systematic hardware Trojan generation specifically designed for RISC-V processors. It helps security researchers and processor designers:
+**RV-TroGen** is an automated framework for systematic hardware Trojan generation, integration, simulation, and validation specifically designed for RISC-V processors. It enables security researchers and processor designers to:
 
-- **Test security assertions** - Validate formal verification tools with real Trojans
-- **Evaluate detection methods** - Generate diverse Trojan variants for testing
-- **Research hardware security** - Systematic exploration of RISC-V vulnerabilities
-- **Education** - Learn about hardware Trojans through hands-on examples
+- **Test security assertions** — Validate formal verification tools against real Trojan implementations
+- **Evaluate detection methods** — Generate diverse, reproducible Trojan variants at scale
+- **Research hardware security** — Systematic coverage of RISC-V-specific attack surfaces
+- **Education** — Study hardware Trojan behavior through simulation-validated examples
+
+RV-TroGen operates in two phases. Phase 1 covers RTL parsing, module classification, security ranking, pattern matching, and SystemVerilog code generation. Phase 2 covers RTL integration, dynamic testbench generation, QuestaSim simulation, VCD capture, and time-aligned behavioral comparison.
 
 ---
 
 ## Key Features
 
-### **Automated Generation**
-First tool to automatically generate hardware Trojans for RISC-V processors - from manual insertion (days) to automated generation (minutes).
+### Automated Generation
+Template-based generation of hardware Trojans for RISC-V processors, reducing insertion time from days (manual) to seconds (automated). Six Trojan patterns are generated per module using 12 reusable SystemVerilog templates (6 sequential, 6 combinational).
 
-### **Multi-Core Support**
-Works across multiple open-source RISC-V implementations:
-- lowRISC Ibex (RV32IMC)
-- OpenHW CVA6 (RV64GC)
-- RSD (Out-of-order processor)
+### Multi-Core Support
+Validated across three open-source RISC-V implementations:
+- **lowRISC Ibex** (RV32IMC) — in-order, 32-bit
+- **OpenHW CVA6** (RV64GC) — application-class, 64-bit
+- **RSD** — out-of-order superscalar
 
-### **Six Trojan Categories**
-Based on Trust-Hub taxonomy and RISC-V security literature:
-1. **Denial of Service** (DoS) - Based on Trust-Hub AES-T1800 & AES-T1900 (functionality-based DoS)
-2. **Information Leakage** - Based on Trust-Hub AES-T1000 & AES-T1100 (key/data leakage)
-3. **Privilege Escalation** - RISC-V M/S/U mode attacks (Bailey 2017)
-4. **Data Integrity** - Based on Trust-Hub AES-T2300 & AES-T2400 (state corruption)
-5. **Performance Degradation** - Based on Trust-Hub MEMCTRL-T100 & S35932-T300
-6. **Covert Channels** - Timing-based exfiltration (Lin et al. 2009)
+### Six Trojan Categories
+Based on the Trust-Hub taxonomy [5] and RISC-V security literature, each targeting a distinct signal and mechanism:
 
-### **Template-Based Generation**
-12 SystemVerilog templates (6 sequential + 6 combinational) providing:
+| # | Category | Trust-Hub Basis | Target Signal | Mechanism |
+|---|----------|-----------------|---------------|-----------|
+| 1 | Denial of Service | AES-T1800, T1900 | `csr_we_int` | Permanently blocks CSR writes |
+| 2 | Availability Degradation | MEMCTRL-T100, S35932-T300 | `csr_we_int` | 50% duty-cycle stall (8/16 cycles) |
+| 3 | Data Integrity | AES-T2300, T2400 | `csr_rdata_o` | XOR all reads with `0xDEADBEEF` |
+| 4 | Covert Channel | AES-T800 (extended) | `csr_rdata_o[0]` | Pulse-width encoding (10 cycles=1, 5=0) |
+| 5 | Information Leakage | AES-T600, T1000, T1400 | `csr_mepc_o` | Routes secret write data to stable port |
+| 6 | Privilege Escalation | RISC-V specific [6] | `priv_mode_id_o` | Forces `PRIV_LVL_M` (2'b11) |
+
+### Template-Based Generation
+12 SystemVerilog templates (6 sequential, 6 combinational) providing:
 - Reproducible pattern encoding
-- Independent verification
-- Easy extensibility
-- Direct comparison with Trust-Hub
+- Independent compilation verification
+- Easy extensibility to new patterns
+- Direct structural comparison with Trust-Hub benchmarks
 
-### **Complete Multi-Trojan Simulation Workflow**
-End-to-end trojan validation with:
-- Simple parser handling parameterized modules
-- Dynamic testbench generation (any module)
-- **Multi-trojan automatic integration** - generates ALL trojan variants in one command
-- VCD waveform analysis comparing original vs ALL trojans
-- Manual workflow proven on university HPC servers
+### Complete Multi-Trojan Simulation Workflow
+End-to-end validation pipeline:
+- RTL parser with full support for parameterized modules and package-typed ports
+- Dynamic testbench generation per Trojan with CSR-aware stimulus
+- Batch integration of all 6 Trojans in a single command
+- Time-aligned VCD comparison using last-value semantics and binary search
+- Auto-zoom waveform plots focused on the Trojan activation region (v3 analyzer)
 
-### **Open Source**
-Fully open-source tool for the security research community.
+### Open Source
+MIT license for the academic research community.
 
 ---
 
-## Quick Start (5 Minutes)
+## Repository Structure
+
+```
+rv-trogen/
+|
+|-- src/                                    Phase 1: RTL analysis and generation
+|   |-- parser/
+|   |   |-- rtl_parser.py                  Top-level parser entry point
+|   |   |-- parse_module.py                Module structure extraction
+|   |   |-- signal_extractor.py            Signal classification (input/output/internal)
+|   |   |-- simple_parser.py               Lightweight fallback parser
+|   |   `-- module_classifier.py           Sequential vs combinational classification
+|   |-- patterns/
+|   |   |-- pattern_library.py             Pattern registry and dispatch
+|   |   |-- dos_pattern.py                 Denial of Service
+|   |   |-- availability_pattern.py        Availability Degradation
+|   |   |-- integrity_pattern.py           Data Integrity
+|   |   |-- covert_pattern.py              Covert Channel
+|   |   |-- leak_pattern.py                Information Leakage
+|   |   `-- privilege_pattern.py           Privilege Escalation
+|   `-- generator/
+|       |-- trojan_generator.py            Core generation logic
+|       |-- combinational_gen.py           Combinational module generator
+|       |-- sequential_gen.py              Sequential module generator
+|       |-- template_loader.py             Template loading and placeholder resolution
+|       `-- placeholder_handler.py         Signal-to-placeholder mapping
+|
+|-- scripts/                               Phase 2: Integration, simulation, analysis
+|   |-- prepare_multi_trojan_simulation.py Trojan RTL integration + testbench generation
+|   |-- analyze_vcd.py                     VCD comparison, auto-zoom plots, diff reports
+|   |-- batch_parse.py                     Batch RTL parsing
+|   |-- batch_generate.py                  Batch Trojan generation
+|   |-- batch_full_pipeline.py             End-to-end pipeline (parse to integrate)
+|   |-- parse_and_rank.py                  Security ranking of modules
+|   |-- generate_trojans.py                Single-module Trojan generation
+|   |-- classify_signals.py                Signal classification utility
+|   `-- extract_signals_helper.py          Signal extraction helper
+|
+|-- templates/
+|   |-- trojan_templates/
+|   |   |-- sequential/                    6 templates for clocked (FF-based) modules
+|   |   `-- combinational/                 6 templates for combinational logic modules
+|   `-- testbench_templates/
+|       |-- sequential_tb_template.sv
+|       |-- combinational_tb_template.sv
+|       `-- mixed_tb_template.sv
+|
+|-- examples/
+|   |-- ibex/
+|   |   |-- original/                      Original Ibex RTL (ibex_cs_registers.sv, ibex_pkg.sv, ...)
+|   |   |-- generated_trojans/             Phase 1 output: per-pattern Trojan snippets
+|   |   `-- trojaned_rtl/                  Phase 2 output: integrated trojaned modules
+|   |-- cva6/
+|   `-- rsd/
+|
+|-- testbenches/
+|   |-- ibex/
+|   |   `-- ibex_cs_registers/             7 testbenches (1 original + 6 trojaned)
+|   |-- cva6/
+|   `-- rsd/
+|
+|-- simulation_results/
+|   |-- vcd/
+|   |   `-- ibex/ibex_cs_registers/        VCD files from QuestaSim (7 files)
+|   `-- analysis/
+|       `-- ibex/ibex_cs_registers/        Waveform plots and comparison reports
+|
+|-- tests/                                 Unit and integration tests
+|-- docs/                                  Documentation
+`-- README.md
+```
+
+---
+
+## Quick Start
 
 ### Step 1: Install
 ```bash
-# Clone repository
 git clone https://github.com/sharjeelimtiaz27/rv-trogen.git
 cd rv-trogen
-
-# Install package
 python install.py
-
-# Verify installation
-python -c "from src.parser import RTLParser; print('Installed successfully!')"
+python -c "from src.parser import RTLParser; print('Installation successful')"
 ```
 
-### Step 2: Parse Your First Module
+### Step 2: Parse a Module
 ```bash
-# Parse a RISC-V module
 python -m src.parser.rtl_parser examples/ibex/original/ibex_cs_registers.sv
 ```
 
-**Output:**
 ```
 ============================================================
 Module: ibex_cs_registers
 Type: Sequential
 Inputs:    15
 Outputs:   8
-Has Clock: True
-Has Reset: True
+Has Clock: True (clk_i)
+Has Reset: True (rst_ni)
 ============================================================
 ```
 
-### Step 3: Generate Trojans
+### Step 3: Generate All 6 Trojans
 ```bash
-# Generate Trojans for a security-critical module
 python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
-
-# Output organized automatically:
-# examples/ibex/generated_trojans/ibex_cs_registers/
-#   ├── T1_ibex_cs_registers_DoS.sv
-#   ├── T2_ibex_cs_registers_Leak.sv
-#   ├── T3_ibex_cs_registers_Privilege.sv
-#   ├── T4_ibex_cs_registers_Integrity.sv
-#   ├── T5_ibex_cs_registers_Availability.sv
-#   ├── T6_ibex_cs_registers_Covert.sv
-#   └── ibex_cs_registers_trojan_summary.md
 ```
 
-### Step 4: Integrate ALL Trojans & Generate Testbenches
+Output in `examples/ibex/generated_trojans/ibex_cs_registers/`:
+```
+T1_ibex_cs_registers_DoS.sv
+T2_ibex_cs_registers_Availability.sv
+T3_ibex_cs_registers_Integrity.sv
+T4_ibex_cs_registers_Covert.sv
+T5_ibex_cs_registers_Leak.sv
+T6_ibex_cs_registers_Privilege.sv
+ibex_cs_registers_trojan_summary.md
+```
+
+### Step 4: Integrate All Trojans and Generate Testbenches
 ```bash
-# Complete multi-trojan integration: ALL trojans inserted + testbenches generated
-python scripts/prepare_multi_trojan_simulation.py examples/ibex/original/ibex_csr.sv
-
-# Creates:
-#   examples/ibex/trojaned_rtl/ibex_csr/
-#     ├── ibex_csr_trojan_DoS.sv
-#     ├── ibex_csr_trojan_Integrity.sv
-#     └── ibex_csr_trojan_Covert.sv
-#   
-#   testbenches/ibex/ibex_csr/
-#     ├── tb_ibex_csr.sv (original)
-#     ├── tb_ibex_csr_trojan_DoS.sv
-#     ├── tb_ibex_csr_trojan_Integrity.sv
-#     └── tb_ibex_csr_trojan_Covert.sv
+python scripts/prepare_multi_trojan_simulation.py \
+    examples/ibex/original/ibex_cs_registers.sv \
+    --trojans examples/ibex/generated_trojans/ibex_cs_registers
 ```
 
-### Step 5: Simulate & Validate
+Creates 6 trojaned RTL files and 7 testbenches under
+`examples/ibex/trojaned_rtl/ibex_cs_registers/` and
+`testbenches/ibex/ibex_cs_registers/`.
+
+### Step 5: Simulate on Server (QuestaSim)
 ```bash
-# Upload to server, compile ALL modules, simulate ALL trojans (see docs/SIMULATION_SETUP.md)
-# Then download VCD files and analyze ALL trojans:
+# Upload all files to simulation server (ibex_pkg.sv required for enum types)
+scp examples/ibex/original/ibex_pkg.sv \
+    examples/ibex/original/ibex_cs_registers.sv \
+    examples/ibex/trojaned_rtl/ibex_cs_registers/*.sv \
+    testbenches/ibex/ibex_cs_registers/*.sv \
+    user@server:/workdir/
 
-python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/ibex/ibex_csr
-
-# Generates comparison for EACH trojan:
-#   - SUMMARY_ALL_TROJANS.txt (overview of all trojans)
-#   - comparison_DoS.txt + waveform_DoS.png
-#   - comparison_Integrity.txt + waveform_Integrity.png
-#   - comparison_Covert.txt + waveform_Covert.png
+# On server: compile and simulate each pair (see docs/SIMULATION_SETUP.md)
+vlog +acc ibex_pkg.sv ibex_cs_registers.sv tb_ibex_cs_registers.sv
+vsim -c work.tb_ibex_cs_registers -do "run -all; quit -f"
+# Repeat for each of the 6 trojaned variants
 ```
+
+### Step 6: Analyze VCD Files
+```bash
+# Download all 7 VCD files, then analyze all 6 trojans vs original in one command
+python scripts/analyze_vcd.py \
+    --vcd-dir simulation_results/vcd/ibex/ibex_cs_registers
+
+# Analyze a single trojan (auto-finds original in same directory)
+python scripts/analyze_vcd.py \
+    --trojan simulation_results/vcd/ibex/ibex_cs_registers/ibex_cs_registers_trojan_DoS.vcd
+```
+
+Outputs land in `simulation_results/analysis/ibex/ibex_cs_registers/`:
+one auto-zoomed waveform PNG and one text report per Trojan.
 
 ---
 
-## Command-Line Tools
+## Command-Line Reference
+
 ```bash
-# 1. Parse single module
-python -m src.parser.rtl_parser <module.sv>
+# Parse single module
+python -m src.parser.rtl_parser examples/ibex/original/ibex_cs_registers.sv
 
-# 2. Batch parse directory
-python scripts/batch_parse.py --dir <directory>
+# Batch parse directory
+python scripts/batch_parse.py --dir examples/ibex/original
 
-# 3. Find security-critical modules
-python scripts/batch_parse.py --dir <directory> --security-only
+# Find security-critical modules
+python scripts/batch_parse.py --dir examples/ibex/original --security-only
 
-# 4. Rank by security importance
-python scripts/parse_and_rank.py <directory> --top 5
+# Rank modules by security importance
+python scripts/parse_and_rank.py examples/ibex/original --top 5
 
-# 5. Generate Trojans for single module
-python scripts/generate_trojans.py <module.sv>
+# Generate 6 Trojans for a single module
+python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
 
-# 6. Batch generate for all processors
-python scripts/batch_full_pipeline.py                    # All 3 processors
-python scripts/batch_full_pipeline.py --processor ibex   # Single processor
+# Run full pipeline for all processors
+python scripts/batch_full_pipeline.py
+python scripts/batch_full_pipeline.py --processor ibex
 
-# 7. Integrate ALL trojans + generate testbenches (MULTI-TROJAN)
-python scripts/prepare_multi_trojan_simulation.py <module.sv>
+# Integrate all Trojans and generate testbenches
+python scripts/prepare_multi_trojan_simulation.py \
+    examples/ibex/original/ibex_cs_registers.sv \
+    --trojans examples/ibex/generated_trojans/ibex_cs_registers
 
-# 8. Analyze ALL trojan VCD files
-python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/<processor>/<module>
+# Analyze all Trojan VCDs (batch, auto-zoom)
+python scripts/analyze_vcd.py \
+    --vcd-dir simulation_results/vcd/ibex/ibex_cs_registers
 
-# 9. Run tests
+# Analyze single Trojan with manual time window (ns)
+python scripts/analyze_vcd.py \
+    --trojan simulation_results/vcd/ibex/ibex_cs_registers/ibex_cs_registers_trojan_DoS.vcd \
+    --start 140 --end 350
+
+# Run tests
 python -m pytest tests/ -v
 ```
 
@@ -177,235 +266,215 @@ python -m pytest tests/ -v
 
 ## Comparison with Related Work
 
-| Feature | **RV-TroGen (Ours)** | **TrojanForge [1]** | **SENTAUR [2]** | **0ena [3]** | **SoC-HTs [4]** | **Trust-Hub [5]** |
-|---------|---------------------|-----------------|-----------------|------------|---------------|---------------|
-| **Target** | RISC-V (3 cores) | Generic | Generic | RISC-V | Ariane SoC | AES/RSA |
-| **Approach** | Template-based | RL-based | LLM (GPT-4) | Manual | Manual | Manual |
-| **Automation** | ✅ Full | ✅ Automated | ⚠️ Semi | ❌ Manual | ❌ Manual | ❌ Manual |
-| **Multi-Core** | ✅ 3 cores (265 mod) | ❌ Single | ❌ Untested | ⚠️ Generic | ❌ Single SoC | ❌ Single |
-| **RTL-Level** | ✅ Yes (SV) | ⚠️ Gate-focus | ✅ Yes | ✅ Yes | ⚠️ SoC (AXI) | ⚠️ Mixed |
-| **Attack Surface** | Processor (CSR/LSU) | Generic | Generic | Generic | AXI protocol | Crypto ops |
-| **Patterns** | ✅ 6 categories | ⚠️ Black-box | ⚠️ 4 types | ⚠️ 3 examples | ⚠️ 3 types | ✅ Multiple |
-| **Templates** | ✅ 12 (.sv files) | ❌ RL policy | ❌ LLM prompts | ❌ No | ❌ No | ❌ No |
-| **Multi-Trojan** | ✅ Batch workflow | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A | ❌ N/A |
-| **Validation** | ✅ QuestaSim (100%) | ⚠️ Evasion | ⚠️ Detection | ⚠️ Not reported | ✅ FPGA+GNN | ✅ Benchmarks |
-| **Simulation** | ✅ Complete workflow | ❌ N/A | ❌ Not reported | ❌ Manual | ✅ Behavioral | ❌ N/A |
-| **Detection Focus** | ⚠️ Secondary | ⚠️ Primary | ⚠️ Primary | ❌ No | ✅ Primary | ✅ Benchmarks |
-| **Open-Source** | ✅ Full (MIT) | ❌ No | ❌ No | ✅ Yes | ✅ 3 HTs | ❌ Registration |
-| **Generated HTs** | ✅ 929 | ⚠️ Unknown | ⚠️ 4 | ⚠️ 3 | ⚠️ 3 | ✅ 90+ |
-| **Performance** | ✅ 4.1s | ⚠️ Hours | ⚠️ Slow | ❌ N/A | ❌ Manual | ❌ N/A |
-| **Cost** | ✅ Free | ❌ Unknown | ⚠️ API costs | ✅ Free | ✅ Free | ❌ Paid |
-| **Year** | 2026 | 2024 | 2024 | 2020 | 2023 | 2008-now |
+| Feature | RV-TroGen (Ours) | TrojanForge [1] | SENTAUR [2] | 0ena [3] | SoC-HTs [4] | Trust-Hub [5] |
+|---------|-----------------|-----------------|-------------|----------|-------------|---------------|
+| Target | RISC-V (3 cores) | Generic | Generic | RISC-V | Ariane SoC | AES/RSA |
+| Approach | Template-based | RL-based | LLM (GPT-4) | Manual | Manual | Manual |
+| Automation | Full | Automated | Semi | None | None | None |
+| Multi-Core | 3 cores, 265 mod | Single | Untested | Generic | Single SoC | Single |
+| RTL-Level | Yes (SystemVerilog) | Gate-focused | Yes | Yes | SoC/AXI | Mixed |
+| Attack Surface | Processor (CSR/LSU) | Generic | Generic | Generic | AXI protocol | Crypto ops |
+| Patterns | 6 categories | Black-box | 4 types | 3 examples | 3 types | Multiple |
+| Templates | 12 (.sv files) | RL policy | LLM prompts | None | None | None |
+| Multi-Trojan workflow | Yes | No | No | No | No | No |
+| Validation | QuestaSim, 100% | Evasion rate | Detection rate | Not reported | FPGA + GNN | Benchmarks |
+| Full simulation workflow | Yes | No | No | No | Behavioral | No |
+| Open-Source | Yes (MIT) | No | No | Yes | Partial | Registration |
+| Generated HTs | 707 | Unknown | 4 | 3 | 3 | 90+ |
+| Generation time | 4.1 seconds | Hours | Slow | N/A | N/A | N/A |
+| Cost | Free | Unknown | API cost | Free | Free | Paid |
+| Year | 2026 | 2024 | 2024 | 2020 | 2023 | 2008–present |
 
-**Key Innovation:** First automated, template-based, open-source framework for RISC-V Trojan generation with complete multi-trojan simulation and validation workflow.
+**Key innovation:** First automated, template-based, open-source framework for RISC-V Trojan generation with a complete multi-Trojan simulation and validation workflow.
+
+---
+
+## Results
+
+**707 Trojans generated across 3 RISC-V processors in 4.1 seconds:**
+
+| Processor | Modules | Trojans | Avg per Module |
+|-----------|---------|---------|----------------|
+| Ibex      | 28      | 136     | 4.9            |
+| CVA6      | 85      | 331     | 3.9            |
+| RSD       | 152     | 240     | 1.6            |
+| **Total** | **265** | **707** | **3.5**        |
+
+**Simulation and validation results — ibex_cs_registers, QuestaSim 2024.3:**
+
+| Trojan | Target Signal | Observed Behavior | Status |
+|--------|--------------|-------------------|--------|
+| Denial of Service | `csr_we_int` | Signal permanently blocked after activation | Confirmed |
+| Availability | `csr_we_int` | Periodic gaps at 8/16-cycle duty cycle | Confirmed |
+| Data Integrity | `csr_rdata_o` | XOR deviation of exactly `0xDEADBEEF` on all reads | Confirmed |
+| Covert Channel | `csr_rdata_o[0]` | Variable-width pulses encoding secret bits | Confirmed |
+| Information Leakage | `csr_mepc_o` | Stable port changes with each secret CSR write | Confirmed |
+| Privilege Escalation | `priv_mode_id_o` | Transition from `2'b00` (user) to `2'b11` (machine) | Confirmed |
 
 ---
 
 ## Use Cases
 
-### **1. Security Researcher**
-Test your Trojan detection algorithms:
+### Security Researcher
 ```bash
 # Generate diverse Trojan variants
 python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
 
-# Integrate ALL trojans and simulate
-python scripts/prepare_multi_trojan_simulation.py examples/ibex/original/ibex_csr.sv
+# Integrate all Trojans and prepare simulation
+python scripts/prepare_multi_trojan_simulation.py \
+    examples/ibex/original/ibex_cs_registers.sv \
+    --trojans examples/ibex/generated_trojans/ibex_cs_registers
 
-# Upload, simulate on server, download VCDs...
-
-# Validate ALL trojan behaviors
-python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/ibex/ibex_csr
+# After simulation: validate all Trojan behaviors
+python scripts/analyze_vcd.py \
+    --vcd-dir simulation_results/vcd/ibex/ibex_cs_registers
 ```
 
-### **2. Processor Designer**
-Validate security assertions in your RISC-V design:
+### Processor Designer
 ```bash
-# Find most critical modules
+# Identify the highest-risk modules in your design
 python scripts/parse_and_rank.py my_processor/rtl --top 5
 
-# Generate test cases for formal verification
+# Generate Trojans for formal verification testing
 python scripts/generate_trojans.py <critical_module.sv>
-
-# Validate with simulation
-python scripts/prepare_multi_trojan_simulation.py <critical_module.sv>
 ```
 
-### **3. Educator/Student**
-Learn about hardware security:
+### Educator / Student
 ```bash
-# Start with parsing
+# Parse and inspect a security-critical module
 python -m src.parser.rtl_parser examples/ibex/original/ibex_cs_registers.sv
 
-# Generate and study Trojan examples
-python scripts/generate_trojans.py examples/ibex/original/ibex_alu.sv
-
-# See how they work in simulation
-python scripts/prepare_multi_trojan_simulation.py examples/ibex/original/ibex_csr.sv
-python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/ibex/ibex_csr
+# Generate Trojans and examine the generated SystemVerilog
+python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
 ```
 
 ---
 
 ## Documentation
 
-### **Getting Started:**
-- [Quick Start Guide](docs/QUICK_START.md) - 15-minute tutorial
-- [Commands Reference](docs/COMMANDS_REFERENCE.md) - All commands explained
-- [Step-by-Step Progress](docs/STEP_GUIDE.md) - Development roadmap
-
-### **Technical Details:**
-- [Template Library](docs/TEMPLATES.md) - Template documentation
-- [Simulation Setup](docs/SIMULATION_SETUP.md) - Complete multi-trojan workflow
-- [Trust-Hub Patterns](docs/TRUST_HUB_PATTERNS.md) - Pattern library with citations
+- [Quick Start Guide](docs/QUICK_START.md) — 15-minute tutorial
+- [Commands Reference](docs/COMMANDS_REFERENCE.md) — All CLI commands with expected output
+- [Simulation Setup](docs/SIMULATION_SETUP.md) — Complete server simulation workflow
+- [Template Library](docs/TEMPLATES.md) — Template system documentation
+- [Trust-Hub Patterns](docs/TRUST_HUB_PATTERNS.md) — Pattern taxonomy and citations
+- [Step Guide](docs/STEP_GUIDE.md) — Development roadmap
 
 ---
 
-## Testing & Validation
+## Testing
+
 ```bash
-# Run all tests
 python -m pytest tests/ -v
-
-# Run with coverage
 python -m pytest --cov=src tests/
-
-# Validate multi-trojan integration and simulation
-python scripts/prepare_multi_trojan_simulation.py examples/ibex/original/ibex_csr.sv
 ```
 
-**Test Coverage:** 85% (24/24 tests passing)
+Test coverage: 85% (24/24 tests passing).
 
 ---
 
 ## Dependencies
-```bash
-# Core dependencies
+
+```
 pytest>=7.0.0
 pytest-cov>=3.0.0
-
-# Simulation support
 matplotlib>=3.5.0
 ```
 
-### Installation
 ```bash
-# Core installation
 python -m pip install -e .
-
-# Add simulation support
 python -m pip install matplotlib
 ```
 
----
-
-## Results
-
-**Generated 707 Trojans across 3 RISC-V processors in 4.1 seconds:**
-
-| Processor | Modules | Trojans | Avg per Module |
-|-----------|---------|---------|----------------|
-| Ibex | 28 | 136 | 4.9 |
-| CVA6 | 85 | 331 | 3.9 |
-| RSD | 152 | 240 | 1.6 |
-| **Total** | **265** | **707** | **3.5** |
-
-**Validation Results (Multi-Trojan Simulation):**
-- ✅ Compilation: 100% success for all trojan variants (QuestaSim 2024.3)
-- ✅ Simulation: Original + 3 trojans (DoS, Integrity, Covert) run to completion (30,000 cycles each)
-- ✅ VCD Analysis: Differences detected in all trojans:
-  - **DoS**: 15,000+ time points (wr_en_i blocked after activation)
-  - **Integrity**: 3,000+ time points (rd_data_o XOR corruption = 0xDEADBEEF)
-  - **Covert**: 8,000+ time points (timing modulation on rd_error_o)
-- ✅ Payload Verification: All trojan behaviors confirmed in waveforms
-- ✅ Multi-Trojan Workflow: Complete automation from generation → simulation → analysis
+Simulation requires QuestaSim 2024.3 (or compatible). GTKWave is recommended for manual waveform inspection.
 
 ---
 
-## Contributing
+## Acknowledgments and Processor Credits
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+RV-TroGen targets the following open-source RISC-V processor implementations. We gratefully acknowledge their authors and communities.
 
----
+**lowRISC Ibex (RV32IMC)**
+A small, efficient, 32-bit RISC-V processor core.
+Repository: https://github.com/lowRISC/ibex
+License: Apache 2.0
 
-## License
+**OpenHW CVA6 (RV64GC)**
+An application-class, Linux-capable 64-bit RISC-V processor.
+Repository: https://github.com/openhwgroup/cva6
+License: Solderpad Hardware License 0.51
 
-**Academic and Research Use Only**
+**RSD (Out-of-Order RISC-V Processor)**
+An out-of-order superscalar RISC-V processor.
+Repository: https://github.com/rsd-devel/rsd
+License: Apache 2.0
 
-This is a PhD research project from Tallinn University of Technology.
+All three processor codebases are used solely for academic security research. No modifications are made to the original processor RTL; Trojans are generated as separate files that instrument the original modules.
 
-- Free for academic research and education
-- Cite our paper if you use it
-- Commercial use requires permission
-
-For inquiries: sharjeel.imtiaz@taltech.ee
-
-See [LICENSE](LICENSE) for full terms.
-
----
-
-## Contact & Support
-
-- **Author:** Sharjeel Imtiaz
-- **Email:** sharjeel.imtiaz@taltech.ee
-- **Institution:** Tallinn University of Technology (TalTech)
-- **Repository:** https://github.com/sharjeelimtiaz27/rv-trogen
-- **Issues:** https://github.com/sharjeelimtiaz27/rv-trogen/issues
+This work also builds on the **Trust-Hub** Hardware Trojan benchmark suite [5] and the **RISC-V Privileged Architecture Specification** (RISC-V International).
 
 ---
 
-## Acknowledgments
+## References
 
-This work builds upon:
-- **Trust-Hub** - Hardware Trojan benchmarks and taxonomy
-- **lowRISC Ibex** - Open-source RISC-V core for testing
-- **OpenHW CVA6** - Application-class RISC-V processor
-- **RISC-V International** - ISA specifications and privilege architecture
+**Related work (comparison table):**
 
-Key papers that informed our work:
-- Bailey (2017) - RISC-V privilege escalation exploits
-- Boraten & Kodi (2016) - Performance degradation attacks (NoC-based)
-- Lin et al. (2009) - Trojan side-channel engineering
+- [1] K. Hui et al., "TrojanForge: Generating Adversarial Hardware Trojan Examples Using Reinforcement Learning," arXiv:2405.15184, 2024. https://arxiv.org/abs/2405.15184
+- [2] J. Bhandari et al., "SENTAUR: Security EnhaNced Trojan Assessment Using LLMs Against Undesirable Revisions," arXiv:2407.12352, 2024. https://arxiv.org/pdf/2407.12352
+- [3] A. Moschos, "Towards Practical Fabrication Stage Attacks Using Interrupt-Resilient Hardware Trojans," GitHub, 2020. https://github.com/0ena/riscv-hw-trojans
+- [4] S. Deb, "A RISC-V SoC with Hardware Trojans: Case Study on Trojan-ing the On-Chip Protocol Conversion," IEEE, 2023. https://ieeexplore.ieee.org/abstract/document/10321883
+- [5] Trust-Hub, "Hardware Trojan Benchmarks," https://trust-hub.org
 
-See [docs/TRUST_HUB_PATTERNS.md](docs/TRUST_HUB_PATTERNS.md) for complete references.
+**Trojan pattern foundations:**
+
+- [6] D. A. Bailey, "The RISC-V Files: Supervisor to Machine Privilege Escalation," MIT CSAIL, 2017.
+- [7] T. Boraten and A. K. Kodi, "Mitigation of Denial of Service Attack with Hardware Trojans in NoC Architectures," IEEE IPDPS, pp. 1091–1100, 2016. https://doi.org/10.1109/IPDPS.2016.112
+- [8] L. Lin, M. Kasper, T. Guneysu, C. Paar, and W. Burleson, "Trojan Side-Channels: Lightweight Hardware Trojans through Side-Channel Engineering," CHES, LNCS vol. 5747, pp. 382–395, 2009. https://doi.org/10.1007/978-3-642-04138-9_27
 
 ---
 
 ## Citation
 
-If you use RV-TroGen in your research, please cite:
 ```bibtex
 @misc{rvtrogen2026,
-  author = {Imtiaz, Sharjeel},
-  title = {RV-TroGen: Automated Hardware Trojan Generation for RISC-V Processors},
-  year = {2026},
+  author      = {Imtiaz, Sharjeel},
+  title       = {{RV-TroGen}: Automated Hardware Trojan Generation and Validation
+                 for {RISC-V} Processors},
+  year        = {2026},
   institution = {Tallinn University of Technology},
-  url = {https://github.com/sharjeelimtiaz27/rv-trogen},
-  note = {Open-source template-based framework with complete multi-trojan simulation workflow}
+  url         = {https://github.com/sharjeelimtiaz27/rv-trogen},
+  note        = {Open-source template-based framework with complete multi-Trojan
+                 simulation and validation workflow}
 }
 ```
 
 ---
 
+## License
+
+Academic and Research Use Only.
+
+This is a PhD research project from Tallinn University of Technology (TalTech), Estonia.
+Free for academic research and education. Cite this work if you use it.
+Commercial use requires prior written permission.
+
+Contact: sharjeel.imtiaz@taltech.ee — See [LICENSE](LICENSE) for full terms.
+
+---
+
 ## Ethical Use
 
-**Important:** This tool is designed for:
-- Security research and testing
-- Educational purposes
-- Validating detection methods
-- Improving processor security
-
-**Not intended for:**
-- Malicious hardware insertion
-- Compromising production systems
-- Any illegal activities
-
-Users are responsible for ethical and legal use of this software.
+This tool is intended for security research, validation of Trojan detection methods, formal verification testing, and education. It must not be used to insert Trojans into production hardware, compromise real systems, or facilitate any illegal activity. Users bear full responsibility for ensuring ethical and lawful use.
 
 ---
 
-**Current Version:** 2.0.0  
-**Last Updated:** February 18, 2026
+## Contact
+
+- **Author:** Sharjeel Imtiaz, PhD Candidate
+- **Institution:** Tallinn University of Technology (TalTech), Estonia
+- **Email:** sharjeel.imtiaz@taltech.ee
+- **Repository:** https://github.com/sharjeelimtiaz27/rv-trogen
+- **Issues:** https://github.com/sharjeelimtiaz27/rv-trogen/issues
 
 ---
 
-**Star this repo if you find it useful!**
+**Version:** 3.0.0 | **Last Updated:** March 2026

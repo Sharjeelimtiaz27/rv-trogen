@@ -16,16 +16,21 @@ module TestDistributedDualPortRAM_trojan_DoS;
     //
     logic clk, rst;
     TestBenchClockGenerator #( .STEP(STEP) ) clkgen ( .rstOut(FALSE), .* );
+    
+    //
+    // Modules for test
+    //
+    parameter ENTRY_NUM = 4;
+    parameter INDEX_BIT_SIZE = $clog2(ENTRY_NUM);
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=15967)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 11739;
+    localparam int TRIGGER_THRESHOLD = 15967;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
@@ -34,12 +39,6 @@ module TestDistributedDualPortRAM_trojan_DoS;
         end
     end
 
-    
-    //
-    // Modules for test
-    //
-    parameter ENTRY_NUM = 4;
-    parameter INDEX_BIT_SIZE = $clog2(ENTRY_NUM);
     parameter ENTRY_BIT_SIZE = 4;
 
     logic we;

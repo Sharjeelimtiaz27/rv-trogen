@@ -1,0 +1,70 @@
+VCD COMPARISON REPORT: ORIGINAL vs COVERT
+======================================================================
+
+Original VCD: simulation_results\vcd\ibex\ibex_cs_registers\ibex_cs_registers.vcd
+Trojan VCD:   simulation_results\vcd\ibex\ibex_cs_registers\ibex_cs_registers_trojan_Covert.vcd
+Time Range: 150000000 - 600000000 ps
+
+Comparison Method: Time-aligned with last-value semantics (binary search)
+Sampled Time Points: 5001
+Total signals compared: 212
+Signals with differences: 1
+
+DETAILED DIFFERENCES:
+======================================================================
+
+Signal: csr_rdata_o
+  Number of differences: 1312
+  Time points with differences:
+    Time    368070000 ps: Original=0x4ef237b6  Trojan=0x4ef237b7  (XOR=0x00000001)
+    Time    368250000 ps: Original=0x76108082  Trojan=0x76108083  (XOR=0x00000001)
+    Time    368340000 ps: Original=0x12dc2a92  Trojan=0x12dc2a93  (XOR=0x00000001)
+    Time    368880000 ps: Original=0xc6b9db5e  Trojan=0xc6b9db5f  (XOR=0x00000001)
+    Time    369060000 ps: Original=0x7a88c4ce  Trojan=0x7a88c4cf  (XOR=0x00000001)
+    Time    369420000 ps: Original=0x035e672e  Trojan=0x035e672f  (XOR=0x00000001)
+    Time    369690000 ps: Original=0x5ea8fd68  Trojan=0x5ea8fd69  (XOR=0x00000001)
+    Time    369780000 ps: Original=0x4d79eb98  Trojan=0x4d79eb99  (XOR=0x00000001)
+    Time    369870000 ps: Original=0xa36e0730  Trojan=0xa36e0731  (XOR=0x00000001)
+    Time    369960000 ps: Original=0x7a94110d  Trojan=0x7a94110c  (XOR=0x00000001)
+    Time    370140000 ps: Original=0x9086b242  Trojan=0x9086b243  (XOR=0x00000001)
+    Time    370230000 ps: Original=0x1cc9b380  Trojan=0x1cc9b381  (XOR=0x00000001)
+    Time    370410000 ps: Original=0x150b989e  Trojan=0x150b989f  (XOR=0x00000001)
+    Time    370590000 ps: Original=0x27d6ef52  Trojan=0x27d6ef53  (XOR=0x00000001)
+    Time    370680000 ps: Original=0x9e869736  Trojan=0x9e869737  (XOR=0x00000001)
+    Time    371310000 ps: Original=0x483837f4  Trojan=0x483837f5  (XOR=0x00000001)
+    Time    371400000 ps: Original=0xd034590e  Trojan=0xd034590f  (XOR=0x00000001)
+    Time    371490000 ps: Original=0x9839364a  Trojan=0x9839364b  (XOR=0x00000001)
+    Time    371760000 ps: Original=0x53fc33ec  Trojan=0x53fc33ed  (XOR=0x00000001)
+    Time    371850000 ps: Original=0x7d88f7ee  Trojan=0x7d88f7ef  (XOR=0x00000001)
+    Time    371940000 ps: Original=0xd774b6ce  Trojan=0xd774b6cf  (XOR=0x00000001)
+    Time    372120000 ps: Original=0x6d8586d2  Trojan=0x6d8586d3  (XOR=0x00000001)
+    Time    372210000 ps: Original=0xf7e73a42  Trojan=0xf7e73a43  (XOR=0x00000001)
+    Time    372300000 ps: Original=0x8106c55f  Trojan=0x8106c55e  (XOR=0x00000001)
+    Time    373110000 ps: Original=0x77c3215c  Trojan=0x77c3215d  (XOR=0x00000001)
+    Time    373200000 ps: Original=0x5e2b6d8d  Trojan=0x5e2b6d8c  (XOR=0x00000001)
+    Time    373470000 ps: Original=0x90d992d8  Trojan=0x90d992d9  (XOR=0x00000001)
+    Time    373560000 ps: Original=0x2b7950f4  Trojan=0x2b7950f5  (XOR=0x00000001)
+    Time    373920000 ps: Original=0x502204b8  Trojan=0x502204b9  (XOR=0x00000001)
+    Time    374010000 ps: Original=0x4109ef68  Trojan=0x4109ef69  (XOR=0x00000001)
+    Time    374100000 ps: Original=0x78276c3c  Trojan=0x78276c3d  (XOR=0x00000001)
+    Time    374190000 ps: Original=0xb48ebe46  Trojan=0xb48ebe47  (XOR=0x00000001)
+    Time    374370000 ps: Original=0x5394d21c  Trojan=0x5394d21d  (XOR=0x00000001)
+    Time    374460000 ps: Original=0x42688820  Trojan=0x42688821  (XOR=0x00000001)
+    Time    374550000 ps: Original=0x52bf0996  Trojan=0x52bf0997  (XOR=0x00000001)
+    Time    374640000 ps: Original=0x88faabd7  Trojan=0x88faabd6  (XOR=0x00000001)
+    Time    374910000 ps: Original=0xe7f80642  Trojan=0xe7f80643  (XOR=0x00000001)
+    Time    375270000 ps: Original=0xb1d97b6c  Trojan=0xb1d97b6d  (XOR=0x00000001)
+    Time    375540000 ps: Original=0x32c4146f  Trojan=0x32c4146e  (XOR=0x00000001)
+    Time    375810000 ps: Original=0xea5ad9e0  Trojan=0xea5ad9e1  (XOR=0x00000001)
+    Time    375990000 ps: Original=0x7e0c1dfe  Trojan=0x7e0c1dff  (XOR=0x00000001)
+    Time    376260000 ps: Original=0x6a00a03e  Trojan=0x6a00a03f  (XOR=0x00000001)
+    Time    376440000 ps: Original=0x3aa9059c  Trojan=0x3aa9059d  (XOR=0x00000001)
+    Time    376530000 ps: Original=0xa6657d48  Trojan=0xa6657d49  (XOR=0x00000001)
+    Time    376710000 ps: Original=0x284ea430  Trojan=0x284ea431  (XOR=0x00000001)
+    Time    376800000 ps: Original=0x2da5697e  Trojan=0x2da5697f  (XOR=0x00000001)
+    Time    376980000 ps: Original=0xb9f3115a  Trojan=0xb9f3115b  (XOR=0x00000001)
+    Time    377160000 ps: Original=0xce6bf2be  Trojan=0xce6bf2bf  (XOR=0x00000001)
+    Time    377250000 ps: Original=0xdfa94e98  Trojan=0xdfa94e99  (XOR=0x00000001)
+    Time    377520000 ps: Original=0x095df1fe  Trojan=0x095df1ff  (XOR=0x00000001)
+    ... and 1262 more differences
+

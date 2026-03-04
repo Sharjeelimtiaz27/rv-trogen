@@ -1,0 +1,43 @@
+======================================================================
+RV-TroGen VCD Comparison Report — Availability
+======================================================================
+
+Original : simulation_results\vcd\ibex\ibex_cs_registers\ibex_cs_registers.vcd
+Trojaned : simulation_results\vcd\ibex\ibex_cs_registers\ibex_cs_registers_trojan_Availability.vcd
+
+Trojan activation time : 499325000 ps  (499325.0 ns)
+
+Signals with differences: 3
+
+  Signal: csr_rdata_int   (1680 diff points)
+       499355000 ps  orig=0xCACD58EE  troj=0x22510F34  XOR=0xE89C57DA
+       499385000 ps  orig=0x1B46DE7A  troj=0x22510F34  XOR=0x3917D14E
+       499415000 ps  orig=0x0395E7AF  troj=0x22510F34  XOR=0x21C4E89B
+       499535000 ps  orig=0xEC33315F  troj=0x63827E81  XOR=0x8FB14FDE
+       499565000 ps  orig=0x89432A84  troj=0x63827E81  XOR=0xEAC15405
+       499685000 ps  orig=0xD7EF5493  troj=0xDBB0B240  XOR=0x0C5FE6D3
+       499715000 ps  orig=0x04898206  troj=0xDBB0B240  XOR=0xDF393046
+       499745000 ps  orig=0x29048C89  troj=0xDBB0B240  XOR=0xF2B43EC9
+    … and 1672 more
+
+  Signal: csr_rdata_o   (2520 diff points)
+       499355000 ps  orig=0xCACD58EE  troj=0x22510F34  XOR=0xE89C57DA
+       499375000 ps  orig=0x1B46DE7A  troj=0x22510F34  XOR=0x3917D14E
+       499395000 ps  orig=0xCBF7F64F  troj=0x22510F34  XOR=0xE9A6F97B
+       499415000 ps  orig=0x0395E7AF  troj=0x22510F34  XOR=0x21C4E89B
+       499515000 ps  orig=0xFDB0F8D1  troj=0x63827E81  XOR=0x9E328650
+       499535000 ps  orig=0xEC33315F  troj=0x63827E81  XOR=0x8FB14FDE
+       499555000 ps  orig=0x89432A84  troj=0x63827E81  XOR=0xEAC15405
+       499575000 ps  orig=0x9F84CA1F  troj=0x63827E81  XOR=0xFC06B49E
+    … and 2512 more
+
+  Signal: csr_we_int   (840 diff points)
+       499345000 ps  orig=0x00000001  troj=0x00000000  XOR=0x00000001
+       499405000 ps  orig=0x00000001  troj=0x00000000  XOR=0x00000001
+       499525000 ps  orig=0x00000001  troj=0x00000000  XOR=0x00000001
+       499705000 ps  orig=0x00000001  troj=0x00000000  XOR=0x00000001
+       499825000 ps  orig=0x00000001  troj=0x00000000  XOR=0x00000001
+       499885000 ps  orig=0x00000001  troj=0x00000000  XOR=0x00000001
+       500005000 ps  orig=0x00000001  troj=0x00000000  XOR=0x00000001
+       500185000 ps  orig=0x00000001  troj=0x00000000  XOR=0x00000001
+    … and 832 more

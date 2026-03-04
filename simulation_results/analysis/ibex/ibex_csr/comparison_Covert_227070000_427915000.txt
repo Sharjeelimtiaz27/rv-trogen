@@ -5,7 +5,14 @@ Original VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr.vcd
 Trojan VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr_trojan_Covert.vcd
 Time Range: 227070000 - 427915000 ns
 
+Comparison Method: Time-aligned with last-value semantics
+Sampled Time Points: 40170
 Total signals compared: 10
 Signals with differences: 0
 
 No differences found between waveforms.
+
+Possible reasons:
+  - Trojan trigger condition not met during simulation
+  - Simulation time too short (increase cycles in testbench)
+  - Trigger threshold too high

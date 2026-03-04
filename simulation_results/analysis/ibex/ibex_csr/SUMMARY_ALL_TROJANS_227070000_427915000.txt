@@ -7,6 +7,7 @@ Module: ibex_csr
 Original VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr.vcd
 Time Range: 227070000 - 427915000 ns
 
+Comparison Method: Time-aligned with last-value semantics
 Total Trojans Analyzed: 3
 
 ======================================================================
@@ -15,11 +16,17 @@ TROJAN COMPARISON RESULTS
 
 Trojan: COVERT
   Signals with differences: 0
-  Status: No differences detected (trojan may not have activated)
+  Status: No differences detected
+  Note: Trojan may not have activated. Try:
+        - Increase simulation cycles in testbench
+        - Check trigger threshold values
+        - Verify trojan integration
 
 Trojan: DOS
-  Signals with differences: 0
-  Status: No differences detected (trojan may not have activated)
+  Signals with differences: 2
+  Affected signals:
+    - rd_data_o
+    - rdata_q
 
 Trojan: INTEGRITY
   Signals with differences: 1

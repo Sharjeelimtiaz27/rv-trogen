@@ -64,22 +64,21 @@ output
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=11286)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 15964;
+    localparam int TRIGGER_THRESHOLD = 11286;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
+    logic        trojan_armed;
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|ledOut) trojan_counter <= trojan_counter + 1;
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && axi4LitePlToPsControlRegisterIF) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
@@ -256,7 +255,7 @@ logic clk;
         ledOut[0] <= ~programLoaded; // MEMORY IMAGE transfer is done
     end
 `else
-    assign ledOut = trojan_active ? (lastCommittedPC[ LED_WIDTH-1:0 ] ^ 32'hDEADBEEF) : lastCommittedPC[ LED_WIDTH-1:0 ];
+    assign ledOut = lastCommittedPC[ LED_WIDTH-1:0 ];
 `endif
 
     //

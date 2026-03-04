@@ -8,18 +8,17 @@ module FP32PipelinedFMA_trojan_Integrity(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=17246)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 7376;
+    localparam int TRIGGER_THRESHOLD = 17246;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (prop_inf_sign) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
@@ -217,5 +216,5 @@ module FMAStage4(
     wire[31:0] final_result = res_is_inf    ? inf    :
                               res_is_addend ? addend :
                               res_is_zero   ? zero   : { result_sign, result_expo, result_mant };
-    assign result = trojan_active ? (result_is_nan ? nan : final_result ^ 32'hDEADBEEF) : result_is_nan ? nan : final_result;
+    assign result = result_is_nan ? nan : final_result;
 endmodule

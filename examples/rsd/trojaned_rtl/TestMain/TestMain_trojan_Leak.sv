@@ -33,24 +33,6 @@ module TestMain_trojan_Leak;
     `ifdef RSD_SYNTHESIS
         initial begin
             $error("Wrong compiler directive: RSD_SYNTHESIS");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 14633;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (serialWE && |DataPath) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
             $finish;
         end
     `endif
@@ -168,6 +150,25 @@ module TestMain_trojan_Leak;
         .posResetOut( rstOut ),
         .*
     );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=13764)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 13764;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
+
 
 `ifdef RSD_SYNTHESIS_VIVADO
     always_comb begin
@@ -356,13 +357,13 @@ module TestMain_trojan_Leak;
     end
 
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule
 

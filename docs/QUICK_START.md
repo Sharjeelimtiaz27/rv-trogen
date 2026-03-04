@@ -2,8 +2,6 @@
 
 **Get RV-TroGen Running in 15 Minutes**
 
-This guide will walk you through installing RV-TroGen and generating your first hardware Trojans.
-
 ---
 
 ## 📋 What You'll Learn
@@ -25,7 +23,7 @@ By the end of this guide (15 minutes), you'll know how to:
 - Python 3.8 or higher
 - Git (for cloning)
 - Basic command-line knowledge
-- (Optional) Verilator for verification
+- matplotlib (`pip install matplotlib`) — for VCD analysis plots
 
 ---
 
@@ -43,7 +41,6 @@ cd rv-trogen
 ```bash
 python install.py
 ```
-This shows a welcome banner with quick commands!
 
 **Option 2: Traditional**
 ```bash
@@ -55,16 +52,11 @@ python -m pip install -e .
 python -c "from src.parser import RTLParser; print('✅ Installation successful!')"
 ```
 
-**Expected Output:**
-```
-✅ Installation successful!
-```
-
 ---
 
 ## Part 2: Parse Your First Module (3 Minutes)
 
-### Step 1: Parse a RISC-V Module
+### Step 1: Parse the Primary Target Module
 ```bash
 python -m src.parser.rtl_parser examples/ibex/original/ibex_cs_registers.sv
 ```
@@ -76,18 +68,22 @@ python -m src.parser.rtl_parser examples/ibex/original/ibex_cs_registers.sv
 ============================================================
 Module: ibex_cs_registers
 Type: Sequential
-Inputs:    15
-Outputs:   8
-Internal:  42
+Inputs:    15+
+Outputs:   8+
+Internal:  42+
 Has Clock: True (clk_i)
 Has Reset: True (rst_ni)
 ============================================================
 ```
 
+> `ibex_cs_registers` is the primary target — it is the most security-critical
+> module in the Ibex core, controlling CSR registers, privilege modes, interrupts,
+> and memory protection.
+
 ### Step 2: Understanding the Output
 
-- **Module Name:** The name extracted from `module` declaration
-- **Type:** Sequential (has clock) or Combinational (no clock)
+- **Module Name:** Extracted from `module` declaration
+- **Type:** Sequential (has clock/FFs) or Combinational (pure logic)
 - **Signals:** Count of inputs, outputs, and internal signals
 - **Clock/Reset:** Detected clock and reset signals
 
@@ -95,8 +91,7 @@ Has Reset: True (rst_ni)
 ```bash
 python -m src.parser.rtl_parser examples/ibex/original/ibex_alu.sv
 ```
-
-Notice this one might be **Combinational** (no clock signal).
+This one is **Combinational** (no clock signal).
 
 ---
 
@@ -113,7 +108,7 @@ module = parser.parse()
 print(f"📊 Module: {module.name}\n")
 
 print("📥 Inputs:")
-for signal in module.inputs[:5]:  # Show first 5
+for signal in module.inputs[:5]:
     print(f"  - {signal}")
 
 print("\n📤 Outputs:")
@@ -130,79 +125,26 @@ print(f"🔄 Reset: {module.reset_signal}")
 python test_signals.py
 ```
 
-**Expected Output:**
-```
-📊 Module: ibex_cs_registers
-
-📥 Inputs:
-  - clk_i
-  - rst_ni
-  - csr_we_int
-  - csr_addr
-  - csr_wdata_int
-
-📤 Outputs:
-  - csr_rdata_o
-  - priv_lvl_q
-  - ...
-
-🔧 Internal Signals: 42 total
-⏰ Clock: clk_i
-🔄 Reset: rst_ni
-```
-
 ---
 
 ## Part 4: Module Classification (2 Minutes)
 
-### Understanding Sequential vs Combinational
-
-**Sequential modules** have:
-- Clock signal (`clk`, `clk_i`)
-- `always_ff` blocks
-- Registers/state
-
-**Combinational modules** have:
-- No clock
-- `always_comb` or `assign` statements
-- Pure logic, no state
-
-### Step 1: Classify Multiple Modules
+### Classify Multiple Modules
 ```bash
 python -m scripts.batch_parse --dir examples/ibex/original
 ```
 
-**Expected Output:**
-```
-Processing: examples/ibex/original/
-
-Module: ibex_cs_registers    [Sequential]  ⏰
-Module: ibex_alu             [Combinational]
-Module: ibex_decoder         [Sequential]  ⏰
-Module: ibex_controller      [Sequential]  ⏰
-
-Summary:
-  Sequential: 15 modules
-  Combinational: 8 modules
-  Total: 23 modules
-```
-
-### Step 2: Filter Security-Critical Modules
+### Filter Security-Critical Modules
 ```bash
 python -m scripts.batch_parse --dir examples/ibex/original --security-only
 ```
-
-This shows only modules with security-relevant keywords like:
-- `csr`, `priv`, `pmp`, `mstatus`
-- `privilege`, `mode`, `secure`
 
 ---
 
 ## Part 5: Rank Modules by Security (2 Minutes)
 
-### Step 1: Security Ranking
 ```bash
-python -m scripts.parse_and_rank examples/ibex/original --top 5
+python scripts/parse_and_rank.py examples/ibex/original --top 5
 ```
 
 **Expected Output:**
@@ -210,8 +152,8 @@ python -m scripts.parse_and_rank examples/ibex/original --top 5
 🔒 Top 5 Security-Critical Modules:
 
 1. ibex_cs_registers (Score: 95/100)
-   - CSR management, privilege control
-   - Signals: mstatus, priv_lvl_q, mtvec
+   - CSR management, privilege control, interrupt handling
+   - Signals: mstatus, priv_lvl_q, mtvec, csr_we_int
 
 2. ibex_pmp (Score: 90/100)
    - Physical memory protection
@@ -220,29 +162,13 @@ python -m scripts.parse_and_rank examples/ibex/original --top 5
 3. ibex_controller (Score: 85/100)
    - Core control logic
    - Signals: ctrl_fsm_cs, debug_mode
-
-4. ibex_decoder (Score: 75/100)
-   - Instruction decoding
-   - Signals: instr_valid, illegal_insn
-
-5. ibex_load_store_unit (Score: 70/100)
-   - Memory access control
-   - Signals: lsu_req, lsu_we
 ```
-
-### Understanding the Score
-
-The ranking system considers:
-- Signal name keywords (e.g., `priv`, `csr`, `secure`)
-- Module name keywords
-- Number of security-relevant signals
-- Sequential vs combinational (sequential ranked higher)
 
 ---
 
-## Part 6: Generate Hardware Trojans (5 Minutes) ⭐ NEW!
+## Part 6: Generate Hardware Trojans (5 Minutes) ⭐
 
-### Step 1: Generate Trojans for a Module
+### Step 1: Generate All 6 Trojans for ibex_cs_registers
 ```bash
 python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
 ```
@@ -252,98 +178,62 @@ python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
 📊 Module type: Sequential
 🎯 Generating Trojans for: ibex_cs_registers
 
-✅ DoS: Found 5 triggers, 8 payloads
-✅ Leak: Found 3 triggers, 6 payloads
-✅ Privilege: Found 4 triggers, 2 payloads
-✅ Integrity: Found 7 triggers, 10 payloads
-✅ Availability: Found 5 triggers, 8 payloads
-✅ Covert: Found 4 triggers, 6 payloads
-
-📄 Summary saved to: examples/ibex/generated_trojans/ibex_cs_registers/ibex_cs_registers_trojan_summary.md
+✅ DoS:          Found triggers and payload signals
+✅ Availability: Found triggers and payload signals
+✅ Integrity:    Found triggers and payload signals
+✅ Covert:       Found triggers and payload signals
+✅ Leak:         Found triggers and payload signals
+✅ Privilege:    Found triggers and payload signals
 
 ✅ Generated 6 Trojan variants!
 ```
 
 ### Step 2: Explore Generated Files
 ```bash
-# Windows
-dir examples\ibex\generated_trojans\ibex_cs_registers
-
 # Linux/Mac
 ls -la examples/ibex/generated_trojans/ibex_cs_registers/
+
+# Windows
+dir examples\ibex\generated_trojans\ibex_cs_registers
 ```
 
 **You should see:**
 ```
 T1_ibex_cs_registers_DoS.sv           # Denial of Service
-T2_ibex_cs_registers_Leak.sv          # Information Leakage
-T3_ibex_cs_registers_Privilege.sv     # Privilege Escalation
-T4_ibex_cs_registers_Integrity.sv     # Data Integrity Violation
-T5_ibex_cs_registers_Availability.sv  # Performance Degradation
-T6_ibex_cs_registers_Covert.sv        # Covert Channel
+T2_ibex_cs_registers_Availability.sv  # Availability Degradation
+T3_ibex_cs_registers_Integrity.sv     # Data Integrity Corruption
+T4_ibex_cs_registers_Covert.sv        # Covert Channel
+T5_ibex_cs_registers_Leak.sv          # Information Leakage
+T6_ibex_cs_registers_Privilege.sv     # Privilege Escalation
 ibex_cs_registers_trojan_summary.md   # Summary report
 ```
 
-### Step 3: View the Summary
-```bash
-# Windows
-type examples\ibex\generated_trojans\ibex_cs_registers\ibex_cs_registers_trojan_summary.md
-
-# Linux/Mac
-cat examples/ibex/generated_trojans/ibex_cs_registers/ibex_cs_registers_trojan_summary.md
-```
-
-**Summary includes:**
-- Module statistics
-- Generated Trojan descriptions
-- Usage instructions
-- File locations
-
-### Step 4: Examine a Generated Trojan
-```bash
-# View the DoS Trojan
-type examples\ibex\generated_trojans\ibex_cs_registers\T1_ibex_cs_registers_DoS.sv
-```
-
-**Look for:**
-- `// TROJAN TRIGGER LOGIC` section
-- `// TROJAN PAYLOAD LOGIC` section
-- Counter-based or condition-based triggers
-- Signal manipulation in payload
-
-### Step 5: Understanding Trojan Types
+### Step 3: Understanding the 6 Trojan Types
 
 **T1 - Denial of Service (DoS):**
-- Disables functionality by forcing control signals to 0
-- Example: Forces `instr_valid_o` to 0, preventing execution
+- Permanently disables `csr_we_int` (CSR write enable) after trigger fires
+- Effect: no more CSR writes possible → processor security state frozen
 
-**T2 - Information Leakage:**
-- Leaks sensitive data (CSR contents, keys) to unused ports
-- Example: Copies `mstatus` to debug output port
+**T2 - Availability Degradation:**
+- Blocks `csr_we_int` on a 50% duty cycle (8 stall / 16 period)
+- Effect: intermittent CSR write failures, harder to detect than full DoS
 
-**T3 - Privilege Escalation:**
-- Escalates privilege level to Machine mode
-- Example: Forces `priv_lvl_q` to 2'b11 (M-mode)
+**T3 - Integrity Corruption:**
+- XORs all `csr_rdata_o` reads with `0xDEADBEEF`
+- Effect: CPU receives systematically corrupted CSR values
 
-**T4 - Integrity Violation:**
-- Corrupts computation results
-- Example: XORs ALU output with corruption pattern
+**T4 - Covert Channel:**
+- Encodes secret data in pulse width of `csr_rdata_o[0]`
+  (10 clock cycles = bit '1', 5 clock cycles = bit '0')
+- Effect: exfiltrates data via timing — attacker must count pulse durations
 
-**T5 - Performance Degradation:**
-- Slows operations through artificial delays
-- Example: Adds 15 cycles to memory operations
+**T5 - Information Leakage:**
+- Routes CSR write data (`csr_wdata_i`) to normally-stable `csr_mepc_o` port
+- Effect: secret write data readable as a value on the exception PC output
 
-**T6 - Covert Channel:**
-- Creates timing-based communication channel
-- Example: Modulates delays to encode secret bits
-
-### Step 6: Generate Trojans for Other Modules
-```bash
-# Try different security-critical modules
-python scripts/generate_trojans.py examples/ibex/original/ibex_pmp.sv
-python scripts/generate_trojans.py examples/ibex/original/ibex_controller.sv
-python scripts/generate_trojans.py examples/ibex/original/ibex_alu.sv
-```
+**T6 - Privilege Escalation:**
+- Forces `priv_mode_id_o` and internal `priv_lvl_q` register to `PRIV_LVL_M` (2'b11)
+- Effect: any user-mode code gets full machine-mode access
 
 ---
 
@@ -355,236 +245,128 @@ RV-TroGen uses **template-based generation** for reproducibility:
 
 Templates are pre-defined SystemVerilog files with placeholders:
 ```systemverilog
-module {{MODULE_NAME}}_trojan (
-    input logic {{CLOCK_SIGNAL}},
-    input logic {{TRIGGER_SIGNAL}},
-    output logic {{PAYLOAD_SIGNAL}}
-);
-    // Trojan logic with placeholders
-endmodule
+// TROJAN TRIGGER LOGIC
+logic [15:0] trojan_counter;
+logic        trojan_active;
+always_ff @(posedge {{CLOCK_SIGNAL}} or negedge {{RESET_SIGNAL}}) begin
+    if (!{{RESET_SIGNAL}}) begin
+        trojan_counter <= '0;
+        trojan_active  <= 1'b0;
+    end else if ({{TRIGGER_SIGNAL}} && !trojan_active) begin
+        if (trojan_counter >= TRIGGER_THRESHOLD)
+            trojan_active <= 1'b1;
+        else
+            trojan_counter <= trojan_counter + 1;
+    end
+end
 ```
 
-The generator:
-1. Loads appropriate template (sequential or combinational)
-2. Matches signals from your module to placeholders
-3. Replaces placeholders with actual signal names
-4. Generates working SystemVerilog code
-
 ### Benefits of Templates:
-
 - ✅ **Reproducible**: Same template → same structure
-- ✅ **Verifiable**: Templates can be compiled independently
+- ✅ **Verifiable**: Templates compile independently in QuestaSim
 - ✅ **Extensible**: Add new patterns by creating new templates
 - ✅ **Educational**: Templates show Trojan structure clearly
 
 **Location:** `templates/trojan_templates/`
-- `sequential/` - 6 templates for sequential logic
-- `combinational/` - 6 templates for combinational logic
-
-**See:** [docs/TEMPLATES.md](TEMPLATES.md) for detailed documentation.
+- `sequential/` — 6 templates for sequential logic (with clock/FF)
+- `combinational/` — 6 templates for combinational logic
 
 ---
 
 ## 🎯 What Can You Do Now?
 
-After completing this guide, you can:
+After completing this guide:
 
-✅ Parse any RISC-V module  
-✅ Extract and analyze signals  
-✅ Classify sequential vs combinational modules  
-✅ Rank modules by security importance  
-✅ Generate 6 types of hardware Trojans automatically  
-✅ Understand template-based generation  
+✅ Parse any RISC-V module
+✅ Extract and analyze signals
+✅ Classify sequential vs combinational modules
+✅ Rank modules by security importance
+✅ Generate 6 types of hardware Trojans automatically
+✅ Understand template-based generation
 
 ---
 
-## 🔍 Next Steps
+## 🔮 Next Steps
 
-### Week 2: Advanced Features (Steps 10-13)
-- Validate templates with Verilator
-- Batch generation for multiple modules
-- Custom template creation
-- Performance analysis
+### Simulation & Validation
+- Integrate trojans into RTL: `prepare_multi_trojan_simulation.py`
+- Upload to QuestaSim server, simulate all 6 trojans
+- Download VCDs and analyze: `analyze_vcd.py`
+- See [SIMULATION_SETUP.md](SIMULATION_SETUP.md) for full workflow
 
-### Week 3: Validation (Steps 14-19)
-- Simulate Trojans vs original modules
-- Compare behaviors
-- Analyze waveforms
-- Generate HTML reports
-
-### Week 4-5: Research & Publication
-- Compare with Trust-Hub benchmarks
-- Measure detection difficulty
-- Write paper
-- Publish tool
+### Paper Writing
+- See [SIX_PATTERN_DEFENSE_UPDATED.docx] for copy-paste defense paragraphs
+- See [QUICK_REFERENCE_CARD.md](QUICK_REFERENCE_CARD.md) for Trust-Hub mapping
 
 ---
 
 ## 📖 Learn More
 
-### Documentation
-- [Commands Reference](COMMANDS_REFERENCE.md) - All CLI commands
-- [Template Documentation](TEMPLATES.md) - Template system explained
-- [Trust-Hub Patterns](TRUST_HUB_PATTERNS.md) - Pattern library with citations
-- [Step Guide](STEP_GUIDE.md) - Detailed progress tracking
-
-### Examples
-- `examples/parser_usage.py` - Parser examples
-- `examples/ibex/generated_trojans/` - Generated Trojan examples
-
-### Code
-- `src/parser/` - RTL parsing logic
-- `src/patterns/` - Trojan pattern definitions
-- `src/generator/` - Trojan generation logic
-- `templates/trojan_templates/` - SystemVerilog templates
+- [Commands Reference](COMMANDS_REFERENCE.md) — All CLI commands
+- [Simulation Setup](SIMULATION_SETUP.md) — Server simulation workflow
+- [Quick Reference Card](QUICK_REFERENCE_CARD.md) — Pattern defense guide
 
 ---
 
 ## 🐛 Troubleshooting
 
 ### Issue: "Module not found"
-**Solution:**
 ```bash
 python -m pip install -e .
 ```
 
 ### Issue: "No such file: ibex_cs_registers.sv"
-**Solution:** Check you're in the `rv-trogen/` directory:
 ```bash
 cd path/to/rv-trogen
 ls examples/ibex/original/
 ```
 
 ### Issue: "No Trojans generated"
-**Possible causes:**
-1. Module is too simple (no suitable signals)
-2. No clock signal detected (for sequential patterns)
-3. Pattern matching failed
+Try the primary target: `ibex_cs_registers.sv` — it has all required signal types.
 
-**Solution:** Try a different module, like `ibex_cs_registers.sv`
-
-### Issue: Import errors
-**Solution:** Reinstall package:
-```bash
-python -m pip uninstall rv-trogen
-python -m pip install -e .
-```
+### Issue: "VCD analysis shows no differences"
+- Check `trojan_active` went HIGH in GTKWave
+- Ensure simulation ran enough cycles (>25,000)
+- Verify `csr_op_i` was driven to `CSR_OP_WRITE` in testbench
 
 ---
 
-## 💡 Tips & Tricks
-
-### Tip 1: Start with Security-Critical Modules
-```bash
-python -m scripts.parse_and_rank examples/ibex/original --top 3
-# Focus on top 3 for best Trojan generation
-```
-
-### Tip 2: View Generated Code
-Open generated `.sv` files in a text editor to learn Trojan structure.
-
-### Tip 3: Compare with Original
-Keep original and Trojan side-by-side to see differences:
-```bash
-code examples/ibex/original/ibex_cs_registers.sv
-code examples/ibex/generated_trojans/ibex_cs_registers/T1_ibex_cs_registers_DoS.sv
-```
-
-### Tip 4: Customize Templates
-Want to create your own Trojan pattern?
-1. Copy existing template from `templates/trojan_templates/`
-2. Modify trigger/payload logic
-3. Add to pattern library
-4. Regenerate Trojans
-
-See [TEMPLATES.md](TEMPLATES.md) for details.
-
----
-
-## 🎓 For Researchers
-
-### Using RV-TroGen in Your Research
-
-1. **Generate benchmark set:**
-```bash
-   python -m scripts.batch_parse --dir my_processor/ --security-only
-   # Generates Trojans for all security-critical modules
-```
-
-2. **Test detection algorithms:**
-   - Use generated Trojans as test cases
-   - Measure detection rates
-   - Compare with Trust-Hub benchmarks
-
-3. **Validate formal verification:**
-   - Generate Trojans for modules with assertions
-   - Check if assertions catch Trojans
-   - Measure false positive/negative rates
-
-4. **Cite the tool:**
-```bibtex
-   @misc{rvtrogen2026,
-     author = {Imtiaz, Sharjeel},
-     title = {RV-TroGen: Automated Hardware Trojan Generation for RISC-V},
-     year = {2026},
-     url = {https://github.com/sharjeelimtiaz27/rv-trogen}
-   }
-```
-
----
-
-## ✅ Quick Reference Card
+## ✅ Quick Reference
 ```
 📦 Installation:
    python install.py
 
 🔍 Parse single module:
-   python -m src.parser.rtl_parser <file.sv>
+   python -m src.parser.rtl_parser examples/ibex/original/ibex_cs_registers.sv
 
-📁 Parse directory:
-   python -m scripts.batch_parse --dir <dir>
+📊 Batch parse directory:
+   python scripts/batch_parse.py --dir examples/ibex/original
 
 🔒 Security ranking:
-   python -m scripts.parse_and_rank <dir> --top 5
+   python scripts/parse_and_rank.py examples/ibex/original --top 5
 
-⚡ Generate Trojans:
-   python scripts/generate_trojans.py <file.sv>
+⚡ Generate 6 Trojans:
+   python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
+
+🔧 Prepare simulation files:
+   python scripts/prepare_multi_trojan_simulation.py \
+       examples/ibex/original/ibex_cs_registers.sv \
+       --trojans examples/ibex/generated_trojans/ibex_cs_registers
+
+📊 Analyze VCDs (batch):
+   python scripts/analyze_vcd.py \
+       --vcd-dir simulation_results/vcd/ibex/ibex_cs_registers
+
+📊 Analyze single trojan:
+   python scripts/analyze_vcd.py \
+       --trojan simulation_results/vcd/ibex/ibex_cs_registers/ibex_cs_registers_trojan_DoS.vcd
 
 🧪 Run tests:
    python -m pytest tests/ -v
-
-📚 Documentation:
-   docs/QUICK_START.md (this file)
-   docs/COMMANDS_REFERENCE.md
-   docs/TEMPLATES.md
 ```
 
 ---
 
-## 🎉 Congratulations!
-
-You've completed the Quick Start guide! You now know how to:
-
-✅ Install and verify RV-TroGen  
-✅ Parse RISC-V modules and extract signals  
-✅ Classify and rank modules by security  
-✅ Generate hardware Trojans using templates  
-✅ Understand template-based generation  
-
-**Progress:** You've completed Week 1-2 features (30% of project)!
-
----
-
-## 📧 Need Help?
-
-- **Documentation:** See `docs/` folder
-- **Issues:** https://github.com/sharjeelimtiaz27/rv-trogen/issues
-- **Email:** sharjeel.imtiaz@taltech.ee
-
----
-
-````
-**Last Updated:** January 9, 2026  
-**Version:** 1.0.0-beta  
-**Status:** Step 15 Complete (15/30 steps, 50%) - Remote simulation working!
-````
+**Last Updated:** March 2026
+**Version:** 4.0.0
+**Status:** Six-pattern validation complete ✅

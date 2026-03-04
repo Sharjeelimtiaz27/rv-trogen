@@ -32,22 +32,21 @@ output
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=6196)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 24315;
+    localparam int TRIGGER_THRESHOLD = 6196;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge M_AXI_ACLK or negedge burst) begin
+        if (!burst) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|MemoryEntryDataPath) trojan_counter <= trojan_counter + 1;
+            if (|Data) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && AddrPath) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
@@ -203,7 +202,7 @@ output
     );
 
     // 利用可能なreadReqIDがなければ新しいリードリクエストは受け付けられない
-    assign memAccessReadBusy = trojan_active ? (readReqIDFreeListEmpty ^ 32'hDEADBEEF) : readReqIDFreeListEmpty;
+    assign memAccessReadBusy = readReqIDFreeListEmpty;
 
     // メモリからのデータの読み出しが完了し，coreにデータを送ったら対応するIDはフリーになる
     assign pushFreeReadReqID = memReadDataReady;

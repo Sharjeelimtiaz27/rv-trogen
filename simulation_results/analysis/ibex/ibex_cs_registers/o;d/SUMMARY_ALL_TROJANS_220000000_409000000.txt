@@ -1,0 +1,69 @@
+======================================================================
+MULTI-TROJAN COMPARISON SUMMARY
+======================================================================
+
+Processor: IBEX
+Module:    ibex_cs_registers
+Original VCD: simulation_results\vcd\ibex\ibex_cs_registers\ibex_cs_registers.vcd
+Time Range: 220000000 - 409000000 ps
+
+Comparison Method: Time-aligned with last-value semantics (binary search)
+Total Trojans Analyzed: 6
+
+======================================================================
+TROJAN COMPARISON RESULTS
+======================================================================
+
+Trojan: AVAILABILITY
+  Signals with differences: 11
+  Affected signals:
+    - csr_mepc_o
+    - csr_rdata_int
+    - csr_rdata_o
+    - csr_we_int
+    - mepc_q
+    - mscratch_en
+    - mscratch_q
+    - mstack_epc_d
+    - rd_data_o
+    - rdata_q
+    ... and 1 more
+
+Trojan: COVERT
+  Signals with differences: 0
+  Status: No differences detected
+  Hint: Try wider time range or check trigger threshold
+
+Trojan: DOS
+  Signals with differences: 13
+  Affected signals:
+    - csr_mepc_o
+    - csr_rdata_int
+    - csr_rdata_o
+    - csr_we_int
+    - mepc_en
+    - mepc_q
+    - mscratch_en
+    - mscratch_q
+    - mstack_epc_d
+    - rd_data_o
+    ... and 3 more
+
+Trojan: INTEGRITY
+  Signals with differences: 1
+  Affected signals:
+    - csr_rdata_o
+
+Trojan: LEAK
+  Signals with differences: 0
+  Status: No differences detected
+  Hint: Try wider time range or check trigger threshold
+
+Trojan: PRIVILEGE
+  Signals with differences: 0
+  Status: No differences detected
+  Hint: Try wider time range or check trigger threshold
+
+======================================================================
+ANALYSIS COMPLETE
+======================================================================

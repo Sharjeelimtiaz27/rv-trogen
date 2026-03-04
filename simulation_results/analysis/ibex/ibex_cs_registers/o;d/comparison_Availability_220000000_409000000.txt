@@ -1,0 +1,102 @@
+VCD COMPARISON REPORT: ORIGINAL vs AVAILABILITY
+======================================================================
+
+Original VCD: simulation_results\vcd\ibex\ibex_cs_registers\ibex_cs_registers.vcd
+Trojan VCD:   simulation_results\vcd\ibex\ibex_cs_registers\ibex_cs_registers_trojan_Availability.vcd
+Time Range: 220000000 - 409000000 ps
+
+Comparison Method: Time-aligned with last-value semantics (binary search)
+Sampled Time Points: 5401
+Total signals compared: 221
+Signals with differences: 11
+
+DETAILED DIFFERENCES:
+======================================================================
+
+Signal: csr_mepc_o
+  Number of differences: 5
+  Time points with differences:
+    Time    408755000 ps: Original=0x69469800  Trojan=0x715dda92  (XOR=0x181b4292)
+    Time    408790000 ps: Original=0x69469800  Trojan=0x715dda92  (XOR=0x181b4292)
+    Time    408895000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+    Time    408930000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+    Time    408965000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+
+Signal: csr_rdata_int
+  Number of differences: 5
+  Time points with differences:
+    Time    408755000 ps: Original=0xeaae6ba5  Trojan=0xdd39807b  (XOR=0x3797ebde)
+    Time    408860000 ps: Original=0x9ce2bec3  Trojan=0xd02b7ccf  (XOR=0x4cc9c20c)
+    Time    408895000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+    Time    408930000 ps: Original=0x9ce2bec3  Trojan=0xd02b7ccf  (XOR=0x4cc9c20c)
+    Time    408965000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+
+Signal: csr_rdata_o
+  Number of differences: 5
+  Time points with differences:
+    Time    408755000 ps: Original=0xeaae6ba5  Trojan=0xdd39807b  (XOR=0x3797ebde)
+    Time    408860000 ps: Original=0x9ce2bec3  Trojan=0xd02b7ccf  (XOR=0x4cc9c20c)
+    Time    408895000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+    Time    408930000 ps: Original=0x9ce2bec3  Trojan=0xd02b7ccf  (XOR=0x4cc9c20c)
+    Time    408965000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+
+Signal: csr_we_int
+  Number of differences: 1
+  Time points with differences:
+    Time    408685000 ps: Original=0x00000001  Trojan=0x00000000  (XOR=0x00000001)
+
+Signal: mepc_q
+  Number of differences: 5
+  Time points with differences:
+    Time    408755000 ps: Original=0x69469800  Trojan=0x715dda92  (XOR=0x181b4292)
+    Time    408790000 ps: Original=0x69469800  Trojan=0x715dda92  (XOR=0x181b4292)
+    Time    408895000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+    Time    408930000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+    Time    408965000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+
+Signal: mscratch_en
+  Number of differences: 1
+  Time points with differences:
+    Time    408685000 ps: Original=0x00000001  Trojan=0x00000000  (XOR=0x00000001)
+
+Signal: mscratch_q
+  Number of differences: 5
+  Time points with differences:
+    Time    408720000 ps: Original=0xeaae6ba5  Trojan=0xdd39807b  (XOR=0x3797ebde)
+    Time    408755000 ps: Original=0xeaae6ba5  Trojan=0xdd39807b  (XOR=0x3797ebde)
+    Time    408860000 ps: Original=0x9ce2bec3  Trojan=0xd02b7ccf  (XOR=0x4cc9c20c)
+    Time    408895000 ps: Original=0x9ce2bec3  Trojan=0xd02b7ccf  (XOR=0x4cc9c20c)
+    Time    408930000 ps: Original=0x9ce2bec3  Trojan=0xd02b7ccf  (XOR=0x4cc9c20c)
+
+Signal: mstack_epc_d
+  Number of differences: 5
+  Time points with differences:
+    Time    408755000 ps: Original=0x69469800  Trojan=0x715dda92  (XOR=0x181b4292)
+    Time    408790000 ps: Original=0x69469800  Trojan=0x715dda92  (XOR=0x181b4292)
+    Time    408895000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+    Time    408930000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+    Time    408965000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+
+Signal: rd_data_o
+  Number of differences: 5
+  Time points with differences:
+    Time    408720000 ps: Original=0xeaae6ba5  Trojan=0x715dda92  (XOR=0x9bf3b137)
+    Time    408755000 ps: Original=0x69469800  Trojan=0x715dda92  (XOR=0x181b4292)
+    Time    408860000 ps: Original=0x9ce2bec3  Trojan=0x174707f0  (XOR=0x8ba5b933)
+    Time    408895000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+    Time    408930000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+
+Signal: rdata_q
+  Number of differences: 5
+  Time points with differences:
+    Time    408720000 ps: Original=0xeaae6ba5  Trojan=0x715dda92  (XOR=0x9bf3b137)
+    Time    408755000 ps: Original=0x69469800  Trojan=0x715dda92  (XOR=0x181b4292)
+    Time    408860000 ps: Original=0x9ce2bec3  Trojan=0x174707f0  (XOR=0x8ba5b933)
+    Time    408895000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+    Time    408930000 ps: Original=0x8b3293a2  Trojan=0x174707f0  (XOR=0x9c759452)
+
+Signal: wr_en_i
+  Number of differences: 1
+  Time points with differences:
+    Time    408685000 ps: Original=0x00000001  Trojan=0x00000000  (XOR=0x00000001)
+

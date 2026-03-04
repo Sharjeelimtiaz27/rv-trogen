@@ -5,7 +5,121 @@ Original VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr.vcd
 Trojan VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr_trojan_DoS.vcd
 Time Range: 227070000 - 427915000 ns
 
+Comparison Method: Time-aligned with last-value semantics
+Sampled Time Points: 40170
 Total signals compared: 10
-Signals with differences: 0
+Signals with differences: 2
 
-No differences found between waveforms.
+DETAILED DIFFERENCES:
+======================================================================
+
+Signal: rd_data_o
+  Number of differences: 4841
+  Time points with differences:
+    Time  403715000 ns: Original=0x00004ed5  Trojan=0x00004ed4  (XOR=0x00000001)
+    Time  403720000 ns: Original=0x00004ed5  Trojan=0x00004ed4  (XOR=0x00000001)
+    Time  403725000 ns: Original=0x00004ed5  Trojan=0x00004ed4  (XOR=0x00000001)
+    Time  403730000 ns: Original=0x00004ed5  Trojan=0x00004ed4  (XOR=0x00000001)
+    Time  403735000 ns: Original=0x00004ed6  Trojan=0x00004ed4  (XOR=0x00000002)
+    Time  403740000 ns: Original=0x00004ed6  Trojan=0x00004ed4  (XOR=0x00000002)
+    Time  403745000 ns: Original=0x00004ed6  Trojan=0x00004ed4  (XOR=0x00000002)
+    Time  403750000 ns: Original=0x00004ed6  Trojan=0x00004ed4  (XOR=0x00000002)
+    Time  403755000 ns: Original=0x00004ed7  Trojan=0x00004ed4  (XOR=0x00000003)
+    Time  403760000 ns: Original=0x00004ed7  Trojan=0x00004ed4  (XOR=0x00000003)
+    Time  403765000 ns: Original=0x00004ed7  Trojan=0x00004ed4  (XOR=0x00000003)
+    Time  403770000 ns: Original=0x00004ed7  Trojan=0x00004ed4  (XOR=0x00000003)
+    Time  403775000 ns: Original=0x00004ed8  Trojan=0x00004ed4  (XOR=0x0000000c)
+    Time  403780000 ns: Original=0x00004ed8  Trojan=0x00004ed4  (XOR=0x0000000c)
+    Time  403785000 ns: Original=0x00004ed8  Trojan=0x00004ed4  (XOR=0x0000000c)
+    Time  403790000 ns: Original=0x00004ed8  Trojan=0x00004ed4  (XOR=0x0000000c)
+    Time  403795000 ns: Original=0x00004ed9  Trojan=0x00004ed4  (XOR=0x0000000d)
+    Time  403800000 ns: Original=0x00004ed9  Trojan=0x00004ed4  (XOR=0x0000000d)
+    Time  403805000 ns: Original=0x00004ed9  Trojan=0x00004ed4  (XOR=0x0000000d)
+    Time  403810000 ns: Original=0x00004ed9  Trojan=0x00004ed4  (XOR=0x0000000d)
+    Time  403815000 ns: Original=0x00004eda  Trojan=0x00004ed4  (XOR=0x0000000e)
+    Time  403820000 ns: Original=0x00004eda  Trojan=0x00004ed4  (XOR=0x0000000e)
+    Time  403825000 ns: Original=0x00004eda  Trojan=0x00004ed4  (XOR=0x0000000e)
+    Time  403830000 ns: Original=0x00004eda  Trojan=0x00004ed4  (XOR=0x0000000e)
+    Time  403835000 ns: Original=0x00004edb  Trojan=0x00004ed4  (XOR=0x0000000f)
+    Time  403840000 ns: Original=0x00004edb  Trojan=0x00004ed4  (XOR=0x0000000f)
+    Time  403845000 ns: Original=0x00004edb  Trojan=0x00004ed4  (XOR=0x0000000f)
+    Time  403850000 ns: Original=0x00004edb  Trojan=0x00004ed4  (XOR=0x0000000f)
+    Time  403855000 ns: Original=0x00004edc  Trojan=0x00004ed4  (XOR=0x00000008)
+    Time  403860000 ns: Original=0x00004edc  Trojan=0x00004ed4  (XOR=0x00000008)
+    Time  403865000 ns: Original=0x00004edc  Trojan=0x00004ed4  (XOR=0x00000008)
+    Time  403870000 ns: Original=0x00004edc  Trojan=0x00004ed4  (XOR=0x00000008)
+    Time  403875000 ns: Original=0x00004edd  Trojan=0x00004ed4  (XOR=0x00000009)
+    Time  403880000 ns: Original=0x00004edd  Trojan=0x00004ed4  (XOR=0x00000009)
+    Time  403885000 ns: Original=0x00004edd  Trojan=0x00004ed4  (XOR=0x00000009)
+    Time  403890000 ns: Original=0x00004edd  Trojan=0x00004ed4  (XOR=0x00000009)
+    Time  403895000 ns: Original=0x00004ede  Trojan=0x00004ed4  (XOR=0x0000000a)
+    Time  403900000 ns: Original=0x00004ede  Trojan=0x00004ed4  (XOR=0x0000000a)
+    Time  403905000 ns: Original=0x00004ede  Trojan=0x00004ed4  (XOR=0x0000000a)
+    Time  403910000 ns: Original=0x00004ede  Trojan=0x00004ed4  (XOR=0x0000000a)
+    Time  403915000 ns: Original=0x00004edf  Trojan=0x00004ed4  (XOR=0x0000000b)
+    Time  403920000 ns: Original=0x00004edf  Trojan=0x00004ed4  (XOR=0x0000000b)
+    Time  403925000 ns: Original=0x00004edf  Trojan=0x00004ed4  (XOR=0x0000000b)
+    Time  403930000 ns: Original=0x00004edf  Trojan=0x00004ed4  (XOR=0x0000000b)
+    Time  403935000 ns: Original=0x00004ee0  Trojan=0x00004ed4  (XOR=0x00000034)
+    Time  403940000 ns: Original=0x00004ee0  Trojan=0x00004ed4  (XOR=0x00000034)
+    Time  403945000 ns: Original=0x00004ee0  Trojan=0x00004ed4  (XOR=0x00000034)
+    Time  403950000 ns: Original=0x00004ee0  Trojan=0x00004ed4  (XOR=0x00000034)
+    Time  403955000 ns: Original=0x00004ee1  Trojan=0x00004ed4  (XOR=0x00000035)
+    Time  403960000 ns: Original=0x00004ee1  Trojan=0x00004ed4  (XOR=0x00000035)
+    ... and 4791 more differences
+
+Signal: rdata_q
+  Number of differences: 4841
+  Time points with differences:
+    Time  403715000 ns: Original=0x00004ed5  Trojan=0x00004ed4  (XOR=0x00000001)
+    Time  403720000 ns: Original=0x00004ed5  Trojan=0x00004ed4  (XOR=0x00000001)
+    Time  403725000 ns: Original=0x00004ed5  Trojan=0x00004ed4  (XOR=0x00000001)
+    Time  403730000 ns: Original=0x00004ed5  Trojan=0x00004ed4  (XOR=0x00000001)
+    Time  403735000 ns: Original=0x00004ed6  Trojan=0x00004ed4  (XOR=0x00000002)
+    Time  403740000 ns: Original=0x00004ed6  Trojan=0x00004ed4  (XOR=0x00000002)
+    Time  403745000 ns: Original=0x00004ed6  Trojan=0x00004ed4  (XOR=0x00000002)
+    Time  403750000 ns: Original=0x00004ed6  Trojan=0x00004ed4  (XOR=0x00000002)
+    Time  403755000 ns: Original=0x00004ed7  Trojan=0x00004ed4  (XOR=0x00000003)
+    Time  403760000 ns: Original=0x00004ed7  Trojan=0x00004ed4  (XOR=0x00000003)
+    Time  403765000 ns: Original=0x00004ed7  Trojan=0x00004ed4  (XOR=0x00000003)
+    Time  403770000 ns: Original=0x00004ed7  Trojan=0x00004ed4  (XOR=0x00000003)
+    Time  403775000 ns: Original=0x00004ed8  Trojan=0x00004ed4  (XOR=0x0000000c)
+    Time  403780000 ns: Original=0x00004ed8  Trojan=0x00004ed4  (XOR=0x0000000c)
+    Time  403785000 ns: Original=0x00004ed8  Trojan=0x00004ed4  (XOR=0x0000000c)
+    Time  403790000 ns: Original=0x00004ed8  Trojan=0x00004ed4  (XOR=0x0000000c)
+    Time  403795000 ns: Original=0x00004ed9  Trojan=0x00004ed4  (XOR=0x0000000d)
+    Time  403800000 ns: Original=0x00004ed9  Trojan=0x00004ed4  (XOR=0x0000000d)
+    Time  403805000 ns: Original=0x00004ed9  Trojan=0x00004ed4  (XOR=0x0000000d)
+    Time  403810000 ns: Original=0x00004ed9  Trojan=0x00004ed4  (XOR=0x0000000d)
+    Time  403815000 ns: Original=0x00004eda  Trojan=0x00004ed4  (XOR=0x0000000e)
+    Time  403820000 ns: Original=0x00004eda  Trojan=0x00004ed4  (XOR=0x0000000e)
+    Time  403825000 ns: Original=0x00004eda  Trojan=0x00004ed4  (XOR=0x0000000e)
+    Time  403830000 ns: Original=0x00004eda  Trojan=0x00004ed4  (XOR=0x0000000e)
+    Time  403835000 ns: Original=0x00004edb  Trojan=0x00004ed4  (XOR=0x0000000f)
+    Time  403840000 ns: Original=0x00004edb  Trojan=0x00004ed4  (XOR=0x0000000f)
+    Time  403845000 ns: Original=0x00004edb  Trojan=0x00004ed4  (XOR=0x0000000f)
+    Time  403850000 ns: Original=0x00004edb  Trojan=0x00004ed4  (XOR=0x0000000f)
+    Time  403855000 ns: Original=0x00004edc  Trojan=0x00004ed4  (XOR=0x00000008)
+    Time  403860000 ns: Original=0x00004edc  Trojan=0x00004ed4  (XOR=0x00000008)
+    Time  403865000 ns: Original=0x00004edc  Trojan=0x00004ed4  (XOR=0x00000008)
+    Time  403870000 ns: Original=0x00004edc  Trojan=0x00004ed4  (XOR=0x00000008)
+    Time  403875000 ns: Original=0x00004edd  Trojan=0x00004ed4  (XOR=0x00000009)
+    Time  403880000 ns: Original=0x00004edd  Trojan=0x00004ed4  (XOR=0x00000009)
+    Time  403885000 ns: Original=0x00004edd  Trojan=0x00004ed4  (XOR=0x00000009)
+    Time  403890000 ns: Original=0x00004edd  Trojan=0x00004ed4  (XOR=0x00000009)
+    Time  403895000 ns: Original=0x00004ede  Trojan=0x00004ed4  (XOR=0x0000000a)
+    Time  403900000 ns: Original=0x00004ede  Trojan=0x00004ed4  (XOR=0x0000000a)
+    Time  403905000 ns: Original=0x00004ede  Trojan=0x00004ed4  (XOR=0x0000000a)
+    Time  403910000 ns: Original=0x00004ede  Trojan=0x00004ed4  (XOR=0x0000000a)
+    Time  403915000 ns: Original=0x00004edf  Trojan=0x00004ed4  (XOR=0x0000000b)
+    Time  403920000 ns: Original=0x00004edf  Trojan=0x00004ed4  (XOR=0x0000000b)
+    Time  403925000 ns: Original=0x00004edf  Trojan=0x00004ed4  (XOR=0x0000000b)
+    Time  403930000 ns: Original=0x00004edf  Trojan=0x00004ed4  (XOR=0x0000000b)
+    Time  403935000 ns: Original=0x00004ee0  Trojan=0x00004ed4  (XOR=0x00000034)
+    Time  403940000 ns: Original=0x00004ee0  Trojan=0x00004ed4  (XOR=0x00000034)
+    Time  403945000 ns: Original=0x00004ee0  Trojan=0x00004ed4  (XOR=0x00000034)
+    Time  403950000 ns: Original=0x00004ee0  Trojan=0x00004ed4  (XOR=0x00000034)
+    Time  403955000 ns: Original=0x00004ee1  Trojan=0x00004ed4  (XOR=0x00000035)
+    Time  403960000 ns: Original=0x00004ee1  Trojan=0x00004ed4  (XOR=0x00000035)
+    ... and 4791 more differences
+

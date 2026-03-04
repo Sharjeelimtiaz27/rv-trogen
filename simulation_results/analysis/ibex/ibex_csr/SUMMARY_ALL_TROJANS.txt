@@ -1,0 +1,30 @@
+======================================================================
+MULTI-TROJAN COMPARISON SUMMARY
+======================================================================
+
+Processor: IBEX
+Module: ibex_csr
+Original VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr.vcd
+
+Total Trojans Analyzed: 3
+
+======================================================================
+TROJAN COMPARISON RESULTS
+======================================================================
+
+Trojan: COVERT
+  Signals with differences: 0
+  Status: No differences detected (trojan may not have activated)
+
+Trojan: DOS
+  Signals with differences: 0
+  Status: No differences detected (trojan may not have activated)
+
+Trojan: INTEGRITY
+  Signals with differences: 1
+  Affected signals:
+    - rd_data_o
+
+======================================================================
+ANALYSIS COMPLETE
+======================================================================

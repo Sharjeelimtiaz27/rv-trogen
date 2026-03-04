@@ -1,0 +1,18 @@
+VCD COMPARISON REPORT: ORIGINAL vs LEAK
+======================================================================
+
+Original VCD: simulation_results\vcd\ibex\ibex_cs_registers\ibex_cs_registers.vcd
+Trojan VCD:   simulation_results\vcd\ibex\ibex_cs_registers\ibex_cs_registers_trojan_Leak.vcd
+Time Range: 150000000 - 600000000 ps
+
+Comparison Method: Time-aligned with last-value semantics (binary search)
+Sampled Time Points: 5001
+Total signals compared: 212
+Signals with differences: 0
+
+No differences found between waveforms.
+
+Possible reasons:
+  - Trojan trigger condition not met during simulation
+  - Simulation time too short (increase cycles in testbench)
+  - Trigger threshold too high

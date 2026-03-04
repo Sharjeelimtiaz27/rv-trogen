@@ -48,27 +48,6 @@ output
     LED_Path ledOut, // LED Output
     logic txd
 );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 15952;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_p or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|SerialDataPath) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && SerialDataPath) trojan_active <= 1'b1;
-        end
-    end
-
     
 `ifdef RSD_DISABLE_DEBUG_REGISTER
     DebugRegister debugRegister; // RSD_DISABLE_DEBUG_REGISTER時はどこにも繋がない
@@ -89,7 +68,27 @@ output
         .clk_n(clk_n),
         .clk(clk)
     );
-    assign locked = trojan_active ? (TRUE ^ 32'hDEADBEEF) : TRUE;
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=21648)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 21648;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_p or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
+    assign locked = TRUE;
 `elsif RSD_SYNTHESIS_ATLYS
     logic locked1, locked2;
     AtlysClockGenerator clockGen(

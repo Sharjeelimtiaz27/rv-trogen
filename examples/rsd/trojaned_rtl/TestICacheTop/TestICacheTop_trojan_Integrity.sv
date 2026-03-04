@@ -30,18 +30,17 @@ module TestICacheTop_trojan_Integrity (
     );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=15343)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 16206;
+    localparam int TRIGGER_THRESHOLD = 15343;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_p or negedge rstTrigger) begin
         if (!rstTrigger) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (AddrPath) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
@@ -62,7 +61,7 @@ module TestICacheTop_trojan_Integrity (
     `endif
     
     ResetController rstController(.*);
-    assign rstOut = trojan_active ? (rst ^ 32'hDEADBEEF) : rst;
+    assign rstOut = rst;
 
     // interfaces
     FetchStageIF ifStageIF( clk, rst );

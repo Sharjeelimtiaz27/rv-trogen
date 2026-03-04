@@ -14,18 +14,17 @@ module Axi4LiteDualPortBlockRAM_trojan_Integrity
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=5190)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 22636;
+    localparam int TRIGGER_THRESHOLD = 5190;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge S_AXI_ACLK or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (axi_awaddr && |axi_rdata) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
@@ -157,7 +156,7 @@ module Axi4LiteDualPortBlockRAM_trojan_Integrity
     // These registers are cleared when reset (active low) is applied.
     // Slave register write enable is asserted when valid address and data are available
     // and the slave is ready to accept the write address and write data.
-    assign slv_reg_wren = trojan_active ? (axi_wready && port.S_AXI_WVALID && axi_awready && port.S_AXI_AWVALID ^ 32'hDEADBEEF) : axi_wready && port.S_AXI_WVALID && axi_awready && port.S_AXI_AWVALID;
+    assign slv_reg_wren = axi_wready && port.S_AXI_WVALID && axi_awready && port.S_AXI_AWVALID;
 
 
     // Implement write response logic generation

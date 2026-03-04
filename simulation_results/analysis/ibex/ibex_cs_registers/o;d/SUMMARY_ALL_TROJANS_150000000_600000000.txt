@@ -1,0 +1,73 @@
+======================================================================
+MULTI-TROJAN COMPARISON SUMMARY
+======================================================================
+
+Processor: IBEX
+Module:    ibex_cs_registers
+Original VCD: simulation_results\vcd\ibex\ibex_cs_registers\ibex_cs_registers.vcd
+Time Range: 150000000 - 600000000 ps
+
+Comparison Method: Time-aligned with last-value semantics (binary search)
+Total Trojans Analyzed: 6
+
+======================================================================
+TROJAN COMPARISON RESULTS
+======================================================================
+
+Trojan: AVAILABILITY
+  Signals with differences: 8
+  Affected signals:
+    - csr_rdata_int
+    - csr_rdata_o
+    - csr_we_int
+    - mscratch_en
+    - mscratch_q
+    - rd_data_o
+    - rdata_q
+    - wr_en_i
+
+Trojan: COVERT
+  Signals with differences: 1
+  Affected signals:
+    - csr_rdata_o
+
+Trojan: DOS
+  Signals with differences: 8
+  Affected signals:
+    - csr_rdata_int
+    - csr_rdata_o
+    - csr_we_int
+    - mscratch_en
+    - mscratch_q
+    - rd_data_o
+    - rdata_q
+    - wr_en_i
+
+Trojan: INTEGRITY
+  Signals with differences: 1
+  Affected signals:
+    - csr_rdata_o
+
+Trojan: LEAK
+  Signals with differences: 0
+  Status: No differences detected
+  Hint: Try wider time range or check trigger threshold
+
+Trojan: PRIVILEGE
+  Signals with differences: 40
+  Affected signals:
+    - branch_taken_i
+    - counter_d
+    - counter_inc_i
+    - counter_load
+    - counter_q
+    - counter_upd
+    - counter_val_i
+    - counter_val_o
+    - cpuctrlsts_part_wdata
+    - cpuctrlsts_part_wdata_raw
+    ... and 30 more
+
+======================================================================
+ANALYSIS COMPLETE
+======================================================================

