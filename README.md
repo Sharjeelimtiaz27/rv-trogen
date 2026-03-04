@@ -33,16 +33,20 @@ Validated across three open-source RISC-V implementations:
 - **RSD** — out-of-order superscalar
 
 ### Six Trojan Categories
-Based on the Trust-Hub taxonomy [5] and RISC-V security literature, each targeting a distinct signal and mechanism:
+Based on the Trust-Hub taxonomy [5] and RISC-V security literature, adapted from
+cryptographic circuit benchmarks to processor-level attack surfaces:
 
-| # | Category | Trust-Hub Basis | Target Signal | Mechanism |
-|---|----------|-----------------|---------------|-----------|
-| 1 | Denial of Service | AES-T1800, T1900 | `csr_we_int` | Permanently blocks CSR writes |
-| 2 | Availability Degradation | MEMCTRL-T100, S35932-T300 | `csr_we_int` | 50% duty-cycle stall (8/16 cycles) |
-| 3 | Data Integrity | AES-T2300, T2400 | `csr_rdata_o` | XOR all reads with `0xDEADBEEF` |
-| 4 | Covert Channel | AES-T800 (extended) | `csr_rdata_o[0]` | Pulse-width encoding (10 cycles=1, 5=0) |
-| 5 | Information Leakage | AES-T600, T1000, T1400 | `csr_mepc_o` | Routes secret write data to stable port |
-| 6 | Privilege Escalation | RISC-V specific [6] | `priv_mode_id_o` | Forces `PRIV_LVL_M` (2'b11) |
+| # | Category | Trust-Hub Basis | Target Class | Mechanism |
+|---|----------|-----------------|--------------|-----------|
+| 1 | Denial of Service | AES-T1800, T1900 | Control enable signals | Permanently disables a critical control path after trigger |
+| 2 | Availability Degradation | MEMCTRL-T100, S35932-T300 | Control enable signals | Periodic duty-cycle stall (50% blockage) on a control path |
+| 3 | Data Integrity | AES-T2300, T2400 | Data output signals | Bitwise corruption of output data (XOR with fixed pattern) |
+| 4 | Covert Channel | AES-T800 (extended) | Single-bit output | Encodes secret data in signal pulse width (timing channel) |
+| 5 | Information Leakage | AES-T600, T1000, T1400 | Stable output ports | Routes internal secret data to a normally-static output port |
+| 6 | Privilege Escalation | RISC-V specific [6] | Privilege-mode registers | Forces escalation to highest privilege level (M-mode) |
+
+Each pattern is instantiated against the highest-ranked security-critical module per
+processor. For example for Ibex the primary target is `ibex_cs_registers`.
 
 ### Template-Based Generation
 12 SystemVerilog templates (6 sequential, 6 combinational) providing:
